@@ -8,7 +8,8 @@ const fetch = require("node-fetch");
     const slackUsers = JSON.parse(core.getInput("slack-users"));
     // Get the JSON webhook payload for the event that triggered the workflow
     const payload = JSON.stringify(github.context.payload, undefined, 2);
-    console.log(`The event payload: ${payload}`);
+    console.log("payload", payload);
+    console.log("payload.sender", payload.sender);
 
     const options = {
       body: JSON.stringify({
