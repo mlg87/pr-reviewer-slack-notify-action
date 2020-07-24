@@ -2,7 +2,7 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const fetch = require("node-fetch");
 
-(() => {
+(async () => {
   try {
     const channel = core.getInput("channel");
     // `slack-users` input defined in action metadata file
@@ -15,11 +15,11 @@ const fetch = require("node-fetch");
     );
     const baseMessage = `${github.context.payload.sender.login} is requesting your review on ${github.context.payload.pull_request._links.html.href}`;
     console.log("requested_reviewers", requested_reviewers);
-    
+
     if (!channel) {
       const options = {
         body: JSON.stringify({
-          text: baseMessage
+          text: baseMessage,
         }),
         headers: { "Content-Type": "application/json" },
         method: "POST",
@@ -30,9 +30,11 @@ const fetch = require("node-fetch");
         }
       });
     } else {
-      const usersToAt = slackUsers.filter(user => requested_reviewers.includes(user.github_username));
+      const usersToAt = slackUsers.filter((user) =>
+        requested_reviewers.includes(user.github_username)
+      );
       let usersToAtString;
-      usersToAt.forEach(user => {
+      usersToAt.forEach((user) => {
         if (!usersToAtString) {
           usersToAtString = `@${user.slack_username}`;
           return;
@@ -42,14 +44,13 @@ const fetch = require("node-fetch");
       });
       const options = {
         body: JSON.stringify({
-          text: `${usersToAtString}`
+          text: `${usersToAtString}`,
         }),
         headers: { "Content-Type": "application/json" },
         method: "POST",
       };
       await fetch(channel, options);
     }
-
   } catch (error) {
     core.setFailed(error.message);
   }
