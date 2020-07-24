@@ -8,6 +8,7 @@ const fetch = require("node-fetch");
     const slackUsers = JSON.parse(core.getInput("slack-users"));
     // Get the JSON webhook payload for the event that triggered the workflow
     const payload = JSON.stringify(github.context.payload, undefined, 2);
+    console.log(`The event payload: ${payload}`);
 
     const options = {
       body: JSON.stringify({
@@ -19,8 +20,6 @@ const fetch = require("node-fetch");
     slackUsers.forEach(async (user) => {
       await fetch(user.slack_webhook, options);
     });
-
-    console.log(`The event payload: ${payload}`);
   } catch (error) {
     core.setFailed(error.message);
   }
