@@ -44,7 +44,7 @@ const fetch = require("node-fetch");
       });
       const options = {
         body: JSON.stringify({
-          text: `${usersToAtString}`,
+          text: `${usersToAtString} ${baseMessage}`,
         }),
         headers: { "Content-Type": "application/json" },
         method: "POST",
