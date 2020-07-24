@@ -36,10 +36,10 @@ const fetch = require("node-fetch");
       let usersToAtString;
       usersToAt.forEach((user) => {
         if (!usersToAtString) {
-          usersToAtString = `@${user.slack_username}`;
+          usersToAtString = `<@${user.slack_id}>`;
           return;
         }
-        usersToAtString = `${usersToAtString}, @${user.slack_username}`;
+        usersToAtString = `${usersToAtString}, <@${user.slack_id}>`;
         return;
       });
       const options = {
