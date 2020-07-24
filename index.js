@@ -9,13 +9,10 @@ const fetch = require("node-fetch");
     // Get the JSON webhook payload for the event that triggered the workflow
     const payload = JSON.stringify(github.context.payload, undefined, 2);
     console.log("payload", payload);
-    console.log("keys of payload", Object.keys(payload));
-
-    console.log("payload.sender", payload.sender);
 
     const options = {
       body: JSON.stringify({
-        text: `${payload.sender.login} is requesting your review on ${payload.pull_request._links.html.href}`,
+        text: `${github.context.payload.sender.login} is requesting your review on ${github.context.payload.pull_request._links.html.href}`,
       }),
       headers: { "Content-Type": "application/json" },
       method: "POST",
