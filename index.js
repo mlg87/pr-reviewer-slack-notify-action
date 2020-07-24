@@ -15,15 +15,15 @@ const fetch = require("node-fetch");
     );
     console.log("requested_reviewers", requested_reviewers);
 
-    const options = {
-      body: JSON.stringify({
-        text: `${github.context.payload.sender.login} is requesting your review on ${github.context.payload.pull_request._links.html.href}`,
-      }),
-      headers: { "Content-Type": "application/json" },
-      method: "POST",
-    };
     slackUsers.forEach(async (user) => {
       if (requested_reviewers.includes(user.github_username)) {
+        const options = {
+          body: JSON.stringify({
+            text: `@${user.slack_username}, ${github.context.payload.sender.login} is requesting your review on ${github.context.payload.pull_request._links.html.href}`,
+          }),
+          headers: { "Content-Type": "application/json" },
+          method: "POST",
+        };
         await fetch(user.slack_webhook, options);
       }
     });
