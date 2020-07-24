@@ -1,13 +1,10 @@
 name: "PR Reviewer Slack Notify"
 description: "Slide into DMs when adding people to review your PR."
 inputs:
-  who-to-greet: # id of input
-    description: "Who to greet"
+  slack-users: # id of input
+    description: "This is JSON stringified array of the users you would like to be able to notify via slack when they are requested to review a PR. The format should be [{ slack_username: string, github_username: string, slack_webhook_url: string }]"
     required: true
-    default: "World"
-outputs:
-  time: # id of output
-    description: "The time we greeted you"
+    default: "[]"
 runs:
   using: "node12"
   main: "index.js"
