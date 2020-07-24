@@ -10,6 +10,10 @@ const fetch = require("node-fetch");
     const payload = JSON.stringify(github.context.payload, undefined, 2);
     console.log("payload", payload);
 
+    const requested_reviewers = github.context.payload.pull_request.requested_reviewers.map(
+      (user) => user.login
+    );
+
     const options = {
       body: JSON.stringify({
         text: `${github.context.payload.sender.login} is requesting your review on ${github.context.payload.pull_request._links.html.href}`,
@@ -18,7 +22,9 @@ const fetch = require("node-fetch");
       method: "POST",
     };
     slackUsers.forEach(async (user) => {
-      await fetch(user.slack_webhook, options);
+      if (requested_reviewers.includes(user.github_username)) {
+        await fetch(user.slack_webhook, options);
+      }
     });
   } catch (error) {
     core.setFailed(error.message);
