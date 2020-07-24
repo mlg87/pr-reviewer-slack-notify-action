@@ -9,6 +9,8 @@ const fetch = require("node-fetch");
     // Get the JSON webhook payload for the event that triggered the workflow
     const payload = JSON.stringify(github.context.payload, undefined, 2);
     console.log("payload", payload);
+    console.log("keys of payload", Object.keys(payload));
+
     console.log("payload.sender", payload.sender);
 
     const options = {
