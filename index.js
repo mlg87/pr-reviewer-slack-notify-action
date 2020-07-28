@@ -13,9 +13,11 @@ const fetch = require("node-fetch");
     // Get the JSON webhook payload for the event that triggered the workflow
     // const payload = JSON.stringify(github.context.payload, undefined, 2);
     // console.log("payload", payload);
-    const requested_reviewers = github.context.payload.pull_request.requested_reviewers.map(
+    const requestedReviewers = github.context.payload.pull_request.requested_reviewers.map(
       (user) => user.login
     );
+    console.log("requested_reviewers", requestedReviewers);
+
     const baseMessage = `${github.context.payload.sender.login} is requesting your review on ${github.context.payload.pull_request._links.html.href}`;
 
     // if there is no channelWebhook specified, DM the requested reviewers
@@ -28,13 +30,13 @@ const fetch = require("node-fetch");
         method: "POST",
       };
       slackUsers.forEach(async (user) => {
-        if (requested_reviewers.includes(user.github_username)) {
+        if (requestedReviewers.includes(user.github_username)) {
           await fetch(user.slack_webhook, options);
         }
       });
     } else {
       const usersToAt = slackUsers.filter((user) =>
-        requested_reviewers.includes(user.github_username)
+        requestedReviewers.includes(user.github_username)
       );
       let usersToAtString;
       usersToAt.forEach((user) => {
