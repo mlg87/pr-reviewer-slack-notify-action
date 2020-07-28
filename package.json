@@ -1,6 +1,6 @@
 {
   "name": "pr-reviewer-slack-notify",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Notify requested PR reviewers via slack so they actually know that you want them to look at something because people don't check email.",
   "main": "index.js",
   "repository": "git@github.com:mlg87/pr-reviewer-slack-notify.git",
