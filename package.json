@@ -1,14 +1,14 @@
 {
   "name": "pr-reviewer-slack-notify",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Notify requested PR reviewers via slack so they actually know that you want them to look at something because people don't check email.",
   "main": "index.js",
   "repository": "git@github.com:mlg87/pr-reviewer-slack-notify.git",
   "author": "Mason Goetz <masonlgoetz@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.4",
-    "@actions/github": "^4.0.0",
-    "node-fetch": "^2.6.0"
+    "@actions/core": "1.2.4",
+    "@actions/github": "4.0.0",
+    "node-fetch": "2.6.0"
   }
 }

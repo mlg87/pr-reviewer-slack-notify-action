@@ -1,12 +1,12 @@
-name: "PR Reviewer Slack Notify"
-description: "Slide into DMs when adding people to review your PR."
+name: "PR Reviewer Slack Notify Action"
+description: "Slide into DMs or blow up a channel with @s when adding people to review your PR."
 inputs:
-  channel:
-    description: "Channel to post to."
+  channel-webhook:
+    description: "Webhook for the channel you would like the message posted to."
     required: false
     default: ""
   slack-users: # id of input
-    description: "This is JSON stringified array of the users you would like to be able to notify via slack when they are requested to review a PR. The format should be [{ slack_username: string, github_username: string, slack_webhook_url: string }]"
+    description: "This is JSON stringified array of the users you would like to be able to notify via slack when they are requested to review a PR. The format should be [{ github_username: string, slack_id: string,  slack_webhook: string }]"
     required: true
     default: "[]"
 runs:

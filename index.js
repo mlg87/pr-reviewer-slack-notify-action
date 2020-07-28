@@ -4,7 +4,7 @@ const fetch = require("node-fetch");
 
 (async () => {
   try {
-    const channel = core.getInput("channel");
+    const channelWebhook = core.getInput("channel-webhook");
     // `slack-users` input defined in action metadata file
     const slackUsers = JSON.parse(core.getInput("slack-users"));
     // Get the JSON webhook payload for the event that triggered the workflow
@@ -14,9 +14,9 @@ const fetch = require("node-fetch");
       (user) => user.login
     );
     const baseMessage = `${github.context.payload.sender.login} is requesting your review on ${github.context.payload.pull_request._links.html.href}`;
-    console.log("requested_reviewers", requested_reviewers);
 
-    if (!channel) {
+    // if there is no channelWebhook specified, DM the requested reviewers
+    if (!channelWebhook) {
       const options = {
         body: JSON.stringify({
           text: baseMessage,
@@ -49,7 +49,7 @@ const fetch = require("node-fetch");
         headers: { "Content-Type": "application/json" },
         method: "POST",
       };
-      await fetch(channel, options);
+      await fetch(channelWebhook, options);
     }
   } catch (error) {
     core.setFailed(error.message);
