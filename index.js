@@ -4,6 +4,9 @@ const fetch = require("node-fetch");
 
 (async () => {
   try {
+    const actionType = github.context.payload.action;
+    console.log("actionType", actionType);
+
     const channelWebhook = core.getInput("channel-webhook");
     // `slack-users` input defined in action metadata file
     const slackUsers = JSON.parse(core.getInput("slack-users"));
