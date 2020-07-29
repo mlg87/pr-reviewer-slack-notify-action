@@ -9,6 +9,9 @@ const fetch = require("node-fetch");
     const requestedReviewers = github.context.payload.pull_request.requested_reviewers.map(
       (user) => user.login
     );
+    if (!requestedReviewers.length) {
+      return null;
+    }
     const baseMessage = `${github.context.payload.sender.login} is requesting your review on ${github.context.payload.pull_request._links.html.href}`;
 
     const usersToAt = slackUsers.filter((user) =>
