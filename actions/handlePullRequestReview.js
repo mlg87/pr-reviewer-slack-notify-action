@@ -2,6 +2,7 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const { slackWebClient } = require("../utils");
 
+// TODO use actual values from artifacts
 const SLACK_MESSAGE_ID = "1597439544.023300";
 const PR_NUMBER = 2;
 
@@ -38,12 +39,17 @@ module.exports = async () => {
       timestamp: SLACK_MESSAGE_ID,
     });
 
+    let hasReaction = false;
     // return out if the reaction we would add is already present (since we cant have the bot react on behalf of a user)
     existingReactionsRes.message.reactions.forEach((reaction) => {
       if (reaction.name === reactionToAdd) {
-        return null;
+        hasReaction = true;
       }
     });
+
+    if (hasReaction) {
+      return null;
+    }
 
     return await slackWebClient.reactions.add({
       channel: channelId,
