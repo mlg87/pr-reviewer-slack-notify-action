@@ -39,6 +39,20 @@ module.exports = async () => {
       timestamp: SLACK_MESSAGE_ID,
     });
 
+    const [reviewer] = slackUsers.filter((user) => {
+      return user.github_username === review.user.login;
+    });
+    const [author] = slackUsers.filter((user) => {
+      return user.github_username === pull_request.user.login;
+    });
+    const messageText = `<@${author.slack_id}>, ${reviewer.github_username} ${review.state} your PR`;
+    // post corresponding message
+    await slackWebClient.chat.postMessage({
+      channel: channelId,
+      thread_ts: SLACK_MESSAGE_ID,
+      text: messageText,
+    });
+
     let hasReaction = false;
     // return out if the reaction we would add is already present (since we cant have the bot react on behalf of a user)
     existingReactionsRes.message.reactions.forEach((reaction) => {
@@ -52,23 +66,10 @@ module.exports = async () => {
     }
 
     // add new reactions
-    await slackWebClient.reactions.add({
+    return await slackWebClient.reactions.add({
       channel: channelId,
       timestamp: SLACK_MESSAGE_ID,
       name: reactionToAdd,
-    });
-    const [reviewer] = slackUsers.filter((user) => {
-      return user.github_username === review.user.login;
-    });
-    const [author] = slackUsers.filter((user) => {
-      return user.github_username === pull_request.user.login;
-    });
-    const messageText = `<@${author.slack_id}>, ${reviewer.github_username} ${review.state} your PR`;
-    // post corresponding message
-    return await slackWebClient.chat.postMessage({
-      channel: channelId,
-      thread_ts: SLACK_MESSAGE_ID,
-      text: messageText,
     });
   } catch (error) {
     core.setFailed(error.message);
