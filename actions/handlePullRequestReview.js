@@ -25,17 +25,30 @@ module.exports = async () => {
       return null;
     }
 
-    let reaction = reactionMap["changes-requested"];
+    let reactionToAdd = reactionMap["changes-requested"];
     if (review.state === "commented") {
-      reaction = reactionMap["commented"];
+      reactionToAdd = reactionMap["commented"];
     } else if (review.state === "approved") {
-      reaction = reactionMap["approved"];
+      reactionToAdd = reactionMap["approved"];
     }
+
+    // get existing reactions on message
+    const existingReactionsRes = await slackWebClient.reactions.get({
+      channel: channelId,
+      timestamp: SLACK_MESSAGE_ID,
+    });
+
+    // return out if the reaction we would add is already present (since we cant have the bot react on behalf of a user)
+    existingReactionsRes.message.reactions.forEach((reaction) => {
+      if (reaction.name === reactionToAdd) {
+        return null;
+      }
+    });
 
     return await slackWebClient.reactions.add({
       channel: channelId,
       timestamp: SLACK_MESSAGE_ID,
-      name: reaction,
+      name: reactionToAdd,
     });
   } catch (error) {
     core.setFailed(error.message);
