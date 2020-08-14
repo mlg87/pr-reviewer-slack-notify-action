@@ -35,7 +35,6 @@ module.exports = async () => {
       usersToAtString = `${usersToAtString}, <@${user.slack_id}>`;
       return;
     });
-    // TODO save ids to artifact here
     // See: https://api.slack.com/methods/chat.postMessage
     prSlackMsg = await slackWebClient.chat.postMessage({
       channel: channelId,
