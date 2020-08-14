@@ -1,4 +1,5 @@
 const core = require("@actions/core");
+const github = require("@actions/github");
 const { slackWebClient } = require("../utils/slackWebClient");
 
 module.exports = async () => {
