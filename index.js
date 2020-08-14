@@ -33,7 +33,8 @@ const fetch = require("node-fetch");
       headers: { "Content-Type": "application/json" },
       method: "POST",
     };
-    await fetch(channelWebhook, options);
+    const res = await fetch(channelWebhook, options);
+    console.log("res", res);
   } catch (error) {
     core.setFailed(error.message);
   }
