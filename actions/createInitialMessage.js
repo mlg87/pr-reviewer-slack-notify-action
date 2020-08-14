@@ -50,12 +50,12 @@ module.exports = async () => {
     };
 
     const jsonFilePath =
-      "~/artifacts/pr-reviewer-slack-notify-action-data.json";
+      "./pr-reviewer-slack-notify-action-data.json";
 
     fs.writeFileSync(jsonFilePath, JSON.stringify(githubArtifact));
     const artifactClient = artifact.create();
     const artifactName = "pr-reviewer-slack-notify-action-data";
-    const rootDir = "~/artifacts";
+    const rootDir = "./";
     const uploadResult = await artifactClient.uploadArtifact(
       artifactName,
       jsonFilePath,
