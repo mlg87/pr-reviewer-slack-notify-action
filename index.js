@@ -5,12 +5,11 @@ const fetch = require("node-fetch");
 const { createInitialMessage } = require("./actions");
 
 (async () => {
-  const { payload } = github.context;
-  console.log("github.context", github.context);
-
+  const { eventName, payload } = github.context;
+  console.log("eventName", eventName);
   // route to the appropriate action
   // triggered by one of the pull_request events (opened, ready_for_review, merged)
-  if (!!payload.pull_request) {
+  if (eventName === "pull_request") {
     if (payload.action === "opened" || payload.action === "ready_for_review") {
       const res = await createInitialMessage();
       // TODO store the message id and the PR number in the artifact
@@ -20,11 +19,11 @@ const { createInitialMessage } = require("./actions");
     }
   }
   // push of commit
-  else if (!!payload.pusher) {
+  else if (eventName === "push") {
     // TODO add handler for new code here
   }
   // a review has been submitted
-  else if (!!payload.review) {
+  else if (eventName === "pull_request_review") {
     // TODO add payload.review.state here (commented, approved, changes requested)
   }
 
