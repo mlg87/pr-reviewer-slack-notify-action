@@ -16,9 +16,9 @@ module.exports = async () => {
   try {
     const channelId = core.getInput("channel-id");
     const slackUsers = JSON.parse(core.getInput("slack-users"));
-    const requestedReviewers = github.context.payload.pull_request.requested_reviewers.map(
-      (user) => user.login
-    );
+    // const requestedReviewers = github.context.payload.pull_request.requested_reviewers.map(
+    //   (user) => user.login
+    // );
     const { action, pull_request, review } = github.context.payload;
 
     // TODO handle more than just submitted PRs
@@ -51,10 +51,24 @@ module.exports = async () => {
       return null;
     }
 
-    return await slackWebClient.reactions.add({
+    // add new reactions
+    await slackWebClient.reactions.add({
       channel: channelId,
       timestamp: SLACK_MESSAGE_ID,
       name: reactionToAdd,
+    });
+    const [reviewer] = slackUsers.filter((user) => {
+      return user.github_username === review.user.login;
+    });
+    const [author] = slackUsers.filter((user) => {
+      return user.github_username === pull_request.user.login;
+    });
+    const messageText = `<@${author.slack_id}>, ${reviewer.github_username} ${review.state} your PR`;
+    // post corresponding message
+    return await slackWebClient.chat.postMessage({
+      channel: channelId,
+      thread_ts: SLACK_MESSAGE_ID,
+      text: messageText,
     });
   } catch (error) {
     core.setFailed(error.message);
