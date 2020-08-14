@@ -2,7 +2,7 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const fetch = require("node-fetch");
 
-const { createInitialMessage } = require("./actions");
+const { createInitialMessage, handlePullRequestReview } = require("./actions");
 
 (async () => {
   const { eventName, payload } = github.context;
@@ -31,6 +31,8 @@ const { createInitialMessage } = require("./actions");
   // a review has been submitted
   else if (eventName === "pull_request_review") {
     // TODO add payload.review.state here (commented, approved, changes requested)
+    const reactionRes = await handlePullRequestReview();
+    console.log("reactionRes", reactionRes);
   }
 
   // NOTE
