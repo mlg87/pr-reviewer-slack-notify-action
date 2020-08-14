@@ -13,6 +13,12 @@ const { createInitialMessage } = require("./actions");
     if (payload.action === "opened" || payload.action === "ready_for_review") {
       const res = await createInitialMessage();
       // TODO store the message id and the PR number in the artifact
+      /**
+      {
+        "slack_message_id": String,
+        "github_pr_number": Number,
+      }
+       */
       console.log("init msg res", res);
     } else if (payload.action === "merged") {
       // TODO add handler for closing out the process here
