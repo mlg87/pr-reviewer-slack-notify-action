@@ -1,7 +1,7 @@
 const core = require("@actions/core");
 const { slackWebClient } = require("../utils/slackWebClient");
 
-module.export = async () => {
+module.exports = async () => {
   try {
     const channelId = core.getInput("channel-id");
     const slackUsers = JSON.parse(core.getInput("slack-users"));
