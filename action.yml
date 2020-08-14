@@ -4,10 +4,12 @@ branding:
   color: blue
   icon: at-sign
 inputs:
-  channel-webhook:
-    description: "Webhook for the channel you would like the message posted to."
+  bot-token:
+    description: "OAuth token for your Slack App Bot to sign requests to Slack's API with."
     required: true
-    default: ""
+  channel-id:
+    description: "ID of the channel or conversation in Slack you would like messages posted to."
+    required: true
   slack-users: # id of input
     description: "This is JSON stringified array of the users you would like to be able to notify via slack when they are requested to review a PR. The format should be [{ github_username: string, slack_id: string,  slack_webhook: string }]"
     required: true
