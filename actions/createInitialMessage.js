@@ -1,9 +1,8 @@
-const fs = require('fs);')
+const fs = require("fs");
 const core = require("@actions/core");
 const github = require("@actions/github");
 const artifact = require("@actions/artifact");
 const { slackWebClient } = require("../utils");
-const actions = require(".");
 
 module.exports = async () => {
   const { payload } = github.context;
@@ -41,25 +40,29 @@ module.exports = async () => {
       text: `${usersToAtString} ${baseMessage}`,
     });
 
-    if (prSlackMsg.ok === false || !!prSlackMsg.ts) throw Error('failed to create initial slack message')
+    if (prSlackMsg.ok === false || !!prSlackMsg.ts)
+      throw Error("failed to create initial slack message");
 
     // we want to create some json and store this as an github artifact
     const githubArtifact = {
-      "slack_message_id": prSlackMsg.ts,
-      "github_pr_number": payload.number,
-    }
+      slack_message_id: prSlackMsg.ts,
+      github_pr_number: payload.number,
+    };
 
-    const jsonFilePath = 'artifacts/pr-reviewer-slack-notify-action-data.json';
+    const jsonFilePath = "artifacts/pr-reviewer-slack-notify-action-data.json";
 
-    fs.writeFileSync(jsonFilePath, JSON.stringify(githubArtifact))
+    fs.writeFileSync(jsonFilePath, JSON.stringify(githubArtifact));
     const artifactClient = artifact.create();
-    const artifactName = 'pr-reviewer-slack-notify-action-data';
-    const uploadResult = await artifactClient.uploadArtifact(artifactName, jsonFilePath, rootDir);
+    const artifactName = "pr-reviewer-slack-notify-action-data";
+    const uploadResult = await artifactClient.uploadArtifact(
+      artifactName,
+      jsonFilePath,
+      rootDir
+    );
 
     // there should be no failed files.
-    if (uploadResult.failedItems.length > 0) throw Error('failed to upload github artifact')
-
-
+    if (uploadResult.failedItems.length > 0)
+      throw Error("failed to upload github artifact");
   } catch (error) {
     core.setFailed(error.message);
   }
