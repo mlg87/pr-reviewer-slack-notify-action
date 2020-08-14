@@ -1,5 +1,6 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
+const artifact = require("@actions/artifact");
 const { slackWebClient } = require("../utils");
 
 // TODO use actual values from artifacts
@@ -32,6 +33,14 @@ module.exports = async () => {
     } else if (review.state === "approved") {
       reactionToAdd = reactionMap["approved"];
     }
+
+    // get slack id and PR number from artifacts
+    const artifactClient = artifact.create();
+    const artifactName = "pr-reviewer-slack-notify-action-data";
+    const info = await artifactClient.downloadArtifact(artifactName);
+    const parsed = JSON.parse(info);
+
+    console.log("parsed", parsed);
 
     // get existing reactions on message
     const existingReactionsRes = await slackWebClient.reactions.get({
