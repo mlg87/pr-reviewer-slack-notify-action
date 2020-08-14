@@ -50,17 +50,21 @@ module.exports = async () => {
     };
 
     const jsonFilePath =
-      "./pr-reviewer-slack-notify-action-data.json";
+      "artifact/pr-reviewer-slack-notify-action-data.json";
 
     fs.writeFileSync(jsonFilePath, JSON.stringify(githubArtifact));
+
+    console.log('cwd:' + process.cwd())
     const artifactClient = artifact.create();
     const artifactName = "pr-reviewer-slack-notify-action-data";
-    const rootDir = "./";
+    const rootDir = "artifact";
     const uploadResult = await artifactClient.uploadArtifact(
       artifactName,
       jsonFilePath,
       rootDir
     );
+
+  
 
     // there should be no failed files.
     if (uploadResult.failedItems.length > 0)
