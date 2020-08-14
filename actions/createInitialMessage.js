@@ -62,7 +62,7 @@ module.exports = async () => {
     const rootDir = path.resolve(__dirname);
     const uploadResult = await artifactClient.uploadArtifact(
       artifactName,
-      jsonFilePath,
+      [jsonFilePath],
       rootDir
     );
 
