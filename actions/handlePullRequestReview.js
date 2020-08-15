@@ -41,6 +41,8 @@ module.exports = async () => {
       repo: repository.name,
       issue_number: pull_request.number,
     });
+    console.log("comments", comments);
+
     let slackMessageId;
     comments.forEach((comment) => {
       const match = comment.body.match(/SLACK_MESSAGE_ID:[0-9]{1,}.[0-9]{1,}/);
