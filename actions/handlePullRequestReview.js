@@ -67,6 +67,19 @@ module.exports = async () => {
     const [author] = slackUsers.filter((user) => {
       return user.github_username === pull_request.user.login;
     });
+
+    if (!reviewer) {
+      throw Error(
+        `Could not map ${review.user.login} to the users you provided in action.yml`
+      );
+    }
+
+    if (!author) {
+      throw Error(
+        `Could not map ${pull_request.user.login} to the users you provided in action.yml`
+      );
+    }
+
     const messageText = `<@${author.slack_id}>, ${reviewer.github_username} ${review.state} your PR`;
     // post corresponding message
     await slackWebClient.chat.postMessage({
