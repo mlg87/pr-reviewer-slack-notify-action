@@ -85,12 +85,17 @@ module.exports = async () => {
     });
 
     let hasReaction = false;
-    // return out if the reaction we would add is already present (since we cant have the bot react on behalf of a user)
-    existingReactionsRes.message.reactions.forEach((reaction) => {
-      if (reaction.name === reactionToAdd) {
-        hasReaction = true;
-      }
-    });
+    if (
+      existingReactionsRes.message.reactions &&
+      existingReactionsRes.message.reactions.length
+    ) {
+      // return out if the reaction we would add is already present (since we cant have the bot react on behalf of a user)
+      existingReactionsRes.message.reactions.forEach((reaction) => {
+        if (reaction.name === reactionToAdd) {
+          hasReaction = true;
+        }
+      });
+    }
 
     if (hasReaction) {
       return null;
