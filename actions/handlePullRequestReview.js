@@ -36,15 +36,13 @@ module.exports = async () => {
     // get slack id and PR number from pull comment
     const token = core.getInput("github-token");
     const octokit = github.getOctokit(token);
-    const comments = await octokit.issues.listComments({
+    const commentRes = await octokit.issues.listComments({
       owner: repository.owner.login,
       repo: repository.name,
       issue_number: pull_request.number,
     });
-    console.log("comments", comments);
-
     let slackMessageId;
-    comments.forEach((comment) => {
+    commentRes.data.forEach((comment) => {
       const match = comment.body.match(/SLACK_MESSAGE_ID:[0-9]{1,}.[0-9]{1,}/);
       if (match) {
         slackMessageId = match[0];
