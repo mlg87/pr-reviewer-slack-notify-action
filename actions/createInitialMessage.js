@@ -1,8 +1,5 @@
-const fs = require("fs");
-const path = require("path");
 const core = require("@actions/core");
 const github = require("@actions/github");
-const artifact = require("@actions/artifact");
 const { slackWebClient } = require("../utils");
 
 module.exports = async () => {
@@ -41,36 +38,17 @@ module.exports = async () => {
       text: `${usersToAtString} ${baseMessage}`,
     });
 
-    if (prSlackMsg.ok === false || !prSlackMsg.ts)
+    if (!prSlackMsg.ok || !prSlackMsg.ts)
       throw Error("failed to create initial slack message");
 
-    // we want to create some json and store this as an github artifact
-    const githubArtifact = {
-      slack_message_id: prSlackMsg.ts,
-      github_pr_number: payload.number,
-    };
-
-    console.log('cwd:' + process.cwd())
-
-    const jsonFilePath = path.resolve(__dirname, "pr-reviewer-slack-notify-action-data.json");
-
-    fs.writeFileSync(jsonFilePath, JSON.stringify(githubArtifact));
-
-
-    const artifactClient = artifact.create();
-    const artifactName = "pr-reviewer-slack-notify-action-data";
-    const rootDir = path.resolve(__dirname);
-    const uploadResult = await artifactClient.uploadArtifact(
-      artifactName,
-      [jsonFilePath],
-      rootDir
-    );
-
-  
-
-    // there should be no failed files.
-    if (uploadResult.failedItems.length > 0)
-      throw Error("failed to upload github artifact");
+    const token = core.getInput("github-token");
+    const octokit = github.getOctokit(token);
+    return await octokit.issues.createComment({
+      owner: payload.repository.owner.login,
+      repo: payload.repository.name,
+      issue_number: payload.number,
+      body: `SLACK_MESSAGE_ID:${prSlackMsg.ts}`,
+    });
   } catch (error) {
     core.setFailed(error.message);
   }
