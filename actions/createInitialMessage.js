@@ -41,8 +41,8 @@ module.exports = async () => {
     if (!prSlackMsg.ok || !prSlackMsg.ts)
       throw Error("failed to create initial slack message");
 
-    const token = core.getInput("github-token");
-    const octokit = github.getOctokit(token);
+    const ghToken = core.getInput("github-token");
+    const octokit = github.getOctokit(ghToken);
     return await octokit.issues.createComment({
       owner: payload.repository.owner.login,
       repo: payload.repository.name,

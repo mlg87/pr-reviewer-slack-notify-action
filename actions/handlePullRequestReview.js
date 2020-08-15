@@ -1,6 +1,7 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
-const { slackWebClient } = require("../utils");
+
+const { getSlackMessageId, slackWebClient } = require("../utils");
 
 const reactionMap = {
   commented: "speech_balloon",
@@ -12,9 +13,6 @@ module.exports = async () => {
   try {
     const channelId = core.getInput("channel-id");
     const slackUsers = JSON.parse(core.getInput("slack-users"));
-    // const requestedReviewers = github.context.payload.pull_request.requested_reviewers.map(
-    //   (user) => user.login
-    // );
     const { action, pull_request, repository, review } = github.context.payload;
 
     // TODO handle more than just submitted PRs
@@ -29,27 +27,7 @@ module.exports = async () => {
       reactionToAdd = reactionMap["approved"];
     }
 
-    // get slack id and PR number from pull comment
-    const token = core.getInput("github-token");
-    const octokit = github.getOctokit(token);
-    const commentRes = await octokit.issues.listComments({
-      owner: repository.owner.login,
-      repo: repository.name,
-      issue_number: pull_request.number,
-    });
-    let slackMessageId;
-    commentRes.data.forEach((comment) => {
-      const match = comment.body.match(/SLACK_MESSAGE_ID:[0-9]{1,}.[0-9]{1,}/);
-      if (match) {
-        slackMessageId = match[0];
-      }
-    });
-
-    if (!slackMessageId) {
-      throw Error(
-        "Unable to find SLACK_MESSAGE_ID comment in PR comment thread."
-      );
-    }
+    const slackMessageId = await getSlackMessageId(pull_request, repository);
 
     // get existing reactions on message
     const existingReactionsRes = await slackWebClient.reactions.get({

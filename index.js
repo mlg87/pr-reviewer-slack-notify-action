@@ -1,6 +1,10 @@
 const github = require("@actions/github");
 
-const { createInitialMessage, handlePullRequestReview } = require("./actions");
+const {
+  createInitialMessage,
+  handleCommitPush,
+  handlePullRequestReview,
+} = require("./actions");
 
 (async () => {
   const { eventName, payload } = github.context;
@@ -16,7 +20,7 @@ const { createInitialMessage, handlePullRequestReview } = require("./actions");
   }
   // push of commit
   else if (eventName === "push") {
-    // TODO add handler for new code here
+    return await handleCommitPush();
   }
   // a review has been submitted
   else if (eventName === "pull_request_review") {

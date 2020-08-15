@@ -9,6 +9,7 @@
   "dependencies": {
     "@actions/core": "1.2.4",
     "@actions/github": "4.0.0",
-    "@slack/web-api": "^5.11.0"
+    "@slack/web-api": "^5.11.0",
+    "node-fetch": "^2.6.0"
   }
 }
