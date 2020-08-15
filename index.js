@@ -9,15 +9,7 @@ const { createInitialMessage, handlePullRequestReview } = require("./actions");
   // triggered by one of the pull_request events (opened, ready_for_review, merged)
   if (eventName === "pull_request") {
     if (payload.action === "opened" || payload.action === "ready_for_review") {
-      const res = await createInitialMessage();
-      // TODO store the message id and the PR number in the artifact
-      /**
-      {
-        "slack_message_id": String,
-        "github_pr_number": Number,
-      }
-       */
-      console.log("init msg res", res);
+      return await createInitialMessage();
     } else if (payload.action === "merged") {
       // TODO add handler for closing out the process here
     }

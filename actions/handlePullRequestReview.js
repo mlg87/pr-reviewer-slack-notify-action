@@ -19,7 +19,7 @@ module.exports = async () => {
     // const requestedReviewers = github.context.payload.pull_request.requested_reviewers.map(
     //   (user) => user.login
     // );
-    const { action, pull_request, review } = github.context.payload;
+    const { action, pull_request, repository, review } = github.context.payload;
 
     // TODO handle more than just submitted PRs
     if (action !== "submitted") {
@@ -34,13 +34,31 @@ module.exports = async () => {
     }
 
     // get slack id and PR number from pull comment
+    const token = core.getInput("github-token");
+    const octokit = github.getOctokit(token);
+    const comments = await octokit.issues.listComments({
+      owner: repository.owner.login,
+      repo: repository.name,
+      issue_number: pull_request.number,
+    });
+    let slackMessageId;
+    comments.forEach((comment) => {
+      const match = comment.body.match(/SLACK_MESSAGE_ID:[0-9]{1,}.[0-9]{1,}/);
+      if (match) {
+        slackMessageId = match[0];
+      }
+    });
 
-    console.log("parsed", parsed);
+    if (!slackMessageId) {
+      throw Error(
+        "Unable to find SLACK_MESSAGE_ID comment in PR comment thread."
+      );
+    }
 
     // get existing reactions on message
     const existingReactionsRes = await slackWebClient.reactions.get({
       channel: channelId,
-      timestamp: SLACK_MESSAGE_ID,
+      timestamp: slackMessageId,
     });
 
     const [reviewer] = slackUsers.filter((user) => {
