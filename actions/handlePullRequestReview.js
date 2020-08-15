@@ -1,9 +1,8 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
-const artifact = require("@actions/artifact");
 const { slackWebClient } = require("../utils");
 
-// TODO use actual values from artifacts
+// TODO use actual values from comment
 const SLACK_MESSAGE_ID = "1597439544.023300";
 const PR_NUMBER = 2;
 
@@ -34,11 +33,7 @@ module.exports = async () => {
       reactionToAdd = reactionMap["approved"];
     }
 
-    // get slack id and PR number from artifacts
-    const artifactClient = artifact.create();
-    const artifactName = "pr-reviewer-slack-notify-action-data";
-    const info = await artifactClient.downloadArtifact(artifactName);
-    const parsed = JSON.parse(info);
+    // get slack id and PR number from pull comment
 
     console.log("parsed", parsed);
 
