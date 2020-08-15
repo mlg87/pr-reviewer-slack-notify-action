@@ -2,10 +2,6 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const { slackWebClient } = require("../utils");
 
-// TODO use actual values from comment
-const SLACK_MESSAGE_ID = "1597439544.023300";
-const PR_NUMBER = 2;
-
 const reactionMap = {
   commented: "speech_balloon",
   approved: "white_check_mark",
@@ -84,7 +80,7 @@ module.exports = async () => {
     // post corresponding message
     await slackWebClient.chat.postMessage({
       channel: channelId,
-      thread_ts: SLACK_MESSAGE_ID,
+      thread_ts: slackMessageId,
       text: messageText,
     });
 
@@ -103,7 +99,7 @@ module.exports = async () => {
     // add new reactions
     return await slackWebClient.reactions.add({
       channel: channelId,
-      timestamp: SLACK_MESSAGE_ID,
+      timestamp: slackMessageId,
       name: reactionToAdd,
     });
   } catch (error) {
