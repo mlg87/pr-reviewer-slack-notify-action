@@ -2,7 +2,11 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const fetch = require("node-fetch");
 
-const { getSlackMessageId, slackWebClient } = require("../utils");
+const {
+  getSlackMessageId,
+  slackWebClient,
+  createUsersToAtString,
+} = require("../utils");
 
 // NOTE in the future we may want to wait to notify everyone that they can review it again when the PR author
 // explicitly asks for a re-review
@@ -12,10 +16,13 @@ module.exports = async () => {
     const ghToken = core.getInput("github-token");
     const slackUsers = JSON.parse(core.getInput("slack-users"));
     const { commits, repository } = github.context.payload;
+
     //
     // ─── GET THE ISSUE NUMBER FOR THE COMMIT ─────────────────────────
     //
+
     const commitSha = commits[0].id;
+    // DOCS https://developer.github.com/v3/repos/commits/#list-pull-requests-associated-with-a-commit
     const prRes = await fetch(
       `https://api.github.com/repos/${repository.full_name}/commits/${commitSha}/pulls`,
       {
@@ -35,10 +42,6 @@ module.exports = async () => {
       return null;
     }
 
-    const requestedReviewers = pull_request.requested_reviewers.map(
-      (user) => user.login
-    );
-
     const slackMessageId = await getSlackMessageId(pull_request, repository);
 
     // this should throw instead of return null bc if there is a pull_request found with this commit it in,
@@ -48,6 +51,7 @@ module.exports = async () => {
       console.error("repository", repository);
       throw Error("No slackMessageId found.");
     }
+
     //
     // ─── CLEAR ALL REACTIONS BC THERE IS NEW CODE ────────────────────
     //
@@ -70,11 +74,38 @@ module.exports = async () => {
       });
     }
 
-    throw Error("not implemented yet");
-
     //
     // ─── NOTIFY REVIEWERS IN THREAD ──────────────────────────────────
     //
+
+    const existingReviewsRes = await fetch(
+      `https://api.github.com/repos/${repository.full_name}/pulls/${pull_request.number}/reviews`,
+      {
+        headers: {
+          Authorization: `token ${ghToken}`,
+        },
+        method: "GET",
+      }
+    );
+    const existingReviewsJson = await existingReviewsRes.json();
+
+    if (existingReviewsJson && existingReviewsJson.length) {
+      const previousReviewers = existingReviewsJson.map(
+        (review) => review.user.login
+      );
+      const distinctPreviousReviewers = [...new Set(previousReviewers)];
+      const baseMessage = `new code has been committed since your review of [PR ${pull_request.number}](${pull_request._links.html.href}), please review the updates.`;
+      const usersToAtString = createUsersToAtString(distinctPreviousReviewers);
+      const threadUpdateRes = await slackWebClient.chat.postMessage({
+        channel: channelId,
+        thread_ts: slackMessageId,
+        text: `${usersToAtString} ${baseMessage}`,
+      });
+
+      if (!threadUpdateRes.ok || !threadUpdateRes.ts) {
+        throw Error("Failed to post message to thread requesting re-reviewe");
+      }
+    }
   } catch (error) {
     core.setFailed(error.message);
   }
