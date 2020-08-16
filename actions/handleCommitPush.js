@@ -26,9 +26,10 @@ module.exports = async () => {
         method: "GET",
       }
     );
+    const prResJson = await prRes.json();
 
-    console.log("prRes", prRes);
-    const [pull_request] = prRes;
+    console.log("prResJson", prResJson);
+    const [pull_request] = prResJson;
 
     throw Error("not implemented yet");
     const requestedReviewers = github.context.payload.pull_request.requested_reviewers.map(
