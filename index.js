@@ -1,41 +1,35 @@
-const core = require("@actions/core");
 const github = require("@actions/github");
-const fetch = require("node-fetch");
+const core = require("@actions/core");
+
+const {
+  createInitialMessage,
+  handleCommitPush,
+  handlePullRequestReview,
+  handleMerge,
+} = require("./actions");
 
 (async () => {
-  try {
-    const channelWebhook = core.getInput("channel-webhook");
-    const slackUsers = JSON.parse(core.getInput("slack-users"));
-    const requestedReviewers = github.context.payload.pull_request.requested_reviewers.map(
-      (user) => user.login
-    );
-    if (!requestedReviewers.length) {
-      return null;
-    }
-    const baseMessage = `${github.context.payload.sender.login} is requesting your review on ${github.context.payload.pull_request._links.html.href}`;
+  const { eventName, payload, ref } = github.context;
+  const baseBranch = core.getInput("base-branch");
+  const isActingOnBaseBranch = ref.includes(baseBranch);
 
-    const usersToAt = slackUsers.filter((user) =>
-      requestedReviewers.includes(user.github_username)
-    );
-    let usersToAtString;
-    usersToAt.forEach((user) => {
-      if (!usersToAtString) {
-        usersToAtString = `<@${user.slack_id}>`;
-        return;
-      }
-      usersToAtString = `${usersToAtString}, <@${user.slack_id}>`;
-      return;
-    });
-    const options = {
-      body: JSON.stringify({
-        text: `${usersToAtString} ${baseMessage}`,
-      }),
-      headers: { "Content-Type": "application/json" },
-      method: "POST",
-    };
-    const res = await fetch(channelWebhook, options);
-    console.log("res", res);
-  } catch (error) {
-    core.setFailed(error.message);
+  // route to the appropriate action
+  if (eventName === "pull_request") {
+    if (payload.action === "opened" || payload.action === "ready_for_review") {
+      return await createInitialMessage();
+    }
+  }
+  // push of commit
+  else if (eventName === "push") {
+    // merge of PR to staging
+    if (isActingOnBaseBranch) {
+      return await handleMerge();
+    }
+
+    return await handleCommitPush();
+  }
+  // a review has been submitted
+  else if (eventName === "pull_request_review") {
+    return await handlePullRequestReview();
   }
 })();
