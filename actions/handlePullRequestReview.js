@@ -15,27 +15,12 @@ module.exports = async () => {
     const slackUsers = JSON.parse(core.getInput("slack-users"));
     const { action, pull_request, repository, review } = github.context.payload;
 
-    console.log("review", review);
-
     // TODO handle more than just submitted PRs
     if (action !== "submitted") {
       return null;
     }
 
-    let reactionToAdd = reactionMap["changes-requested"];
-    if (review.state === "commented") {
-      reactionToAdd = reactionMap["commented"];
-    } else if (review.state === "approved") {
-      reactionToAdd = reactionMap["approved"];
-    }
-
     const slackMessageId = await getSlackMessageId(pull_request, repository);
-
-    // get existing reactions on message
-    const existingReactionsRes = await slackWebClient.reactions.get({
-      channel: channelId,
-      timestamp: slackMessageId,
-    });
 
     //
     // ─── MAP USERS ───────────────────────────────────────────────────
@@ -64,26 +49,51 @@ module.exports = async () => {
     // ─── BUILD MESSAGE ───────────────────────────────────────────────
     //
 
-    return null;
-
     const userText = `<@${author.slack_id}>, *${reviewer.github_username}*`;
     let actionText;
+    let reactionToAdd;
     switch (review.state) {
       case "changes-requested":
         actionText = "would like you to change some things in the code";
+        reactionToAdd = reactionMap["changes-requested"];
         break;
       case "commented":
         actionText = "neither approved or denied your PR, but merely commented";
+        reactionToAdd = reactionMap["commented"];
         break;
       case "approved":
         actionText = "approved your PR";
+        reactionToAdd = reactionMap["approved"];
         break;
     }
+    if (!!review.body) {
+      actionText = `${actionText}\n>${review.body}`;
+    }
+    const text = `${userText} ${actionText}`;
     // post corresponding message
     await slackWebClient.chat.postMessage({
       channel: channelId,
       thread_ts: slackMessageId,
-      text: messageText,
+      text,
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text,
+          },
+        },
+      ],
+    });
+
+    //
+    // ─── ADD REACTION TO MAIN THREAD ─────────────────────────────────
+    //
+
+    // get existing reactions on message
+    const existingReactionsRes = await slackWebClient.reactions.get({
+      channel: channelId,
+      timestamp: slackMessageId,
     });
 
     let hasReaction = false;
