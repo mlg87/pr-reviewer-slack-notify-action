@@ -1,4 +1,5 @@
 const github = require("@actions/github");
+const core = require("@actions/core");
 
 const {
   createInitialMessage,
@@ -20,6 +21,7 @@ const {
   }
   // push of commit
   else if (eventName === "push") {
+    // merge of PR to staging
     if (isActingOnBaseBranch) {
       return await handleMerge();
     }
