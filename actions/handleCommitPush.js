@@ -1,3 +1,5 @@
+const core = require("@actions/core");
+const github = require("@actions/github");
 const fetch = require("node-fetch");
 
 const { getSlackMessageId } = require("../utils");
@@ -48,5 +50,7 @@ module.exports = async () => {
     //
     // ─── NOTIFY REVIEWERS IN THREAD ──────────────────────────────────
     //
-  } catch (error) {}
+  } catch (error) {
+    core.setFailed(error.message);
+  }
 };
