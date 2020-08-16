@@ -9,6 +9,8 @@ const {
 
 (async () => {
   const { eventName, payload } = github.context;
+  console.log("github.context", github.context);
+
   // route to the appropriate action
   if (eventName === "pull_request") {
     if (payload.action === "opened" || payload.action === "ready_for_review") {
