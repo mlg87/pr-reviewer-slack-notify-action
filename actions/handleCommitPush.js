@@ -11,9 +11,6 @@ module.exports = async () => {
     const channelId = core.getInput("channel-id");
     const ghToken = core.getInput("github-token");
     const slackUsers = JSON.parse(core.getInput("slack-users"));
-    const requestedReviewers = github.context.payload.pull_request.requested_reviewers.map(
-      (user) => user.login
-    );
     const { commits, repository } = github.context.payload;
     //
     // ─── GET THE ISSUE NUMBER FOR THE COMMIT ─────────────────────────
@@ -30,6 +27,9 @@ module.exports = async () => {
 
     console.log("prRes", prRes);
     throw Error("not implemented yet");
+    const requestedReviewers = github.context.payload.pull_request.requested_reviewers.map(
+      (user) => user.login
+    );
 
     const slackMessageId = await getSlackMessageId();
     //
