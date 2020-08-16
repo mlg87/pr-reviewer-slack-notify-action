@@ -7,11 +7,12 @@ const { getSlackMessageId } = require("../utils");
 module.exports = async () => {
   try {
     console.log("in handle commit push");
+    console.log("github.context.payload", github.context.payload);
+    console.log("shouldve logged the github context payload");
 
     const channelId = core.getInput("channel-id");
     const ghToken = core.getInput("github-token");
     const slackUsers = JSON.parse(core.getInput("slack-users"));
-    console.log("github.context.payload", github.context.payload);
 
     return null;
 
