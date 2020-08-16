@@ -52,6 +52,8 @@ module.exports = async () => {
     const userText = `<@${author.slack_id}>, *${reviewer.github_username}*`;
     let actionText;
     let reactionToAdd;
+    console.log("review.state", review.state);
+
     switch (review.state) {
       case "changes-requested":
         actionText = "would like you to change some things in the code";
