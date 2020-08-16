@@ -4,6 +4,9 @@ branding:
   color: blue
   icon: at-sign
 inputs:
+  base-branch:
+    description: "Branch that you will be opening PRs in to (e.g. 'staging', 'master')."
+    required: true
   bot-token:
     description: "OAuth token for your Slack App Bot to sign requests to Slack's API with."
     required: true

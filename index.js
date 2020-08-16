@@ -8,19 +8,22 @@ const {
 } = require("./actions");
 
 (async () => {
-  const { eventName, payload } = github.context;
-  console.log("github.context", github.context);
+  const { eventName, payload, ref } = github.context;
+  const baseBranch = core.getInput("base-branch");
+  const isActingOnBaseBranch = ref.includes(baseBranch);
 
   // route to the appropriate action
   if (eventName === "pull_request") {
     if (payload.action === "opened" || payload.action === "ready_for_review") {
       return await createInitialMessage();
-    } else if (payload.action === "merged") {
-      return await handleMerge();
     }
   }
   // push of commit
   else if (eventName === "push") {
+    if (isActingOnBaseBranch) {
+      return await handleMerge();
+    }
+
     return await handleCommitPush();
   }
   // a review has been submitted
