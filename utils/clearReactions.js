@@ -1,6 +1,6 @@
 const core = require("@actions/core");
 
-const { slackWebClient } = require(".");
+const slackWebClient = require("./slackWebClient");
 
 module.exports = async (slackMessageId) => {
   try {
