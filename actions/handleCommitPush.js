@@ -6,6 +6,8 @@ const {
   getSlackMessageId,
   slackWebClient,
   createUsersToAtString,
+  clearReactions,
+  getPrForCommit,
 } = require("../utils");
 
 // NOTE in the future we may want to wait to notify everyone that they can review it again when the PR author
@@ -14,33 +16,13 @@ module.exports = async () => {
   try {
     const channelId = core.getInput("channel-id");
     const ghToken = core.getInput("github-token");
-    const slackUsers = JSON.parse(core.getInput("slack-users"));
-    const { commits, repository } = github.context.payload;
+    const { repository } = github.context.payload;
 
     //
     // ─── GET THE ISSUE NUMBER FOR THE COMMIT ─────────────────────────
     //
 
-    const commitSha = commits[0].id;
-    // DOCS https://developer.github.com/v3/repos/commits/#list-pull-requests-associated-with-a-commit
-    const prRes = await fetch(
-      `https://api.github.com/repos/${repository.full_name}/commits/${commitSha}/pulls`,
-      {
-        headers: {
-          // NOTE very solid chance this breaks as github warns that it is in preview mode currently
-          Accept: "application/vnd.github.groot-preview+json",
-          Authorization: `token ${ghToken}`,
-        },
-        method: "GET",
-      }
-    );
-    const prResJson = await prRes.json();
-    const [pull_request] = prResJson;
-
-    if (!pull_request) {
-      console.log(`No pull_request found for commit: ${commitSha}`);
-      return null;
-    }
+    const pull_request = await getPrForCommit();
 
     const slackMessageId = await getSlackMessageId(pull_request, repository);
 
@@ -56,23 +38,7 @@ module.exports = async () => {
     // ─── CLEAR ALL REACTIONS BC THERE IS NEW CODE ────────────────────
     //
 
-    const existingReactions = await slackWebClient.reactions.get({
-      channel: channelId,
-      timestamp: slackMessageId,
-    });
-
-    if (
-      existingReactions.message.reactions &&
-      existingReactions.message.reactions.length
-    ) {
-      existingReactions.message.reactions.forEach(async (reaction) => {
-        await slackWebClient.reactions.remove({
-          channel: channelId,
-          timestamp: slackMessageId,
-          name: reaction.name,
-        });
-      });
-    }
+    await clearReactions(slackMessageId);
 
     //
     // ─── NOTIFY REVIEWERS IN THREAD ──────────────────────────────────
