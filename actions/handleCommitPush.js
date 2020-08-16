@@ -16,7 +16,7 @@ module.exports = async () => {
     // ─── GET THE ISSUE NUMBER FOR THE COMMIT ─────────────────────────
     //
     const prRes = await fetch(
-      `https://api.github.com/${repository.full_name}/commits/${commits[0].id}/pulls`,
+      `https://api.github.com/repos/${repository.full_name}/commits/${commits[0].id}/pulls`,
       {
         headers: {
           Authorization: `token ${ghToken}`,
