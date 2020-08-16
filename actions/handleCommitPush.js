@@ -9,6 +9,10 @@ module.exports = async () => {
     const channelId = core.getInput("channel-id");
     const ghToken = core.getInput('github-token')
     const slackUsers = JSON.parse(core.getInput("slack-users"));
+    console.log('github.context.payload', github.context.payload);
+
+    return null
+    
     const requestedReviewers = github.context.payload.pull_request.requested_reviewers.map(
       (user) => user.login
     );
