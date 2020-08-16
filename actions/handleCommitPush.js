@@ -19,6 +19,8 @@ module.exports = async () => {
       `https://api.github.com/repos/${repository.full_name}/commits/${commits[0].id}/pulls`,
       {
         headers: {
+          // NOTE very solid chance this breaks as github warns that it is in preview mode currently
+          Accept: "application/vnd.github.groot-preview+json",
           Authorization: `token ${ghToken}`,
         },
         method: "GET",
@@ -26,6 +28,8 @@ module.exports = async () => {
     );
 
     console.log("prRes", prRes);
+    const [pull_request] = prRes;
+
     throw Error("not implemented yet");
     const requestedReviewers = github.context.payload.pull_request.requested_reviewers.map(
       (user) => user.login
