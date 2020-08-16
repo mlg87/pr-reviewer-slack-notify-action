@@ -1,7 +1,12 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 
-const { clearReactions, getPrForCommit, slackWebClient } = require("../utils");
+const {
+  clearReactions,
+  getPrForCommit,
+  getSlackMessageId,
+  slackWebClient,
+} = require("../utils");
 
 // will only run on push to base branch (i.e. staging), so we can assume that a closed state for PR
 // equates to 'merged' (no specific event for 'merged' on PRs)
