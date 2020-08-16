@@ -6,7 +6,7 @@ const { getSlackMessageId, slackWebClient } = require("../utils");
 const reactionMap = {
   commented: "speech_balloon",
   approved: "white_check_mark",
-  "changes-requested": "octagonal_sign",
+  changes_requested: "octagonal_sign",
 };
 
 module.exports = async () => {
@@ -52,12 +52,10 @@ module.exports = async () => {
     const userText = `<@${author.slack_id}>, *${reviewer.github_username}*`;
     let actionText;
     let reactionToAdd;
-    console.log("review.state", review.state);
-
     switch (review.state) {
-      case "changes-requested":
+      case "changes_requested":
         actionText = "would like you to change some things in the code";
-        reactionToAdd = reactionMap["changes-requested"];
+        reactionToAdd = reactionMap["changes_requested"];
         break;
       case "commented":
         actionText = "neither approved or denied your PR, but merely commented";
