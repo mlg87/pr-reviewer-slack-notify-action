@@ -15,6 +15,8 @@ module.exports = async () => {
     const slackUsers = JSON.parse(core.getInput("slack-users"));
     const { action, pull_request, repository, review } = github.context.payload;
 
+    console.log("review", review);
+
     // TODO handle more than just submitted PRs
     if (action !== "submitted") {
       return null;
@@ -35,6 +37,10 @@ module.exports = async () => {
       timestamp: slackMessageId,
     });
 
+    //
+    // ─── MAP USERS ───────────────────────────────────────────────────
+    //
+
     const [reviewer] = slackUsers.filter((user) => {
       return user.github_username === review.user.login;
     });
@@ -54,7 +60,25 @@ module.exports = async () => {
       );
     }
 
-    const messageText = `<@${author.slack_id}>, ${reviewer.github_username} ${review.state} your PR`;
+    //
+    // ─── BUILD MESSAGE ───────────────────────────────────────────────
+    //
+
+    return null;
+
+    const userText = `<@${author.slack_id}>, *${reviewer.github_username}*`;
+    let actionText;
+    switch (review.state) {
+      case "changes-requested":
+        actionText = "would like you to change some things in the code";
+        break;
+      case "commented":
+        actionText = "neither approved or denied your PR, but merely commented";
+        break;
+      case "approved":
+        actionText = "approved your PR";
+        break;
+    }
     // post corresponding message
     await slackWebClient.chat.postMessage({
       channel: channelId,

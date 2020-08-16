@@ -21,7 +21,7 @@ module.exports = async () => {
     console.log("payload", github.context.payload);
 
     // TODO update this to include content from the author's description or last comment
-    const baseMessage = `${sender.login} is requesting your review on <${pull_request._links.html.href}|*PR ${pull_request.number}*>`;
+    const baseMessage = `*${sender.login}* is requesting your review on <${pull_request._links.html.href}|*PR ${pull_request.number}*>`;
 
     // build users to mention string
     const usersToAtString = createUsersToAtString(requestedReviewers);
