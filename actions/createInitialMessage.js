@@ -6,7 +6,7 @@ module.exports = async () => {
   try {
     const channelId = core.getInput("channel-id");
     const { number, pull_request, repository, sender } = github.context.payload;
-    const requestedReviewers = github.context.payload.pull_request.requested_reviewers.map(
+    const requestedReviewers = pull_request.requested_reviewers.map(
       (user) => user.login
     );
 
@@ -18,10 +18,10 @@ module.exports = async () => {
       return null;
     }
 
-    console.log("payload", github.context.payload);
-
-    // TODO update this to include content from the author's description or last comment
-    const baseMessage = `*${sender.login}* is requesting your review on <${pull_request._links.html.href}|*PR ${pull_request.number}*>`;
+    let baseMessage = `*${sender.login}* is requesting your review on <${pull_request._links.html.href}|*${pull_request.title}*>`;
+    if (!!pull_request.body) {
+      baseMessage = `${baseMessage}\n${pull_request.body}`;
+    }
 
     // build users to mention string
     const usersToAtString = createUsersToAtString(requestedReviewers);
