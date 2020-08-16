@@ -20,7 +20,7 @@ module.exports = async () => {
 
     let baseMessage = `*${sender.login}* is requesting your review on <${pull_request._links.html.href}|*${pull_request.title}*>`;
     if (!!pull_request.body) {
-      baseMessage = `${baseMessage}\n${pull_request.body}`;
+      baseMessage = `${baseMessage}\n>${pull_request.body}`;
     }
 
     // build users to mention string
