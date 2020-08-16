@@ -6,6 +6,8 @@ const { getSlackMessageId } = require("../utils");
 // explicitly asks for a re-review
 module.exports = async () => {
   try {
+    console.log("in handle commit push");
+
     const channelId = core.getInput("channel-id");
     const ghToken = core.getInput("github-token");
     const slackUsers = JSON.parse(core.getInput("slack-users"));

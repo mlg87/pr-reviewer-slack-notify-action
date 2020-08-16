@@ -20,6 +20,8 @@ const {
   }
   // push of commit
   else if (eventName === "push") {
+    console.log("calling handleCommitPush");
+
     return await handleCommitPush();
   }
   // a review has been submitted
