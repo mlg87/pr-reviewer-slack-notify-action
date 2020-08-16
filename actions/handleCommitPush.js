@@ -103,8 +103,11 @@ module.exports = async () => {
         text,
         blocks: [
           {
-            type: "mrkdwn",
-            text,
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text,
+            },
           },
         ],
       });
