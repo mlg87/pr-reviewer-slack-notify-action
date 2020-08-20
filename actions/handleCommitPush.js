@@ -23,6 +23,10 @@ module.exports = async () => {
     //
 
     const pull_request = await getPrForCommit();
+    // dont spam everyone on slack
+    if (pull_request.state === "closed") {
+      return null;
+    }
 
     const slackMessageId = await getSlackMessageId(pull_request, repository);
 
