@@ -16,6 +16,8 @@ const {
   // route to the appropriate action
   if (eventName === "pull_request") {
     if (payload.action === "opened" || payload.action === "ready_for_review") {
+      console.log("running createInitialMessage::: ", payload);
+
       return await createInitialMessage();
     }
   }
@@ -23,13 +25,19 @@ const {
   else if (eventName === "push") {
     // merge of PR to staging
     if (isActingOnBaseBranch) {
+      console.log("running handleMerge::: ", payload);
+
       return await handleMerge();
     }
+
+    console.log("running handleCommitPush::: ", payload);
 
     return await handleCommitPush();
   }
   // a review has been submitted
   else if (eventName === "pull_request_review") {
+    console.log("running handlePullRequestReview::: ", payload);
+
     return await handlePullRequestReview();
   }
 })();

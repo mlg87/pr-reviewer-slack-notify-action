@@ -33,9 +33,10 @@ module.exports = async () => {
     // this should throw instead of return null bc if there is a pull_request found with this commit it in,
     // there should also already be a slack message id comment
     if (!slackMessageId) {
-      console.error("pull_request", pull_request);
-      console.error("repository", repository);
-      throw Error("No slackMessageId found.");
+      console.log("pull_request", pull_request);
+      console.log("repository", repository);
+      console.log("No slackMessageId found.");
+      return null;
     }
 
     //
