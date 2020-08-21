@@ -24,7 +24,7 @@ module.exports = async () => {
 
     const pull_request = await getPrForCommit();
     // dont spam everyone on slack
-    if (pull_request.state === "closed") {
+    if (!pull_request || pull_request.state === "closed") {
       return null;
     }
 

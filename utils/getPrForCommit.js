@@ -7,6 +7,10 @@ module.exports = async () => {
     const ghToken = core.getInput("github-token");
     const { commits, repository } = github.context.payload;
 
+    if (!commits || !commits.length) {
+      return null;
+    }
+
     const commitSha = commits[0].id;
     // DOCS https://developer.github.com/v3/repos/commits/#list-pull-requests-associated-with-a-commit
     const prRes = await fetch(
