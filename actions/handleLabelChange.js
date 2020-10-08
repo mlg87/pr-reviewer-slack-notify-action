@@ -22,15 +22,15 @@ module.exports = async () => {
       return null;
     }
 
-    const [sender] = slackUsers.filter((user) => {
-      return user.github_username === review.user.login;
+    const [labeler] = slackUsers.filter((user) => {
+      return user.github_username === sender.login;
     });
     const [author] = slackUsers.filter((user) => {
       return user.github_username === pull_request.user.login;
     });
 
-    const plainText = `<@${author.slack_id}>, ${sender.github_username} added the label ${labelNameToWatchFor} to your PR`;
-    const richText = `<@${author.slack_id}>, *${sender.github_username}* added the label *${labelNameToWatchFor}* to your PR`;
+    const plainText = `<@${author.slack_id}>, ${labeler.github_username} added the label ${labelNameToWatchFor} to your PR`;
+    const richText = `<@${author.slack_id}>, *${labeler.github_username}* added the label *${labelNameToWatchFor}* to your PR`;
     const slackMessageId = await getSlackMessageId(pull_request, repository);
 
     await slackWebClient.chat.postMessage({
