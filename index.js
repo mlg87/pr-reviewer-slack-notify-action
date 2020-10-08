@@ -20,7 +20,16 @@ const {
 
       return await createInitialMessage();
     }
+
+    // notify thread of a PR label change
+    if (payload.action === "labeled" || payload.action === "unlabeled") {
+      console.log("running handleLabelChange::: ", payload);
+
+      return await handleLabelChange();
+    }
   }
+  // TODO check for slack message id here and return if its not found
+
   // push of commit
   else if (eventName === "push") {
     // merge of PR to staging

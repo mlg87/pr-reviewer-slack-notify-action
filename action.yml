@@ -16,6 +16,10 @@ inputs:
   github-token:
     description: "Personal access token with repository rights."
     required: true
+  lable-name-to-watch-for:
+    description: "If you would like to notify the thread of a label being applied to a PR, set this."
+    required: false
+    default: ""
   slack-users: # id of input
     description: "This is JSON stringified array of the users you would like to be able to notify via slack when they are requested to review a PR. The format should be [{ github_username: string, slack_id: string,  slack_webhook: string }]"
     required: true
