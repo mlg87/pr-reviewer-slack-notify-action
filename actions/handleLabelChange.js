@@ -51,7 +51,7 @@ module.exports = async () => {
     return await slackWebClient.reactions.add({
       channel: channelId,
       timestamp: slackMessageId,
-      name: ":heart_eyes:",
+      name: "heart_eyes",
     });
   } catch (error) {
     core.setFailed(error.message);
