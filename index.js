@@ -4,6 +4,7 @@ const core = require("@actions/core");
 const {
   createInitialMessage,
   handleCommitPush,
+  handleLabelChange,
   handlePullRequestReview,
   handleMerge,
 } = require("./actions");
