@@ -1,6 +1,6 @@
 module.exports = {
   branches: ['main'],
-  repositoryUrl: 'https://github.com/GuildEducationInc/recess-table',
+  repositoryUrl: 'https://github.com/mlg87/pr-reviewer-slack-notify-action',
   plugins: [
     [
       '@semantic-release/commit-analyzer',
