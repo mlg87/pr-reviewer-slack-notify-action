@@ -20,10 +20,18 @@ module.exports = {
       url: docsUrl('jsx-props-no-multi-spaces')
     },
     fixable: 'code',
+
+    messages: {
+      noLineGap: 'Expected no line gap between “{{prop1}}” and “{{prop2}}”',
+      onlyOneSpace: 'Expected only one space between “{{prop1}}” and “{{prop2}}”'
+    },
+
     schema: []
   },
 
   create(context) {
+    const sourceCode = context.getSourceCode();
+
     function getPropName(propNode) {
       switch (propNode.type) {
         case 'JSXSpreadAttribute':
@@ -37,15 +45,48 @@ module.exports = {
       }
     }
 
+    // First and second must be adjacent nodes
+    function hasEmptyLines(first, second) {
+      const comments = sourceCode.getCommentsBefore(second);
+      const nodes = [].concat(first, comments, second);
+
+      for (let i = 1; i < nodes.length; i += 1) {
+        const prev = nodes[i - 1];
+        const curr = nodes[i];
+        if (curr.loc.start.line - prev.loc.end.line >= 2) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
     function checkSpacing(prev, node) {
+      if (hasEmptyLines(prev, node)) {
+        context.report({
+          node,
+          messageId: 'noLineGap',
+          data: {
+            prop1: getPropName(prev),
+            prop2: getPropName(node)
+          }
+        });
+      }
+
       if (prev.loc.end.line !== node.loc.end.line) {
         return;
       }
+
       const between = context.getSourceCode().text.slice(prev.range[1], node.range[0]);
+
       if (between !== ' ') {
         context.report({
           node,
-          message: `Expected only one space between "${getPropName(prev)}" and "${getPropName(node)}"`,
+          messageId: 'onlyOneSpace',
+          data: {
+            prop1: getPropName(prev),
+            prop2: getPropName(node)
+          },
           fix(fixer) {
             return fixer.replaceTextRange([prev.range[1], node.range[0]], ' ');
           }
