@@ -14,25 +14,6 @@ const {
   const baseBranch = core.getInput("base-branch");
   const isActingOnBaseBranch = ref.includes(baseBranch);
 
-
-  let hasQuietLabel = false
-  const pull_request = payload.pull_request
-
-  const ignoreDraft = core.getInput("ignore-draft-prs");
-  const allowQuiet = core.getInput("silence-on-quiet-label");
-
-  for (const label of pull_request.labels) {
-    if (label.name === 'quiet') {
-      hasQuietLabel = true
-      break
-    }
-  }
-
-  const isWip = payload.pull_request['draft'] && ignoreDraft;
-
-  // Don't do anything if this is a draft or we tell it to shut up
-  if (isWip || (hasQuietLabel && allowQuiet)) return
-
   // route to the appropriate action
   if (eventName === "pull_request") {
     if (payload.action === "opened" || payload.action === "ready_for_review") {
