@@ -1,3 +1,10 @@
+## [4.3.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.2.0...v4.3.0) (2021-03-24)
+
+
+### Features
+
+* allow quiet ([dff2b14](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/dff2b14540d4c475df8be9e274c52dafd923d8a1))
+
 ## [4.2.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.1.5...v4.2.0) (2021-03-23)
 
 
