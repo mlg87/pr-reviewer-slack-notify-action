@@ -24,6 +24,14 @@ inputs:
     description: "This is JSON stringified array of the users you would like to be able to notify via slack when they are requested to review a PR. The format should be [{ github_username: string, slack_id: string,  slack_webhook: string }]"
     required: true
     default: "[]"
+  ignore-draft-prs:
+    description: "do not message on draft PRs"
+    required: false
+    default: false
+  silence-on-quiet-label:
+    description: "Do not message if the PR has the `quiet` label"
+    required: false
+    default: false
 runs:
   using: "node12"
   main: "index.js"
