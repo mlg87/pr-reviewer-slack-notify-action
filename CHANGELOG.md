@@ -1,3 +1,10 @@
+## [4.5.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.4.0...v4.5.0) (2021-03-31)
+
+
+### Features
+
+* **slack-thread-creation:** if a thread cannot be found, create one ([0b8e20c](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/0b8e20ca8446a68e6707ad2a6ad5306c130cf111))
+
 ## [4.4.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.3.0...v4.4.0) (2021-03-26)
 
 
