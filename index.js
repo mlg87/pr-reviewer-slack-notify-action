@@ -1,5 +1,6 @@
 const github = require("@actions/github");
 const core = require("@actions/core");
+const { getSlackMessageId } = require("../utils");
 
 const {
   createInitialMessage,
@@ -19,19 +20,22 @@ const {
   const pull_request = payload.pull_request
 
   const ignoreDraft = core.getInput("ignore-draft-prs");
-  const allowQuiet = core.getInput("silence-on-quiet-label");
+  const silenceQuiet = core.getInput("silence-on-quiet-label");
 
-  for (const label of pull_request.labels) {
-    if (label.name === 'quiet') {
-      hasQuietLabel = true
-      break
+  // need to prevent unhandled errors here
+  if (pull_request) {
+    for (const label of pull_request.labels) {
+      if (label.name === 'quiet') {
+        hasQuietLabel = true
+        break
+      }
     }
+
+    const isWip = pull_request && pull_request['draft'] && ignoreDraft;
+
+    // Don't do anything if this is a draft or we tell it to shut up
+    if (isWip || (hasQuietLabel && silenceQuiet)) return
   }
-
-  const isWip = payload.pull_request['draft'] && ignoreDraft;
-
-  // Don't do anything if this is a draft or we tell it to shut up
-  if (isWip || (hasQuietLabel && allowQuiet)) return
 
   // route to the appropriate action
   if (eventName === "pull_request") {
@@ -52,6 +56,14 @@ const {
 
   // push of commit
   else if (eventName === "push") {
+    // reduce spamming channels by adding a message if one didn't get created somehow
+    try {
+      await getSlackMessageId();
+    } catch (err) {
+      console.log("initial message not found, running createInitialMessage::: ", payload);
+
+      return await createInitialMessage();
+    }
     // merge of PR to staging
     if (isActingOnBaseBranch) {
       console.log("running handleMerge::: ", payload);
@@ -65,6 +77,16 @@ const {
   }
   // a review has been submitted
   else if (eventName === "pull_request_review") {
+
+    // reduce spamming channels by adding a message if one didn't get created somehow
+    try {
+      await getSlackMessageId();
+    } catch (err) {
+      console.log("initial message not found, running createInitialMessage::: ", payload);
+
+      return await createInitialMessage();
+    }
+
     console.log("running handlePullRequestReview::: ", payload);
 
     return await handlePullRequestReview();
