@@ -1,6 +1,6 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
-const { slackWebClient, createUsersToAtString } = require("../utils");
+const { slackWebClient, createUsersToAtString, fail } = require("../utils");
 
 module.exports = async () => {
   try {
@@ -55,6 +55,6 @@ module.exports = async () => {
       body: `SLACK_MESSAGE_ID:${prSlackMsg.ts}`,
     });
   } catch (error) {
-    core.setFailed(error.message);
+    fail(error.message);
   }
 };

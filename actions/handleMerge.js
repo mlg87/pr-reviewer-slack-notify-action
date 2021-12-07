@@ -6,6 +6,7 @@ const {
   getPrForCommit,
   getSlackMessageId,
   slackWebClient,
+  fail,
 } = require("../utils");
 
 // will only run on push to base branch (i.e. staging), so we can assume that a closed state for PR
@@ -61,6 +62,6 @@ module.exports = async () => {
       text,
     });
   } catch (error) {
-    core.setFailed(error.message);
+    fail(error.message);
   }
 };

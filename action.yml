@@ -32,6 +32,10 @@ inputs:
     description: "Do not message if the PR has the `quiet` label"
     required: false
     default: false
+  fail-silently:
+    description: "Allow action to fail silently to hide the red X of death"
+    required: false
+    default: false
 runs:
   using: "node12"
   main: "index.js"

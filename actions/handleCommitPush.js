@@ -8,6 +8,7 @@ const {
   createUsersToAtString,
   clearReactions,
   getPrForCommit,
+  fail,
 } = require("../utils");
 
 // NOTE in the future we may want to wait to notify everyone that they can review it again when the PR author
@@ -88,6 +89,6 @@ module.exports = async () => {
       }
     }
   } catch (error) {
-    core.setFailed(error.message);
+    fail(error.message);
   }
 };

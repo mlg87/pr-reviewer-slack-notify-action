@@ -1,7 +1,7 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 
-const { getSlackMessageId, slackWebClient } = require("../utils");
+const { getSlackMessageId, slackWebClient, fail } = require("../utils");
 
 const reactionMap = {
   commented: "speech_balloon",
@@ -120,6 +120,6 @@ module.exports = async () => {
       name: reactionToAdd,
     });
   } catch (error) {
-    core.setFailed(error.message);
+    fail(error.message);
   }
 };

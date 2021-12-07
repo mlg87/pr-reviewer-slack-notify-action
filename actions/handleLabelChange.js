@@ -1,6 +1,6 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
-const { slackWebClient, getSlackMessageId } = require("../utils");
+const { slackWebClient, getSlackMessageId, fail } = require("../utils");
 
 // TODO handle labels being removed
 module.exports = async () => {
@@ -54,6 +54,6 @@ module.exports = async () => {
       name: "heart_eyes",
     });
   } catch (error) {
-    core.setFailed(error.message);
+    fail(error.message);
   }
 };
