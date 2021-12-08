@@ -15,9 +15,8 @@ const {
   const baseBranch = core.getInput("base-branch");
   const isActingOnBaseBranch = ref.includes(baseBranch);
 
-
-  let hasQuietLabel = false
-  const pull_request = payload.pull_request
+  let hasQuietLabel = false;
+  const pull_request = payload.pull_request;
 
   const ignoreDraft = core.getInput("ignore-draft-prs");
   const silenceQuiet = core.getInput("silence-on-quiet-label");
@@ -25,16 +24,16 @@ const {
   // need to prevent unhandled errors here
   if (pull_request) {
     for (const label of pull_request.labels) {
-      if (label.name === 'quiet') {
-        hasQuietLabel = true
-        break
+      if (label.name === "quiet") {
+        hasQuietLabel = true;
+        break;
       }
     }
 
-    const isWip = pull_request && pull_request['draft'] && ignoreDraft;
+    const isWip = pull_request && pull_request["draft"] && ignoreDraft;
 
     // Don't do anything if this is a draft or we tell it to shut up
-    if (isWip || (hasQuietLabel && silenceQuiet)) return
+    if (isWip || (hasQuietLabel && silenceQuiet)) return;
   }
 
   // route to the appropriate action
@@ -57,10 +56,12 @@ const {
   // push of commit
   else if (eventName === "push") {
     // reduce spamming channels by adding a message if one didn't get created somehow
-    try {
-      await getSlackMessageId();
-    } catch (err) {
-      console.log("initial message not found, running createInitialMessage::: ", payload);
+    const slackMessageId = await getSlackMessageId();
+    if (!slackMessageId) {
+      console.log(
+        "initial message not found, running createInitialMessage::: ",
+        payload
+      );
 
       return await createInitialMessage();
     }
@@ -77,12 +78,13 @@ const {
   }
   // a review has been submitted
   else if (eventName === "pull_request_review") {
-
     // reduce spamming channels by adding a message if one didn't get created somehow
-    try {
-      await getSlackMessageId();
-    } catch (err) {
-      console.log("initial message not found, running createInitialMessage::: ", payload);
+    const slackMessageId = await getSlackMessageId();
+    if (!slackMessageId) {
+      console.log(
+        "initial message not found, running createInitialMessage::: ",
+        payload
+      );
 
       return await createInitialMessage();
     }
