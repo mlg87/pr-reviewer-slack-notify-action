@@ -1,6 +1,6 @@
 const github = require("@actions/github");
 const core = require("@actions/core");
-const { getSlackMessageId } = require("../utils");
+const { getSlackMessageId } = require("./utils");
 
 const {
   createInitialMessage,
