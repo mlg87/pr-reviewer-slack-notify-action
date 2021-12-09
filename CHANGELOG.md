@@ -1,3 +1,10 @@
+### [4.5.2](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.5.1...v4.5.2) (2021-12-09)
+
+
+### Bug Fixes
+
+* module not found error ([bfe6843](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/bfe684303e3c62d917f9ed6f4908a162755082d4))
+
 ### [4.5.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.5.0...v4.5.1) (2021-12-08)
 
 
