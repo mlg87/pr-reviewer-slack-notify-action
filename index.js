@@ -17,6 +17,7 @@ const {
 
   let hasQuietLabel = false;
   const pull_request = payload.pull_request;
+  const repository = payload.repository;
 
   const ignoreDraft = core.getInput("ignore-draft-prs");
   const silenceQuiet = core.getInput("silence-on-quiet-label");
@@ -56,7 +57,7 @@ const {
   // push of commit
   else if (eventName === "push") {
     // reduce spamming channels by adding a message if one didn't get created somehow
-    const slackMessageId = await getSlackMessageId();
+    const slackMessageId = await getSlackMessageId(pull_request, repository);
     if (!slackMessageId) {
       console.log(
         "initial message not found, running createInitialMessage::: ",
@@ -79,7 +80,7 @@ const {
   // a review has been submitted
   else if (eventName === "pull_request_review") {
     // reduce spamming channels by adding a message if one didn't get created somehow
-    const slackMessageId = await getSlackMessageId();
+    const slackMessageId = await getSlackMessageId(pull_request, repository);
     if (!slackMessageId) {
       console.log(
         "initial message not found, running createInitialMessage::: ",
