@@ -55,6 +55,8 @@ module.exports = async () => {
       body: `SLACK_MESSAGE_ID:${prSlackMsg.ts}`,
     });
   } catch (error) {
+    console.error('error in createInitialMessage::: ', error);
+    
     fail(error.message);
   }
 };

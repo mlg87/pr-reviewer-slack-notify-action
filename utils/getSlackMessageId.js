@@ -28,7 +28,7 @@ module.exports = async (pull_request, repository) => {
 
     return slackMessageId;
   } catch (error) {
-    console.warn(error.message);
+    console.error(error);
     return null;
   }
 };
