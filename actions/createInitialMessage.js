@@ -6,6 +6,9 @@ module.exports = async () => {
   try {
     const channelId = core.getInput("channel-id");
     const { number, pull_request, repository, sender } = github.context.payload;
+
+    if (!pull_request) return null;
+    
     const requestedReviewers = pull_request.requested_reviewers.map(
       (user) => user.login
     );
