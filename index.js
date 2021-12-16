@@ -55,8 +55,9 @@ const {
 
   // push of commit
   else if (eventName === "push") {
+    const { pull_request, repository } = github.context.payload;
     // reduce spamming channels by adding a message if one didn't get created somehow
-    const slackMessageId = await getSlackMessageId();
+    const slackMessageId = await getSlackMessageId(pull_request, repository);
     if (!slackMessageId) {
       console.log(
         "initial message not found, running createInitialMessage::: ",
@@ -78,8 +79,9 @@ const {
   }
   // a review has been submitted
   else if (eventName === "pull_request_review") {
+    const { pull_request, repository } = github.context.payload;
     // reduce spamming channels by adding a message if one didn't get created somehow
-    const slackMessageId = await getSlackMessageId();
+    const slackMessageId = await getSlackMessageId(pull_request, repository);
     if (!slackMessageId) {
       console.log(
         "initial message not found, running createInitialMessage::: ",
