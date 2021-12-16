@@ -1,3 +1,10 @@
+### [4.5.4](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.5.3...v4.5.4) (2021-12-16)
+
+
+### Bug Fixes
+
+* throw error when getInitialMessage called without correct params ([36b0c7c](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/36b0c7cffbae5efb5c20bea405599ca44356914d))
+
 ### [4.5.3](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.5.2...v4.5.3) (2021-12-16)
 
 
