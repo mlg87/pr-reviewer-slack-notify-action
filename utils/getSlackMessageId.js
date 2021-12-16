@@ -4,6 +4,11 @@ const github = require("@actions/github");
 // requires pull_request and repository as inputs bc of the differently shaped action payloads
 module.exports = async (pull_request, repository) => {
   try {
+    if (!pull_request) {
+      throw Error('No pull_request param supplied to getSlackMessageId')
+    } else if (!repository) {
+      throw Error('No repository param supplied to getSlackMessageId')
+    }
     // get slack id and PR number from pull comment
     const token = core.getInput("github-token");
     const octokit = github.getOctokit(token);
