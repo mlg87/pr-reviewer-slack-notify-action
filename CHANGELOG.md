@@ -1,3 +1,10 @@
+### [4.5.5](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.5.4...v4.5.5) (2021-12-16)
+
+
+### Bug Fixes
+
+* more "error" handling ([1f604fb](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/1f604fb829665920793f11a0f51fdd16bc5f152f))
+
 ### [4.5.4](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.5.3...v4.5.4) (2021-12-16)
 
 
