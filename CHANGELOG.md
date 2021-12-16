@@ -1,3 +1,10 @@
+### [4.5.3](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.5.2...v4.5.3) (2021-12-16)
+
+
+### Bug Fixes
+
+* slackMessageId was being called wihtout required params ([463eb19](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/463eb191f8cef764c3291106b70ece99f3373eb8))
+
 ### [4.5.2](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.5.1...v4.5.2) (2021-12-09)
 
 
