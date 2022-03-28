@@ -4,6 +4,15 @@ branding:
   color: blue
   icon: at-sign
 inputs:
+  aws-region:
+    description: 'Region in which the Github <=> Slack engineer mapping JSON is stored'
+    required: true
+  aws-s3-bucket:
+    description: 'Bucket in which the Github <=> Slack engineer mapping JSON object is stored in S3'
+    required: true
+  aws-s3-object-key:
+    description: 'Name of the Github <=> Slack engineer mapping JSON object in S3'
+    required: true
   base-branch:
     description: "Branch that you will be opening PRs in to (e.g. 'staging', 'master')."
     required: true
@@ -20,12 +29,8 @@ inputs:
     description: "If you would like to notify the thread of a label being applied to a PR, set this."
     required: false
     default: ""
-  slack-users: # id of input
-    description: "This is JSON stringified array of the users you would like to be able to notify via slack when they are requested to review a PR. The format should be [{ github_username: string, slack_id: string,  slack_webhook: string }]"
-    required: true
-    default: "[]"
   ignore-draft-prs:
-    description: "do not message on draft PRs"
+    description: "Do not message on draft PRs"
     required: false
     default: false
   silence-on-quiet-label:
@@ -36,6 +41,7 @@ inputs:
     description: "Allow action to fail silently to hide the red X of death"
     required: false
     default: false
+  
 runs:
-  using: "node12"
+  using: "node16"
   main: "index.js"

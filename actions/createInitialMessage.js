@@ -27,7 +27,7 @@ module.exports = async () => {
     }
 
     // build users to mention string
-    const usersToAtString = createUsersToAtString(requestedReviewers);
+    const usersToAtString = await createUsersToAtString(requestedReviewers);
 
     // DOCS https://api.slack.com/methods/chat.postMessage
     const text = `${usersToAtString} ${baseMessage}`;

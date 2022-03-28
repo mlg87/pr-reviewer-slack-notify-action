@@ -1,7 +1,7 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 
-const { getSlackMessageId, slackWebClient, fail } = require("../utils");
+const { getSlackMessageId, slackWebClient, fail, getEngineersFromS3 } = require("../utils");
 
 const reactionMap = {
   commented: "speech_balloon",
@@ -12,7 +12,7 @@ const reactionMap = {
 module.exports = async () => {
   try {
     const channelId = core.getInput("channel-id");
-    const slackUsers = JSON.parse(core.getInput("slack-users"));
+    const slackUsers = await getEngineersFromS3();
     const { action, pull_request, repository, review } = github.context.payload;
 
     // TODO handle more than just submitted PRs
