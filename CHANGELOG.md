@@ -1,3 +1,14 @@
+## [4.7.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.6.0...v4.7.0) (2022-03-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* **release:** hopefully this works
+
+### Features
+
+* **release:** hopefully trigger breaking release ([db22393](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/db2239372bb68729e9456d73f693ecd6740b0cf6))
+
 ## [4.6.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.5.5...v4.6.0) (2022-03-28)
 
 
