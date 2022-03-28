@@ -1,3 +1,14 @@
+## [4.6.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.5.5...v4.6.0) (2022-03-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* **reviewer mapping:** slack-users input no longer valid, must provide AWS inputs and creds
+
+### Features
+
+* **reviewer mapping:** change where the action is looking for reviewers ([97f9887](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/97f988794ddc6df7b5f878362577eda70d350682))
+
 ### [4.5.5](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.5.4...v4.5.5) (2021-12-16)
 
 
