@@ -1,8 +1,14 @@
-const core = require("@actions/core");
+const fail = require("./fail");
+const getEngineersFromS3 = require("./getEngineersFromS3");
 
 // reviewers is string[], where the strings should be github user names
-module.exports = (reviewers) => {
-  const slackUsers = JSON.parse(core.getInput("slack-users"));
+module.exports = async (reviewers) => {
+  let slackUsers = [];
+  try {
+    slackUsers = await getEngineersFromS3();
+  } catch (error) {
+    fail(error)
+  }
 
   const usersToAt = slackUsers.filter((user) =>
     reviewers.includes(user.github_username)
