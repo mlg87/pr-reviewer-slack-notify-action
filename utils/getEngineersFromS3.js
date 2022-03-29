@@ -3,6 +3,7 @@ const { GetObjectCommand, S3Client } = require("@aws-sdk/client-s3")
 
 module.exports = () => {
   return new Promise(async (resolve, reject) => {
+    console.log('Running getEngineersFromS3');
     // required for this to work
     const Bucket = core.getInput("aws-s3-bucket");
     const Key = core.getInput("aws-s3-object-key");
@@ -38,8 +39,9 @@ module.exports = () => {
         response.Body.once('end', () => resolve(JSON.parse(responseDataChunks.join(''))));
       }
     } catch (err) {
+      console.error(err);
       // Handle the error or throw
-      return reject(err)
+      return reject(err);
     } 
   })
 };

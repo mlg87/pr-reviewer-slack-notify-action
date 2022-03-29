@@ -10,6 +10,8 @@ module.exports = async (reviewers) => {
     fail(error)
   }
 
+  console.log('createUsersToAtString - slackUsers::: ', slackUsers);
+
   const usersToAt = slackUsers.filter((user) =>
     reviewers.includes(user.github_username)
   );
