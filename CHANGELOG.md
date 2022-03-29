@@ -1,3 +1,10 @@
+### [5.0.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v5.0.0...v5.0.1) (2022-03-29)
+
+
+### Refactors
+
+* **logging:** fixing it live in prod ([9d4093d](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/9d4093d2559534d336cfd3225485b36e6b4faabf))
+
 ## [5.0.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.8.0...v5.0.0) (2022-03-29)
 
 
