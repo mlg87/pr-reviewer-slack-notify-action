@@ -1,3 +1,14 @@
+## [4.8.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.7.0...v4.8.0) (2022-03-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* **engineer github <=> slack mapping:** slack-users input deprecated; must now provide a JSON file from s3
+
+### Features
+
+* **engineer github <=> slack mapping:** change where the action is looking for reviewers ([185fb45](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/185fb45d500e49ce04227ba0936ffcda84e79fc0))
+
 ## [4.7.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v4.6.0...v4.7.0) (2022-03-28)
 
 
