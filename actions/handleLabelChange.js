@@ -1,13 +1,13 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
-const { slackWebClient, getSlackMessageId, fail } = require("../utils");
+const { slackWebClient, getSlackMessageId, fail, getEngineersFromS3 } = require("../utils");
 
 // TODO handle labels being removed
 module.exports = async () => {
   try {
     const channelId = core.getInput("channel-id");
     const labelNameToWatchFor = core.getInput("label-name-to-watch-for");
-    const slackUsers = JSON.parse(core.getInput("slack-users"));
+    const slackUsers = await getEngineersFromS3();
     const { pull_request, repository, sender } = github.context.payload;
 
     // if there is now a matching label added, notify the slack message

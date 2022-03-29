@@ -6,10 +6,14 @@ module.exports = {
       '@semantic-release/commit-analyzer',
       {
         parserOpts: {
-          noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES', 'BREAKING'],
+          noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES', 'BREAKING', 'BREAKING CHANGE:'],
         },
         preset: 'conventionalcommits',
         releaseRules: [
+          {
+            breaking: true,
+            release: 'major'
+          },
           {
             release: 'minor',
             type: 'feat',
