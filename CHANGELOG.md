@@ -1,3 +1,10 @@
+### [5.0.2](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v5.0.1...v5.0.2) (2022-03-29)
+
+
+### Bug Fixes
+
+* **getengineersfroms3:** fix references in code for new JSON expected shape ([1fd9a8d](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/1fd9a8d4c43fd311dbf10a336423f0ed4eb32252))
+
 ### [5.0.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v5.0.0...v5.0.1) (2022-03-29)
 
 

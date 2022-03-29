@@ -52,5 +52,5 @@
     "lint:staged:script": "eslint --fix",
     "release": "semantic-release"
   },
-  "version": "5.0.1"
+  "version": "5.0.2"
 }
