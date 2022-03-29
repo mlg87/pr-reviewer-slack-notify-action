@@ -22,10 +22,10 @@ module.exports = async () => {
       return null;
     }
 
-    const [labeler] = slackUsers.filter((user) => {
+    const [labeler] = slackUsers.engineers.filter((user) => {
       return user.github_username === sender.login;
     });
-    const [author] = slackUsers.filter((user) => {
+    const [author] = slackUsers.engineers.filter((user) => {
       return user.github_username === pull_request.user.login;
     });
 

@@ -26,10 +26,10 @@ module.exports = async () => {
     // ─── MAP USERS ───────────────────────────────────────────────────
     //
 
-    const [reviewer] = slackUsers.filter((user) => {
+    const [reviewer] = slackUsers.engineers.filter((user) => {
       return user.github_username === review.user.login;
     });
-    const [author] = slackUsers.filter((user) => {
+    const [author] = slackUsers.engineers.filter((user) => {
       return user.github_username === pull_request.user.login;
     });
 
