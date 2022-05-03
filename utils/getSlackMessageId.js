@@ -2,12 +2,13 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 
 // requires pull_request and repository as inputs bc of the differently shaped action payloads
-module.exports = async (pull_request, repository) => {
+module.exports = async () => {
   try {
+    const { pull_request, repository } = github.context.payload;
     if (!pull_request) {
-      throw Error('No pull_request param supplied to getSlackMessageId')
+      throw Error('No pull_request key on github.context.payload in getSlackMessageId')
     } else if (!repository) {
-      throw Error('No repository param supplied to getSlackMessageId')
+      throw Error('No repository key on github.context.payload in getSlackMessageId')
     }
     // get slack id and PR number from pull comment
     const token = core.getInput("github-token");
