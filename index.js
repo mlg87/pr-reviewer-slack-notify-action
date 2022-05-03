@@ -51,22 +51,16 @@ const {
       return await handleLabelChange();
     }
   }
-  // TODO check for slack message id here and return if its not found
+
+  // reduce spamming channels by adding a message if one didn't get created somehow
+  const slackMessageId = await getSlackMessageId();
+  if (!slackMessageId) {
+    return await createInitialMessage();
+  }
 
   // push of commit
-  else if (eventName === "push") {
-    const { pull_request, repository } = github.context.payload;
-    // reduce spamming channels by adding a message if one didn't get created somehow
-    const slackMessageId = await getSlackMessageId(pull_request, repository);
-    if (!slackMessageId) {
-      console.log(
-        "initial message not found, running createInitialMessage::: ",
-        payload
-      );
-
-      return await createInitialMessage();
-    }
-    // merge of PR to staging
+  if (eventName === "push") {
+    // merge of PR to base branch
     if (isActingOnBaseBranch) {
       console.log("running handleMerge::: ", payload);
 
@@ -77,20 +71,9 @@ const {
 
     return await handleCommitPush();
   }
+
   // a review has been submitted
-  else if (eventName === "pull_request_review") {
-    const { pull_request, repository } = github.context.payload;
-    // reduce spamming channels by adding a message if one didn't get created somehow
-    const slackMessageId = await getSlackMessageId(pull_request, repository);
-    if (!slackMessageId) {
-      console.log(
-        "initial message not found, running createInitialMessage::: ",
-        payload
-      );
-
-      return await createInitialMessage();
-    }
-
+  if (eventName === "pull_request_review") {
     console.log("running handlePullRequestReview::: ", payload);
 
     return await handlePullRequestReview();
