@@ -2,11 +2,7 @@
 
 [**semantic-release**](https://github.com/semantic-release/semantic-release) plugin to execute custom shell commands.
 
-[![Travis](https://img.shields.io/travis/semantic-release/exec.svg)](https://travis-ci.org/semantic-release/exec)
-[![Codecov](https://img.shields.io/codecov/c/github/semantic-release/exec.svg)](https://codecov.io/gh/semantic-release/exec)
-[![Greenkeeper badge](https://badges.greenkeeper.io/semantic-release/exec.svg)](https://greenkeeper.io/)
-
-[![npm latest version](https://img.shields.io/npm/v/@semantic-release/exec/latest.svg)](https://www.npmjs.com/package/@semantic-release/exec)
+[![Build Status](https://github.com/semantic-release/exec/workflows/Test/badge.svg)](https://github.com/semantic-release/exec/actions?query=workflow%3ATest+branch%3Amaster) [![npm latest version](https://img.shields.io/npm/v/@semantic-release/exec/latest.svg)](https://www.npmjs.com/package/@semantic-release/exec)
 [![npm next version](https://img.shields.io/npm/v/@semantic-release/exec/next.svg)](https://www.npmjs.com/package/@semantic-release/exec)
 [![npm beta version](https://img.shields.io/npm/v/@semantic-release/exec/beta.svg)](https://www.npmjs.com/package/@semantic-release/exec)
 
@@ -68,7 +64,7 @@ With this example:
 | `shell`               | The shell to use to run the command. See [execa#shell](https://github.com/sindresorhus/execa#shell).                                                                                                                                                                                                                                     |
 | `execCwd`             | The path to use as current working directory when executing the shell commands. This path is relative to the path from which **semantic-release** is running. For example if **semantic-release** runs from `/my-project` and `execCwd` is set to `buildScripts` then the shell command will be executed from `/my-project/buildScripts` |
 
-Each shell command is generated with [Lodash template](https://lodash.com/docs#template). All the objets passed to the [semantic-release plugins](https://github.com/semantic-release/semantic-release#plugins) are available as template options.
+Each shell command is generated with [Lodash template](https://lodash.com/docs#template). All the objects passed to the [semantic-release plugins](https://github.com/semantic-release/semantic-release#plugins) are available as template options.
 
 ## verifyConditionsCmd
 
