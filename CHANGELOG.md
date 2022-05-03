@@ -1,3 +1,19 @@
+## [6.0.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v5.0.3...v6.0.0) (2022-05-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* **node_modules:** all of the deps have been blindly upgraded
+
+### Build System
+
+* **node_modules:** upgrade more or less all deps ([2142e24](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/2142e24d5bf18ccff37395c75d9e6dcd0f32ba80))
+
+
+### CI
+
+* **node version:** fix the node version to 16.15.0 for ci ([766c887](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/766c88718bc10cd90a6aadf1ffd02a4c3ceecd2b))
+
 ### [5.0.3](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v5.0.2...v5.0.3) (2022-05-03)
 
 
