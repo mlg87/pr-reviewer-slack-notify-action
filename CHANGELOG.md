@@ -1,3 +1,15 @@
+### [5.0.3](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v5.0.2...v5.0.3) (2022-05-03)
+
+
+### Bug Fixes
+
+* **slack:** make sure that the initial slack message is created when it should be ([273b883](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/273b8839481b32e42e37f9d9bb4d680c9ca941f7))
+
+
+### CI
+
+* upgrade commitizen ([6732888](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/6732888f912f73dbf2f673bd64fb3e3dc8fe1ba2))
+
 ### [5.0.2](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v5.0.1...v5.0.2) (2022-03-29)
 
 
