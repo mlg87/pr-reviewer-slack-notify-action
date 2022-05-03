@@ -44,7 +44,7 @@
 "use strict";
 
 var builtins = function() {
-    var names = [];
+    var names = new Dictionary();
     // NaN will be included due to Number.NaN
     [
         "null",
@@ -72,16 +72,18 @@ var builtins = function() {
             Object.getOwnPropertyNames(ctor.prototype).map(add);
         }
     });
-    return makePredicate(names);
+    return names;
 
     function add(name) {
-        names.push(name);
+        names.set(name, true);
     }
 }();
 
 function reserve_quoted_keys(ast, reserved) {
     ast.walk(new TreeWalker(function(node) {
-        if (node instanceof AST_ObjectProperty) {
+        if (node instanceof AST_ClassProperty) {
+            if (node.start && node.start.quote) add(node.key);
+        } else if (node instanceof AST_ObjectProperty) {
             if (node.start && node.start.quote) add(node.key);
         } else if (node instanceof AST_Sub) {
             addStrings(node.property, add);
@@ -114,9 +116,9 @@ function mangle_properties(ast, options) {
         reserved: null,
     }, true);
 
-    var reserved = Object.create(options.builtins ? null : builtins);
+    var reserved = options.builtins ? new Dictionary() : builtins.clone();
     if (Array.isArray(options.reserved)) options.reserved.forEach(function(name) {
-        reserved[name] = true;
+        reserved.set(name, true);
     });
 
     var cname = -1;
@@ -124,7 +126,7 @@ function mangle_properties(ast, options) {
     if (options.cache) {
         cache = options.cache.props;
         cache.each(function(name) {
-            reserved[name] = true;
+            reserved.set(name, true);
         });
     } else {
         cache = new Dictionary();
@@ -139,8 +141,8 @@ function mangle_properties(ast, options) {
     var debug_suffix;
     if (debug) debug_suffix = options.debug === true ? "" : options.debug;
 
-    var names_to_mangle = Object.create(null);
-    var unmangleable = Object.create(reserved);
+    var names_to_mangle = new Dictionary();
+    var unmangleable = reserved.clone();
 
     // step 1: find candidates to mangle
     ast.walk(new TreeWalker(function(node) {
@@ -163,6 +165,8 @@ function mangle_properties(ast, options) {
                 addStrings(node.args[0], add);
                 break;
             }
+        } else if (node instanceof AST_ClassProperty) {
+            if (typeof node.key == "string") add(node.key);
         } else if (node instanceof AST_Dot) {
             add(node.property);
         } else if (node instanceof AST_ObjectProperty) {
@@ -193,6 +197,8 @@ function mangle_properties(ast, options) {
                 mangleStrings(node.args[0]);
                 break;
             }
+        } else if (node instanceof AST_ClassProperty) {
+            if (typeof node.key == "string") node.key = mangle(node.key);
         } else if (node instanceof AST_Dot) {
             node.property = mangle(node.property);
         } else if (node instanceof AST_ObjectProperty) {
@@ -205,26 +211,24 @@ function mangle_properties(ast, options) {
     // only function declarations after this line
 
     function can_mangle(name) {
-        if (unmangleable[name]) return false;
+        if (unmangleable.has(name)) return false;
         if (/^-?[0-9]+(\.[0-9]+)?(e[+-][0-9]+)?$/.test(name)) return false;
         return true;
     }
 
     function should_mangle(name) {
-        if (reserved[name]) return false;
+        if (reserved.has(name)) return false;
         if (regex && !regex.test(name)) return false;
-        return cache.has(name) || names_to_mangle[name];
+        return cache.has(name) || names_to_mangle.has(name);
     }
 
     function add(name) {
-        if (can_mangle(name)) names_to_mangle[name] = true;
-        if (!should_mangle(name)) unmangleable[name] = true;
+        if (can_mangle(name)) names_to_mangle.set(name, true);
+        if (!should_mangle(name)) unmangleable.set(name, true);
     }
 
     function mangle(name) {
-        if (!should_mangle(name)) {
-            return name;
-        }
+        if (!should_mangle(name)) return name;
         var mangled = cache.get(name);
         if (!mangled) {
             if (debug) {
@@ -236,6 +240,7 @@ function mangle_properties(ast, options) {
             if (!mangled) do {
                 mangled = base54(++cname);
             } while (!can_mangle(mangled));
+            if (/^#/.test(name)) mangled = "#" + mangled;
             cache.set(name, mangled);
         }
         return mangled;
