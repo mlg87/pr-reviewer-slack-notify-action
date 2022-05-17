@@ -134,6 +134,7 @@ module.exports = {
           'README.md',
           'package.json',
           'yarn.lock',
+          'dist'
         ],
         message:
           "Release <%= nextRelease.version %> - <%= new Date().toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'America/Denver', timeZoneName: 'short'}) %> [skip ci]\n\n<%= nextRelease.notes %>",
@@ -147,6 +148,7 @@ module.exports = {
           'README.md',
           'package.json',
           'yarn.lock',
+          'dist'
         ],
       },
     ],

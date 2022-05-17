@@ -33,6 +33,16 @@ jobs:
           node-version: 16.15.0
       - name: Install dependencies
         run: yarn
+      - name: Compile TS => JS
+        run: yarn build
+      - name: Bundle code
+        run: yarn package
+      - name: Commit dist
+        uses: EndBug/add-and-commit@v9
+        with:
+          default_author: github_actions
+          message: 'Commiting dist for release'
+          add: 'dist'
       - name: Cut release
         run: yarn release
       

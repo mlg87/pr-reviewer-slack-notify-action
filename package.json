@@ -1,10 +1,10 @@
 {
   "author": "Mason Goetz <masonlgoetz@gmail.com>",
   "dependencies": {
-    "@actions/core": "^1.2.4",
-    "@actions/github": "^4.0.0",
+    "@actions/core": "^1.8.0",
+    "@actions/github": "^5.0.1",
     "@aws-sdk/client-s3": "^3.58.0",
-    "@slack/web-api": "^5.11.0",
+    "@slack/web-api": "^6.7.1",
     "node-fetch": "^2.6.7"
   },
   "description": "Notify requested PR reviewers via slack so they actually know that you want them to look at something because people don't check email.",
@@ -17,34 +17,39 @@
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^8.0.4",
     "@semantic-release/npm": "^9.0.1",
+    "@types/node": "^16.10.5",
+    "@types/node-fetch": "^2.6.1",
+    "@typescript-eslint/parser": "^5.8.1",
+    "@vercel/ncc": "^0.31.1",
     "commitizen": "^4.2.3",
     "conventional-changelog-conventionalcommits": "^4.6.3",
-    "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.10.1",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-prettier": "^3.1.2",
-    "eslint-plugin-react": "^7.19.0",
-    "eslint-plugin-react-hooks": "^3.0.0",
-    "eslint-plugin-standard": "^4.0.1",
-    "eslint-standard-config": "^2.4.1",
+    "eslint": "^8.5.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-prettier": "^4.0.0",
     "husky": "^7.0.4",
+    "jest": "^27.2.5",
+    "js-yaml": "^4.1.0",
     "lint-staged": "^12.4.1",
-    "prettier": "^2.0.4",
-    "semantic-release": "^19.0.2"
+    "prettier": "^2.5.1",
+    "semantic-release": "^19.0.2",
+    "ts-jest": "^27.1.2",
+    "typescript": "^4.4.4"
   },
   "license": "MIT",
   "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx}": [
-      "yarn lint:staged:script",
-      "prettier --write"
-    ]
+    "src/**/*.{js,jsx,ts,tsx}": ["yarn format", "yarn lint:script"]
   },
-  "main": "index.js",
+  "main": "lib/index.js",
   "name": "pr-reviewer-slack-notify",
   "repository": "git@github.com:mlg87/pr-reviewer-slack-notify.git",
   "scripts": {
-    "lint:staged:script": "eslint --fix",
-    "release": "semantic-release"
+    "build": "tsc",
+    "format": "prettier --write '**/*.ts'",
+    "lint:script": "eslint --fix",
+    "package": "ncc build --source-map --license licenses.txt --minify",
+    "release": "semantic-release",
+    "test": "jest"
   },
   "version": "6.0.0"
 }
