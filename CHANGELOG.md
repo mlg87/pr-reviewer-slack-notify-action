@@ -1,3 +1,20 @@
+## [7.2.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.1.3...v7.2.0) (2022-05-17)
+
+
+### Build System
+
+* **release:** change source for ncc package step ([98c3f03](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/98c3f033c3f7d32b910e84583fe3c08091d43367))
+
+
+### CI
+
+* **release:** alksdjflkasjdf ([dc11ed6](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/dc11ed6874ad1e6d20681e1c3bc663feba1aa4e0))
+* **release:** change main in pkg.json ([24efd71](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/24efd71a71ca8496e74de900a9b89f6c1bdb916b))
+* **release:** comment out compile ts step ([fad9441](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/fad944177820aedec55a16adfc54447a70c8968e))
+* **release:** fix path for entry file ([dd73f04](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/dd73f04e147ceb7fdcfa4e6ff2d4064f9732d3e7))
+* **release:** force deploy ([32fabbc](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/32fabbc47457b5f94a8bccba291b568976f23b93))
+* **release:** remove node_modules ([d5ded39](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/d5ded39cc341c5a737cd6a4e78bd6d5fbcc5e9bf))
+
 ### [7.1.3](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.1.2...v7.1.3) (2022-05-17)
 
 
