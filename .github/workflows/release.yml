@@ -35,23 +35,25 @@ jobs:
         run: yarn
       # - name: Compile TS => JS
       #   run: yarn build
-      - name: Bundle code
-        uses: tool3/ncc@master
-        with:
-          github_token: ${{ secrets.GH_TOKEN }}
-          src: 'src/index.ts'
-          branch: 'main'
-          ncc_args: '--source-map, --license, licenses.txt'
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: dist
-          path: dist/
-      # - name: Commit dist
-      #   uses: EndBug/add-and-commit@v9
+      - name: Package code
+        run: yarn package
+      # - name: Bundle code
+      #   uses: tool3/ncc@master
       #   with:
-      #     default_author: github_actions
-      #     message: 'Commiting for release'
+      #     github_token: ${{ secrets.GH_TOKEN }}
+      #     src: 'src/index.ts'
+      #     branch: 'main'
+      #     ncc_args: '--source-map, --license, licenses.txt'
+      # - name: Upload artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: dist
+      #     path: dist/
+      - name: Commit dist
+        uses: EndBug/add-and-commit@v9
+        with:
+          default_author: github_actions
+          message: 'Commiting for release'
       - name: Cut release
         run: yarn release
         # white space
