@@ -39,7 +39,7 @@ jobs:
         uses: tool3/ncc@master
         with:
           github_token: ${{ secrets.GH_TOKEN }}
-          src: 'lib/index.js'
+          src: 'src/index.ts'
           branch: 'main'
           ncc_args: '--source-map, --license, licenses.txt'
       - name: Upload artifact
