@@ -54,5 +54,5 @@
     "release": "semantic-release",
     "test": "jest"
   },
-  "version": "7.1.1"
+  "version": "7.1.2"
 }

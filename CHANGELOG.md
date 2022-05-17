@@ -1,3 +1,10 @@
+### [7.1.2](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.1.1...v7.1.2) (2022-05-17)
+
+
+### CI
+
+* **release:** remove asset param from add-and-commit action step ([48b4ffe](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/48b4ffea71259f017e9ab425734c1c56473753db))
+
 ### [7.1.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.1.0...v7.1.1) (2022-05-17)
 
 
