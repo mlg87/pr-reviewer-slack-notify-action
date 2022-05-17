@@ -33,889 +33,6 @@ module.exports = JSON.parse('{"name":"@slack/web-api","version":"6.7.1","descrip
 
 /***/ }),
 
-/***/ 68495:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createInitialMessage = void 0;
-const core_1 = __importDefault(__nccwpck_require__(42186));
-const github_1 = __importDefault(__nccwpck_require__(95438));
-const createUsersToAtString_1 = __nccwpck_require__(45595);
-const fail_1 = __nccwpck_require__(43329);
-const slackWebClient_1 = __nccwpck_require__(32265);
-const createInitialMessage = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const channelId = core_1.default.getInput("channel-id");
-        const { number, pull_request, repository, sender } = github_1.default.context.payload;
-        if (!pull_request || !repository || !sender)
-            return;
-        const requestedReviewers = pull_request.requested_reviewers.map((user) => user.login);
-        //
-        // ─── RETURN IF THERE ARE NO REQUESTED REVIEWERS ──────────────────
-        //
-        if (!requestedReviewers.length) {
-            return;
-        }
-        let baseMessage = `*${sender.login}* is requesting your review on <${pull_request._links.html.href}|*${pull_request.title}*>`;
-        if (!!pull_request.body) {
-            baseMessage = `${baseMessage}\n>${pull_request.body}`;
-        }
-        // build users to mention string
-        const usersToAtString = yield (0, createUsersToAtString_1.createUsersToAtString)(requestedReviewers);
-        // DOCS https://api.slack.com/methods/chat.postMessage
-        const text = `${usersToAtString} ${baseMessage}`;
-        const prSlackMsg = yield slackWebClient_1.slackWebClient.chat.postMessage({
-            channel: channelId,
-            text,
-            blocks: [
-                {
-                    type: "section",
-                    text: {
-                        type: "mrkdwn",
-                        text,
-                    },
-                },
-            ],
-        });
-        if (!prSlackMsg.ok || !prSlackMsg.ts) {
-            throw Error("failed to create initial slack message");
-        }
-        const ghToken = core_1.default.getInput("github-token");
-        const octokit = github_1.default.getOctokit(ghToken);
-        yield octokit.rest.issues.createComment({
-            owner: repository.owner.login,
-            repo: repository.name,
-            issue_number: number,
-            body: `SLACK_MESSAGE_ID:${prSlackMsg.ts}`,
-        });
-        return;
-    }
-    catch (error) {
-        console.error("error in createInitialMessage::: ", error);
-        (0, fail_1.fail)(error.message);
-    }
-});
-exports.createInitialMessage = createInitialMessage;
-
-
-/***/ }),
-
-/***/ 89993:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.handleCommitPush = void 0;
-const core_1 = __importDefault(__nccwpck_require__(42186));
-const github_1 = __importDefault(__nccwpck_require__(95438));
-const clearReactions_1 = __nccwpck_require__(14197);
-const createUsersToAtString_1 = __nccwpck_require__(45595);
-const fail_1 = __nccwpck_require__(43329);
-const getPrForCommit_1 = __nccwpck_require__(62039);
-const getSlackMessageId_1 = __nccwpck_require__(69915);
-const slackWebClient_1 = __nccwpck_require__(32265);
-// NOTE in the future we may want to wait to notify everyone that they can review it again when the PR author
-// explicitly asks for a re-review
-const handleCommitPush = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const channelId = core_1.default.getInput("channel-id");
-        const { repository } = github_1.default.context.payload;
-        if (!repository) {
-            throw Error("no repository found in github.context.paylod in handleCommitPush");
-        }
-        //
-        // ─── GET THE ISSUE NUMBER FOR THE COMMIT ─────────────────────────
-        //
-        const pull_request = yield (0, getPrForCommit_1.getPrForCommit)();
-        // dont spam everyone on slack
-        if (!pull_request || pull_request.state === "closed") {
-            return;
-        }
-        const slackMessageId = yield (0, getSlackMessageId_1.getSlackMessageId)();
-        //
-        // ─── CLEAR ALL REACTIONS BC THERE IS NEW CODE ────────────────────
-        //
-        yield (0, clearReactions_1.clearReactions)(slackMessageId);
-        //
-        // ─── NOTIFY REVIEWERS IN THREAD ──────────────────────────────────
-        //
-        const octokit = github_1.default.getOctokit(core_1.default.getInput("github-token"));
-        const res = yield octokit.rest.pulls.listReviews({
-            owner: repository.owner.name,
-            repo: repository.name,
-            pull_number: pull_request.number,
-        });
-        if (res.data) {
-            const previousReviewers = res.data.map((review) => review.user.login);
-            const distinctPreviousReviewers = [...new Set(previousReviewers)];
-            const baseMessage = `new code has been committed since your review of <${pull_request._links.html.href}|*PR ${pull_request.number}*>, please review the updates.`;
-            const usersToAtString = (0, createUsersToAtString_1.createUsersToAtString)(distinctPreviousReviewers);
-            const text = `${usersToAtString} ${baseMessage}`;
-            const threadUpdateRes = yield slackWebClient_1.slackWebClient.chat.postMessage({
-                channel: channelId,
-                thread_ts: slackMessageId,
-                text,
-                blocks: [
-                    {
-                        type: "section",
-                        text: {
-                            type: "mrkdwn",
-                            text,
-                        },
-                    },
-                ],
-            });
-            if (!threadUpdateRes.ok || !threadUpdateRes.ts) {
-                throw Error("Failed to post message to thread requesting re-reviewe");
-            }
-        }
-    }
-    catch (error) {
-        (0, fail_1.fail)(error);
-        throw error;
-    }
-});
-exports.handleCommitPush = handleCommitPush;
-
-
-/***/ }),
-
-/***/ 32037:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.handleLabelChange = void 0;
-const core_1 = __importDefault(__nccwpck_require__(42186));
-const github_1 = __importDefault(__nccwpck_require__(95438));
-const fail_1 = __nccwpck_require__(43329);
-const getEngineersFromS3_1 = __nccwpck_require__(77573);
-const getSlackMessageId_1 = __nccwpck_require__(69915);
-const slackWebClient_1 = __nccwpck_require__(32265);
-// TODO handle labels being removed
-const handleLabelChange = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const channelId = core_1.default.getInput("channel-id");
-        const labelNameToWatchFor = core_1.default.getInput("label-name-to-watch-for");
-        const slackUsers = yield (0, getEngineersFromS3_1.getEngineersFromS3)();
-        const { pull_request, repository, sender } = github_1.default.context.payload;
-        if (!pull_request) {
-            throw Error("No pull_request found on github.context.payload");
-        }
-        if (!sender) {
-            throw Error("No sender found on github.context.payload");
-        }
-        // if there is now a matching label added, notify the slack message
-        let hasLabel = false;
-        pull_request.labels.forEach((label) => {
-            if (label.name === labelNameToWatchFor) {
-                hasLabel = true;
-            }
-        });
-        if (!hasLabel) {
-            return null;
-        }
-        const [labeler] = slackUsers.engineers.filter((user) => {
-            return user.github_username === sender.login;
-        });
-        const [author] = slackUsers.engineers.filter((user) => {
-            return user.github_username === pull_request.user.login;
-        });
-        const plainText = `<@${author.slack_id}>, ${labeler.github_username} added the label ${labelNameToWatchFor} to your PR`;
-        const richText = `<@${author.slack_id}>, *${labeler.github_username}* added the label *${labelNameToWatchFor}* to your PR`;
-        const slackMessageId = yield (0, getSlackMessageId_1.getSlackMessageId)();
-        yield slackWebClient_1.slackWebClient.chat.postMessage({
-            channel: channelId,
-            thread_ts: slackMessageId,
-            text: plainText,
-            blocks: [
-                {
-                    type: "section",
-                    text: {
-                        type: "mrkdwn",
-                        text: richText,
-                    },
-                },
-            ],
-        });
-        return yield slackWebClient_1.slackWebClient.reactions.add({
-            channel: channelId,
-            timestamp: slackMessageId,
-            name: "heart_eyes",
-        });
-    }
-    catch (error) {
-        (0, fail_1.fail)(error);
-        throw error;
-    }
-});
-exports.handleLabelChange = handleLabelChange;
-
-
-/***/ }),
-
-/***/ 41247:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.handleMerge = void 0;
-const core_1 = __importDefault(__nccwpck_require__(42186));
-const github_1 = __importDefault(__nccwpck_require__(95438));
-const clearReactions_1 = __nccwpck_require__(14197);
-const fail_1 = __nccwpck_require__(43329);
-const getPrForCommit_1 = __nccwpck_require__(62039);
-const getSlackMessageId_1 = __nccwpck_require__(69915);
-const slackWebClient_1 = __nccwpck_require__(32265);
-// will only run on push to base branch (i.e. staging), so we can assume that a closed state for PR
-// equates to 'merged' (no specific event for 'merged' on PRs)
-const handleMerge = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const channelId = core_1.default.getInput("channel-id");
-        const { commits, repository } = github_1.default.context.payload;
-        const commitSha = commits[0].id;
-        //
-        // ─── CONFIRM COMMIT IS ASSOCIATED WITH A PR IN CLOSED STATE ──────
-        //
-        const pull_request = yield (0, getPrForCommit_1.getPrForCommit)();
-        if (!pull_request) {
-            throw Error(`No pull_request found for commit: ${commitSha}`);
-        }
-        if (pull_request.state !== "closed") {
-            throw Error(`PR is not closed for commit: ${commitSha}`);
-        }
-        const slackMessageId = yield (0, getSlackMessageId_1.getSlackMessageId)();
-        //
-        // ─── CLEAR REACTIONS ─────────────────────────────────────────────
-        //
-        yield (0, clearReactions_1.clearReactions)(slackMessageId);
-        //
-        // ─── POST SHIPPED REACTION AND MESSAGE TO THREAD ─────────────────
-        //
-        yield slackWebClient_1.slackWebClient.reactions.add({
-            channel: channelId,
-            timestamp: slackMessageId,
-            name: "ship-it",
-        });
-        const text = "This PR has been merged. One-way ticket to Prod purchased. See you in Valhalla.";
-        return yield slackWebClient_1.slackWebClient.chat.postMessage({
-            channel: channelId,
-            thread_ts: slackMessageId,
-            text,
-        });
-    }
-    catch (error) {
-        (0, fail_1.fail)(error);
-        throw error;
-    }
-});
-exports.handleMerge = handleMerge;
-
-
-/***/ }),
-
-/***/ 63015:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.handlePullRequestReview = void 0;
-const core_1 = __importDefault(__nccwpck_require__(42186));
-const github_1 = __importDefault(__nccwpck_require__(95438));
-const fail_1 = __nccwpck_require__(43329);
-const getEngineersFromS3_1 = __nccwpck_require__(77573);
-const getSlackMessageId_1 = __nccwpck_require__(69915);
-const slackWebClient_1 = __nccwpck_require__(32265);
-const reactionMap = {
-    commented: "speech_balloon",
-    approved: "white_check_mark",
-    changes_requested: "octagonal_sign",
-};
-const handlePullRequestReview = () => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    try {
-        const channelId = core_1.default.getInput("channel-id");
-        const slackUsers = yield (0, getEngineersFromS3_1.getEngineersFromS3)();
-        const { action, pull_request, review } = github_1.default.context.payload;
-        // TODO handle more than just submitted PRs
-        if (action !== "submitted") {
-            return;
-        }
-        if (!pull_request) {
-            throw Error("No pull_request found in handlePullRequestReivew (github.context.payload)");
-        }
-        const slackMessageId = yield (0, getSlackMessageId_1.getSlackMessageId)();
-        //
-        // ─── MAP USERS ───────────────────────────────────────────────────
-        //
-        const [reviewer] = slackUsers.engineers.filter((user) => {
-            return user.github_username === review.user.login;
-        });
-        const [author] = slackUsers.engineers.filter((user) => {
-            return user.github_username === pull_request.user.login;
-        });
-        if (!reviewer) {
-            throw Error(`Could not map ${review.user.login} to the users you provided in action.yml`);
-        }
-        if (!author) {
-            throw Error(`Could not map ${pull_request.user.login} to the users you provided in action.yml`);
-        }
-        //
-        // ─── BUILD MESSAGE ───────────────────────────────────────────────
-        //
-        const userText = `<@${author.slack_id}>, *${reviewer.github_username}*`;
-        let actionText = "";
-        let reactionToAdd = "";
-        switch (review.state) {
-            case "changes_requested":
-                actionText = "would like you to change some things in the code";
-                reactionToAdd = reactionMap["changes_requested"];
-                break;
-            // TODO see if getting the review could allow for posting the text that was commented
-            // NOTE for reviews where the state is "commented", the comment text is not in the event payload
-            case "commented":
-                actionText = "neither approved or denied your PR, but merely commented";
-                reactionToAdd = reactionMap["commented"];
-                break;
-            case "approved":
-                actionText = "approved your PR";
-                reactionToAdd = reactionMap["approved"];
-                break;
-        }
-        if (!!review.body) {
-            actionText = `${actionText}\n>${review.body}`;
-        }
-        const text = `${userText} ${actionText}`;
-        // post corresponding message
-        yield slackWebClient_1.slackWebClient.chat.postMessage({
-            channel: channelId,
-            thread_ts: slackMessageId,
-            text,
-            blocks: [
-                {
-                    type: "section",
-                    text: {
-                        type: "mrkdwn",
-                        text,
-                    },
-                },
-            ],
-        });
-        //
-        // ─── ADD REACTION TO MAIN THREAD ─────────────────────────────────
-        //
-        // get existing reactions on message
-        const existingReactionsRes = yield slackWebClient_1.slackWebClient.reactions.get({
-            channel: channelId,
-            timestamp: slackMessageId,
-        });
-        let hasReaction = false;
-        if ((_a = existingReactionsRes === null || existingReactionsRes === void 0 ? void 0 : existingReactionsRes.message) === null || _a === void 0 ? void 0 : _a.reactions) {
-            // return out if the reaction we would add is already present (since we cant have the bot react on behalf of a user)
-            existingReactionsRes.message.reactions.forEach((reaction) => {
-                if (reaction.name === reactionToAdd) {
-                    hasReaction = true;
-                }
-            });
-        }
-        if (hasReaction) {
-            return;
-        }
-        // add new reactions
-        return yield slackWebClient_1.slackWebClient.reactions.add({
-            channel: channelId,
-            timestamp: slackMessageId,
-            name: reactionToAdd,
-        });
-    }
-    catch (error) {
-        (0, fail_1.fail)(error);
-        throw error;
-    }
-});
-exports.handlePullRequestReview = handlePullRequestReview;
-
-
-/***/ }),
-
-/***/ 94822:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const github_1 = __importDefault(__nccwpck_require__(95438));
-const core_1 = __importDefault(__nccwpck_require__(42186));
-const createInitialMessage_1 = __nccwpck_require__(68495);
-const handleLabelChange_1 = __nccwpck_require__(32037);
-const getSlackMessageId_1 = __nccwpck_require__(69915);
-const handleMerge_1 = __nccwpck_require__(41247);
-const handleCommitPush_1 = __nccwpck_require__(89993);
-const handlePullRequestReview_1 = __nccwpck_require__(63015);
-const run = () => __awaiter(void 0, void 0, void 0, function* () {
-    const { eventName, payload, ref } = github_1.default.context;
-    const baseBranch = core_1.default.getInput("base-branch");
-    const isActingOnBaseBranch = ref.includes(baseBranch);
-    let hasQuietLabel = false;
-    const pull_request = payload.pull_request;
-    const ignoreDraft = core_1.default.getInput("ignore-draft-prs");
-    const silenceQuiet = core_1.default.getInput("silence-on-quiet-label");
-    // need to prevent unhandled errors here
-    if (pull_request) {
-        for (const label of pull_request.labels) {
-            if (label.name === "quiet") {
-                hasQuietLabel = true;
-                break;
-            }
-        }
-        const isWip = pull_request && pull_request["draft"] && ignoreDraft;
-        // Don't do anything if this is a draft or we tell it to shut up
-        if (isWip || (hasQuietLabel && silenceQuiet))
-            return;
-    }
-    // route to the appropriate action
-    if (eventName === "pull_request") {
-        if (payload.action === "opened" || payload.action === "ready_for_review") {
-            console.log("running createInitialMessage::: ", payload);
-            yield (0, createInitialMessage_1.createInitialMessage)();
-            return;
-        }
-        // notify thread of a PR label change
-        if (payload.action === "labeled" || payload.action === "unlabeled") {
-            console.log("running handleLabelChange::: ", payload);
-            yield (0, handleLabelChange_1.handleLabelChange)();
-            return;
-        }
-    }
-    // reduce spamming channels by adding a message if one didn't get created somehow
-    const slackMessageId = yield (0, getSlackMessageId_1.getSlackMessageId)();
-    if (!slackMessageId) {
-        yield (0, createInitialMessage_1.createInitialMessage)();
-        return;
-    }
-    // push of commit
-    if (eventName === "push") {
-        // merge of PR to base branch
-        if (isActingOnBaseBranch) {
-            console.log("running handleMerge::: ", payload);
-            yield (0, handleMerge_1.handleMerge)();
-            return;
-        }
-        console.log("running handleCommitPush::: ", payload);
-        yield (0, handleCommitPush_1.handleCommitPush)();
-        return;
-    }
-    // a review has been submitted
-    if (eventName === "pull_request_review") {
-        console.log("running handlePullRequestReview::: ", payload);
-        yield (0, handlePullRequestReview_1.handlePullRequestReview)();
-        return;
-    }
-});
-run();
-
-
-/***/ }),
-
-/***/ 14197:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.clearReactions = void 0;
-const core_1 = __importDefault(__nccwpck_require__(42186));
-const fail_1 = __nccwpck_require__(43329);
-const slackWebClient_1 = __nccwpck_require__(32265);
-const clearReactions = (slackMessageId) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const channelId = core_1.default.getInput("channel-id");
-        const existingReactions = yield slackWebClient_1.slackWebClient.reactions.get({
-            channel: channelId,
-            timestamp: slackMessageId,
-        });
-        if (existingReactions.type === "message" &&
-            existingReactions.message &&
-            existingReactions.message.reactions) {
-            for (const reaction of existingReactions.message.reactions) {
-                yield slackWebClient_1.slackWebClient.reactions.remove({
-                    channel: channelId,
-                    timestamp: slackMessageId,
-                    name: reaction.name,
-                });
-            }
-        }
-        return;
-    }
-    catch (error) {
-        (0, fail_1.fail)(error);
-        throw error;
-    }
-});
-exports.clearReactions = clearReactions;
-
-
-/***/ }),
-
-/***/ 45595:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createUsersToAtString = void 0;
-const fail_1 = __nccwpck_require__(43329);
-const getEngineersFromS3_1 = __nccwpck_require__(77573);
-// reviewers is string[], where the strings should be github user names
-const createUsersToAtString = (reviewers) => __awaiter(void 0, void 0, void 0, function* () {
-    let engineers = [];
-    try {
-        const res = yield (0, getEngineersFromS3_1.getEngineersFromS3)();
-        engineers = res.engineers;
-    }
-    catch (error) {
-        (0, fail_1.fail)(error);
-    }
-    const usersToAt = engineers.filter((user) => reviewers.includes(user.github_username));
-    let usersToAtString = "";
-    usersToAt.forEach((user) => {
-        if (!usersToAtString) {
-            usersToAtString = `<@${user.slack_id}>`;
-            return;
-        }
-        usersToAtString = `${usersToAtString}, <@${user.slack_id}>`;
-        return;
-    });
-    return usersToAtString;
-});
-exports.createUsersToAtString = createUsersToAtString;
-
-
-/***/ }),
-
-/***/ 43329:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.fail = void 0;
-const core_1 = __importDefault(__nccwpck_require__(42186));
-const fail = (error) => {
-    var _a, _b;
-    const failSilently = core_1.default.getInput("fail-silently");
-    if (failSilently === "true") {
-        core_1.default.warning((_a = error.message) !== null && _a !== void 0 ? _a : "Oops");
-    }
-    else {
-        core_1.default.setFailed((_b = error.message) !== null && _b !== void 0 ? _b : "Oops");
-    }
-};
-exports.fail = fail;
-
-
-/***/ }),
-
-/***/ 77573:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getEngineersFromS3 = void 0;
-const core_1 = __importDefault(__nccwpck_require__(42186));
-const client_s3_1 = __nccwpck_require__(19250);
-const fail_1 = __nccwpck_require__(43329);
-const getEngineersFromS3 = () => {
-    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log("Running getEngineersFromS3");
-        // required for this to work
-        const Bucket = core_1.default.getInput("aws-s3-bucket");
-        const Key = core_1.default.getInput("aws-s3-object-key");
-        const region = core_1.default.getInput("aws-region");
-        if (!Bucket || !Key || !region) {
-            throw "Missing required inputs for AWS";
-        }
-        const client = new client_s3_1.S3Client({ region });
-        const getObjectCommand = new client_s3_1.GetObjectCommand({
-            Bucket,
-            Key,
-        });
-        try {
-            const response = yield client.send(getObjectCommand);
-            // Store all of data chunks returned from the response data stream
-            // into an array then use Array#join() to use the returned contents as a String
-            let responseDataChunks = [];
-            if (response && response.Body) {
-                const body = response.Body;
-                // Handle an error while streaming the response body
-                body.once("error", (err) => reject(err));
-                // Attach a 'data' listener to add the chunks of data to our array
-                // Each chunk is a Buffer instance
-                body.on("data", (chunk) => responseDataChunks.push(chunk));
-                // Once the stream has no more data, join the chunks into a string and return the string
-                body.once("end", () => resolve(JSON.parse(responseDataChunks.join(""))));
-            }
-        }
-        catch (error) {
-            (0, fail_1.fail)(error);
-            // Handle the error or throw
-            return reject(error);
-        }
-    }));
-};
-exports.getEngineersFromS3 = getEngineersFromS3;
-
-
-/***/ }),
-
-/***/ 62039:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getPrForCommit = void 0;
-const core_1 = __importDefault(__nccwpck_require__(42186));
-const github_1 = __importDefault(__nccwpck_require__(95438));
-const fail_1 = __nccwpck_require__(43329);
-const getPrForCommit = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { commits, repository } = github_1.default.context.payload;
-        if (!commits || !commits.length) {
-            throw Error("No commits found");
-        }
-        if (!repository) {
-            throw Error("No repository found in github.context.payload");
-        }
-        const commit_sha = commits[0].id;
-        const octokit = github_1.default.getOctokit(core_1.default.getInput("github-token"));
-        const res = yield octokit.rest.repos.listPullRequestsAssociatedWithCommit({
-            owner: repository.owner.name,
-            repo: repository.name,
-            commit_sha,
-        });
-        const [pull_request] = res.data;
-        if (!pull_request) {
-            throw Error(`No pull_request found for commit: ${commit_sha}`);
-        }
-        return pull_request;
-    }
-    catch (error) {
-        (0, fail_1.fail)(error);
-        throw error;
-    }
-});
-exports.getPrForCommit = getPrForCommit;
-
-
-/***/ }),
-
-/***/ 69915:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getSlackMessageId = void 0;
-const github_1 = __importDefault(__nccwpck_require__(95438));
-const core_1 = __importDefault(__nccwpck_require__(42186));
-const fail_1 = __nccwpck_require__(43329);
-// requires pull_request and repository as inputs bc of the differently shaped action payloads
-const getSlackMessageId = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { pull_request, repository } = github_1.default.context.payload;
-        if (!pull_request) {
-            throw Error("No pull_request key on github.context.payload in getSlackMessageId");
-        }
-        else if (!repository) {
-            throw Error("No repository key on github.context.payload in getSlackMessageId");
-        }
-        // get slack id and PR number from pull comment
-        const octokit = github_1.default.getOctokit(core_1.default.getInput("github-token"));
-        const res = yield octokit.rest.issues.listComments({
-            owner: repository.owner.login,
-            repo: repository.name,
-            issue_number: pull_request.number,
-        });
-        let slackMessageId;
-        res.data.forEach((comment) => {
-            var _a;
-            const match = (_a = comment === null || comment === void 0 ? void 0 : comment.body) === null || _a === void 0 ? void 0 : _a.match(/SLACK_MESSAGE_ID:[0-9]{1,}.[0-9]{1,}/);
-            if (match) {
-                slackMessageId = match[0];
-            }
-        });
-        if (!slackMessageId) {
-            throw Error("Unable to find SLACK_MESSAGE_ID comment in PR comment thread.");
-        }
-        return slackMessageId;
-    }
-    catch (error) {
-        (0, fail_1.fail)(error);
-        throw error;
-    }
-});
-exports.getSlackMessageId = getSlackMessageId;
-
-
-/***/ }),
-
-/***/ 32265:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.slackWebClient = void 0;
-const core_1 = __importDefault(__nccwpck_require__(42186));
-const web_api_1 = __nccwpck_require__(60431);
-exports.slackWebClient = new web_api_1.WebClient(core_1.default.getInput("bot-token"));
-
-
-/***/ }),
-
 /***/ 87351:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -59075,6 +58192,889 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 83396:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createInitialMessage = void 0;
+const core_1 = __importDefault(__nccwpck_require__(42186));
+const github_1 = __importDefault(__nccwpck_require__(95438));
+const createUsersToAtString_1 = __nccwpck_require__(76418);
+const fail_1 = __nccwpck_require__(40661);
+const slackWebClient_1 = __nccwpck_require__(72338);
+const createInitialMessage = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const channelId = core_1.default.getInput("channel-id");
+        const { number, pull_request, repository, sender } = github_1.default.context.payload;
+        if (!pull_request || !repository || !sender)
+            return;
+        const requestedReviewers = pull_request.requested_reviewers.map((user) => user.login);
+        //
+        // ─── RETURN IF THERE ARE NO REQUESTED REVIEWERS ──────────────────
+        //
+        if (!requestedReviewers.length) {
+            return;
+        }
+        let baseMessage = `*${sender.login}* is requesting your review on <${pull_request._links.html.href}|*${pull_request.title}*>`;
+        if (!!pull_request.body) {
+            baseMessage = `${baseMessage}\n>${pull_request.body}`;
+        }
+        // build users to mention string
+        const usersToAtString = yield (0, createUsersToAtString_1.createUsersToAtString)(requestedReviewers);
+        // DOCS https://api.slack.com/methods/chat.postMessage
+        const text = `${usersToAtString} ${baseMessage}`;
+        const prSlackMsg = yield slackWebClient_1.slackWebClient.chat.postMessage({
+            channel: channelId,
+            text,
+            blocks: [
+                {
+                    type: "section",
+                    text: {
+                        type: "mrkdwn",
+                        text,
+                    },
+                },
+            ],
+        });
+        if (!prSlackMsg.ok || !prSlackMsg.ts) {
+            throw Error("failed to create initial slack message");
+        }
+        const ghToken = core_1.default.getInput("github-token");
+        const octokit = github_1.default.getOctokit(ghToken);
+        yield octokit.rest.issues.createComment({
+            owner: repository.owner.login,
+            repo: repository.name,
+            issue_number: number,
+            body: `SLACK_MESSAGE_ID:${prSlackMsg.ts}`,
+        });
+        return;
+    }
+    catch (error) {
+        console.error("error in createInitialMessage::: ", error);
+        (0, fail_1.fail)(error.message);
+    }
+});
+exports.createInitialMessage = createInitialMessage;
+
+
+/***/ }),
+
+/***/ 89086:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.handleCommitPush = void 0;
+const core_1 = __importDefault(__nccwpck_require__(42186));
+const github_1 = __importDefault(__nccwpck_require__(95438));
+const clearReactions_1 = __nccwpck_require__(46875);
+const createUsersToAtString_1 = __nccwpck_require__(76418);
+const fail_1 = __nccwpck_require__(40661);
+const getPrForCommit_1 = __nccwpck_require__(29988);
+const getSlackMessageId_1 = __nccwpck_require__(1013);
+const slackWebClient_1 = __nccwpck_require__(72338);
+// NOTE in the future we may want to wait to notify everyone that they can review it again when the PR author
+// explicitly asks for a re-review
+const handleCommitPush = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const channelId = core_1.default.getInput("channel-id");
+        const { repository } = github_1.default.context.payload;
+        if (!repository) {
+            throw Error("no repository found in github.context.paylod in handleCommitPush");
+        }
+        //
+        // ─── GET THE ISSUE NUMBER FOR THE COMMIT ─────────────────────────
+        //
+        const pull_request = yield (0, getPrForCommit_1.getPrForCommit)();
+        // dont spam everyone on slack
+        if (!pull_request || pull_request.state === "closed") {
+            return;
+        }
+        const slackMessageId = yield (0, getSlackMessageId_1.getSlackMessageId)();
+        //
+        // ─── CLEAR ALL REACTIONS BC THERE IS NEW CODE ────────────────────
+        //
+        yield (0, clearReactions_1.clearReactions)(slackMessageId);
+        //
+        // ─── NOTIFY REVIEWERS IN THREAD ──────────────────────────────────
+        //
+        const octokit = github_1.default.getOctokit(core_1.default.getInput("github-token"));
+        const res = yield octokit.rest.pulls.listReviews({
+            owner: repository.owner.name,
+            repo: repository.name,
+            pull_number: pull_request.number,
+        });
+        if (res.data) {
+            const previousReviewers = res.data.map((review) => review.user.login);
+            const distinctPreviousReviewers = [...new Set(previousReviewers)];
+            const baseMessage = `new code has been committed since your review of <${pull_request._links.html.href}|*PR ${pull_request.number}*>, please review the updates.`;
+            const usersToAtString = (0, createUsersToAtString_1.createUsersToAtString)(distinctPreviousReviewers);
+            const text = `${usersToAtString} ${baseMessage}`;
+            const threadUpdateRes = yield slackWebClient_1.slackWebClient.chat.postMessage({
+                channel: channelId,
+                thread_ts: slackMessageId,
+                text,
+                blocks: [
+                    {
+                        type: "section",
+                        text: {
+                            type: "mrkdwn",
+                            text,
+                        },
+                    },
+                ],
+            });
+            if (!threadUpdateRes.ok || !threadUpdateRes.ts) {
+                throw Error("Failed to post message to thread requesting re-reviewe");
+            }
+        }
+    }
+    catch (error) {
+        (0, fail_1.fail)(error);
+        throw error;
+    }
+});
+exports.handleCommitPush = handleCommitPush;
+
+
+/***/ }),
+
+/***/ 45241:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.handleLabelChange = void 0;
+const core_1 = __importDefault(__nccwpck_require__(42186));
+const github_1 = __importDefault(__nccwpck_require__(95438));
+const fail_1 = __nccwpck_require__(40661);
+const getEngineersFromS3_1 = __nccwpck_require__(77086);
+const getSlackMessageId_1 = __nccwpck_require__(1013);
+const slackWebClient_1 = __nccwpck_require__(72338);
+// TODO handle labels being removed
+const handleLabelChange = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const channelId = core_1.default.getInput("channel-id");
+        const labelNameToWatchFor = core_1.default.getInput("label-name-to-watch-for");
+        const slackUsers = yield (0, getEngineersFromS3_1.getEngineersFromS3)();
+        const { pull_request, repository, sender } = github_1.default.context.payload;
+        if (!pull_request) {
+            throw Error("No pull_request found on github.context.payload");
+        }
+        if (!sender) {
+            throw Error("No sender found on github.context.payload");
+        }
+        // if there is now a matching label added, notify the slack message
+        let hasLabel = false;
+        pull_request.labels.forEach((label) => {
+            if (label.name === labelNameToWatchFor) {
+                hasLabel = true;
+            }
+        });
+        if (!hasLabel) {
+            return null;
+        }
+        const [labeler] = slackUsers.engineers.filter((user) => {
+            return user.github_username === sender.login;
+        });
+        const [author] = slackUsers.engineers.filter((user) => {
+            return user.github_username === pull_request.user.login;
+        });
+        const plainText = `<@${author.slack_id}>, ${labeler.github_username} added the label ${labelNameToWatchFor} to your PR`;
+        const richText = `<@${author.slack_id}>, *${labeler.github_username}* added the label *${labelNameToWatchFor}* to your PR`;
+        const slackMessageId = yield (0, getSlackMessageId_1.getSlackMessageId)();
+        yield slackWebClient_1.slackWebClient.chat.postMessage({
+            channel: channelId,
+            thread_ts: slackMessageId,
+            text: plainText,
+            blocks: [
+                {
+                    type: "section",
+                    text: {
+                        type: "mrkdwn",
+                        text: richText,
+                    },
+                },
+            ],
+        });
+        return yield slackWebClient_1.slackWebClient.reactions.add({
+            channel: channelId,
+            timestamp: slackMessageId,
+            name: "heart_eyes",
+        });
+    }
+    catch (error) {
+        (0, fail_1.fail)(error);
+        throw error;
+    }
+});
+exports.handleLabelChange = handleLabelChange;
+
+
+/***/ }),
+
+/***/ 46362:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.handleMerge = void 0;
+const core_1 = __importDefault(__nccwpck_require__(42186));
+const github_1 = __importDefault(__nccwpck_require__(95438));
+const clearReactions_1 = __nccwpck_require__(46875);
+const fail_1 = __nccwpck_require__(40661);
+const getPrForCommit_1 = __nccwpck_require__(29988);
+const getSlackMessageId_1 = __nccwpck_require__(1013);
+const slackWebClient_1 = __nccwpck_require__(72338);
+// will only run on push to base branch (i.e. staging), so we can assume that a closed state for PR
+// equates to 'merged' (no specific event for 'merged' on PRs)
+const handleMerge = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const channelId = core_1.default.getInput("channel-id");
+        const { commits, repository } = github_1.default.context.payload;
+        const commitSha = commits[0].id;
+        //
+        // ─── CONFIRM COMMIT IS ASSOCIATED WITH A PR IN CLOSED STATE ──────
+        //
+        const pull_request = yield (0, getPrForCommit_1.getPrForCommit)();
+        if (!pull_request) {
+            throw Error(`No pull_request found for commit: ${commitSha}`);
+        }
+        if (pull_request.state !== "closed") {
+            throw Error(`PR is not closed for commit: ${commitSha}`);
+        }
+        const slackMessageId = yield (0, getSlackMessageId_1.getSlackMessageId)();
+        //
+        // ─── CLEAR REACTIONS ─────────────────────────────────────────────
+        //
+        yield (0, clearReactions_1.clearReactions)(slackMessageId);
+        //
+        // ─── POST SHIPPED REACTION AND MESSAGE TO THREAD ─────────────────
+        //
+        yield slackWebClient_1.slackWebClient.reactions.add({
+            channel: channelId,
+            timestamp: slackMessageId,
+            name: "ship-it",
+        });
+        const text = "This PR has been merged. One-way ticket to Prod purchased. See you in Valhalla.";
+        return yield slackWebClient_1.slackWebClient.chat.postMessage({
+            channel: channelId,
+            thread_ts: slackMessageId,
+            text,
+        });
+    }
+    catch (error) {
+        (0, fail_1.fail)(error);
+        throw error;
+    }
+});
+exports.handleMerge = handleMerge;
+
+
+/***/ }),
+
+/***/ 2954:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.handlePullRequestReview = void 0;
+const core_1 = __importDefault(__nccwpck_require__(42186));
+const github_1 = __importDefault(__nccwpck_require__(95438));
+const fail_1 = __nccwpck_require__(40661);
+const getEngineersFromS3_1 = __nccwpck_require__(77086);
+const getSlackMessageId_1 = __nccwpck_require__(1013);
+const slackWebClient_1 = __nccwpck_require__(72338);
+const reactionMap = {
+    commented: "speech_balloon",
+    approved: "white_check_mark",
+    changes_requested: "octagonal_sign",
+};
+const handlePullRequestReview = () => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const channelId = core_1.default.getInput("channel-id");
+        const slackUsers = yield (0, getEngineersFromS3_1.getEngineersFromS3)();
+        const { action, pull_request, review } = github_1.default.context.payload;
+        // TODO handle more than just submitted PRs
+        if (action !== "submitted") {
+            return;
+        }
+        if (!pull_request) {
+            throw Error("No pull_request found in handlePullRequestReivew (github.context.payload)");
+        }
+        const slackMessageId = yield (0, getSlackMessageId_1.getSlackMessageId)();
+        //
+        // ─── MAP USERS ───────────────────────────────────────────────────
+        //
+        const [reviewer] = slackUsers.engineers.filter((user) => {
+            return user.github_username === review.user.login;
+        });
+        const [author] = slackUsers.engineers.filter((user) => {
+            return user.github_username === pull_request.user.login;
+        });
+        if (!reviewer) {
+            throw Error(`Could not map ${review.user.login} to the users you provided in action.yml`);
+        }
+        if (!author) {
+            throw Error(`Could not map ${pull_request.user.login} to the users you provided in action.yml`);
+        }
+        //
+        // ─── BUILD MESSAGE ───────────────────────────────────────────────
+        //
+        const userText = `<@${author.slack_id}>, *${reviewer.github_username}*`;
+        let actionText = "";
+        let reactionToAdd = "";
+        switch (review.state) {
+            case "changes_requested":
+                actionText = "would like you to change some things in the code";
+                reactionToAdd = reactionMap["changes_requested"];
+                break;
+            // TODO see if getting the review could allow for posting the text that was commented
+            // NOTE for reviews where the state is "commented", the comment text is not in the event payload
+            case "commented":
+                actionText = "neither approved or denied your PR, but merely commented";
+                reactionToAdd = reactionMap["commented"];
+                break;
+            case "approved":
+                actionText = "approved your PR";
+                reactionToAdd = reactionMap["approved"];
+                break;
+        }
+        if (!!review.body) {
+            actionText = `${actionText}\n>${review.body}`;
+        }
+        const text = `${userText} ${actionText}`;
+        // post corresponding message
+        yield slackWebClient_1.slackWebClient.chat.postMessage({
+            channel: channelId,
+            thread_ts: slackMessageId,
+            text,
+            blocks: [
+                {
+                    type: "section",
+                    text: {
+                        type: "mrkdwn",
+                        text,
+                    },
+                },
+            ],
+        });
+        //
+        // ─── ADD REACTION TO MAIN THREAD ─────────────────────────────────
+        //
+        // get existing reactions on message
+        const existingReactionsRes = yield slackWebClient_1.slackWebClient.reactions.get({
+            channel: channelId,
+            timestamp: slackMessageId,
+        });
+        let hasReaction = false;
+        if ((_a = existingReactionsRes === null || existingReactionsRes === void 0 ? void 0 : existingReactionsRes.message) === null || _a === void 0 ? void 0 : _a.reactions) {
+            // return out if the reaction we would add is already present (since we cant have the bot react on behalf of a user)
+            existingReactionsRes.message.reactions.forEach((reaction) => {
+                if (reaction.name === reactionToAdd) {
+                    hasReaction = true;
+                }
+            });
+        }
+        if (hasReaction) {
+            return;
+        }
+        // add new reactions
+        return yield slackWebClient_1.slackWebClient.reactions.add({
+            channel: channelId,
+            timestamp: slackMessageId,
+            name: reactionToAdd,
+        });
+    }
+    catch (error) {
+        (0, fail_1.fail)(error);
+        throw error;
+    }
+});
+exports.handlePullRequestReview = handlePullRequestReview;
+
+
+/***/ }),
+
+/***/ 6144:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const github_1 = __importDefault(__nccwpck_require__(95438));
+const core_1 = __importDefault(__nccwpck_require__(42186));
+const createInitialMessage_1 = __nccwpck_require__(83396);
+const handleLabelChange_1 = __nccwpck_require__(45241);
+const getSlackMessageId_1 = __nccwpck_require__(1013);
+const handleMerge_1 = __nccwpck_require__(46362);
+const handleCommitPush_1 = __nccwpck_require__(89086);
+const handlePullRequestReview_1 = __nccwpck_require__(2954);
+const run = () => __awaiter(void 0, void 0, void 0, function* () {
+    const { eventName, payload, ref } = github_1.default.context;
+    const baseBranch = core_1.default.getInput("base-branch");
+    const isActingOnBaseBranch = ref.includes(baseBranch);
+    let hasQuietLabel = false;
+    const pull_request = payload.pull_request;
+    const ignoreDraft = core_1.default.getInput("ignore-draft-prs");
+    const silenceQuiet = core_1.default.getInput("silence-on-quiet-label");
+    // need to prevent unhandled errors here
+    if (pull_request) {
+        for (const label of pull_request.labels) {
+            if (label.name === "quiet") {
+                hasQuietLabel = true;
+                break;
+            }
+        }
+        const isWip = pull_request && pull_request["draft"] && ignoreDraft;
+        // Don't do anything if this is a draft or we tell it to shut up
+        if (isWip || (hasQuietLabel && silenceQuiet))
+            return;
+    }
+    // route to the appropriate action
+    if (eventName === "pull_request") {
+        if (payload.action === "opened" || payload.action === "ready_for_review") {
+            console.log("running createInitialMessage::: ", payload);
+            yield (0, createInitialMessage_1.createInitialMessage)();
+            return;
+        }
+        // notify thread of a PR label change
+        if (payload.action === "labeled" || payload.action === "unlabeled") {
+            console.log("running handleLabelChange::: ", payload);
+            yield (0, handleLabelChange_1.handleLabelChange)();
+            return;
+        }
+    }
+    // reduce spamming channels by adding a message if one didn't get created somehow
+    const slackMessageId = yield (0, getSlackMessageId_1.getSlackMessageId)();
+    if (!slackMessageId) {
+        yield (0, createInitialMessage_1.createInitialMessage)();
+        return;
+    }
+    // push of commit
+    if (eventName === "push") {
+        // merge of PR to base branch
+        if (isActingOnBaseBranch) {
+            console.log("running handleMerge::: ", payload);
+            yield (0, handleMerge_1.handleMerge)();
+            return;
+        }
+        console.log("running handleCommitPush::: ", payload);
+        yield (0, handleCommitPush_1.handleCommitPush)();
+        return;
+    }
+    // a review has been submitted
+    if (eventName === "pull_request_review") {
+        console.log("running handlePullRequestReview::: ", payload);
+        yield (0, handlePullRequestReview_1.handlePullRequestReview)();
+        return;
+    }
+});
+run();
+
+
+/***/ }),
+
+/***/ 46875:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.clearReactions = void 0;
+const core_1 = __importDefault(__nccwpck_require__(42186));
+const fail_1 = __nccwpck_require__(40661);
+const slackWebClient_1 = __nccwpck_require__(72338);
+const clearReactions = (slackMessageId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const channelId = core_1.default.getInput("channel-id");
+        const existingReactions = yield slackWebClient_1.slackWebClient.reactions.get({
+            channel: channelId,
+            timestamp: slackMessageId,
+        });
+        if (existingReactions.type === "message" &&
+            existingReactions.message &&
+            existingReactions.message.reactions) {
+            for (const reaction of existingReactions.message.reactions) {
+                yield slackWebClient_1.slackWebClient.reactions.remove({
+                    channel: channelId,
+                    timestamp: slackMessageId,
+                    name: reaction.name,
+                });
+            }
+        }
+        return;
+    }
+    catch (error) {
+        (0, fail_1.fail)(error);
+        throw error;
+    }
+});
+exports.clearReactions = clearReactions;
+
+
+/***/ }),
+
+/***/ 76418:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createUsersToAtString = void 0;
+const fail_1 = __nccwpck_require__(40661);
+const getEngineersFromS3_1 = __nccwpck_require__(77086);
+// reviewers is string[], where the strings should be github user names
+const createUsersToAtString = (reviewers) => __awaiter(void 0, void 0, void 0, function* () {
+    let engineers = [];
+    try {
+        const res = yield (0, getEngineersFromS3_1.getEngineersFromS3)();
+        engineers = res.engineers;
+    }
+    catch (error) {
+        (0, fail_1.fail)(error);
+    }
+    const usersToAt = engineers.filter((user) => reviewers.includes(user.github_username));
+    let usersToAtString = "";
+    usersToAt.forEach((user) => {
+        if (!usersToAtString) {
+            usersToAtString = `<@${user.slack_id}>`;
+            return;
+        }
+        usersToAtString = `${usersToAtString}, <@${user.slack_id}>`;
+        return;
+    });
+    return usersToAtString;
+});
+exports.createUsersToAtString = createUsersToAtString;
+
+
+/***/ }),
+
+/***/ 40661:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.fail = void 0;
+const core_1 = __importDefault(__nccwpck_require__(42186));
+const fail = (error) => {
+    var _a, _b;
+    const failSilently = core_1.default.getInput("fail-silently");
+    if (failSilently === "true") {
+        core_1.default.warning((_a = error.message) !== null && _a !== void 0 ? _a : "Oops");
+    }
+    else {
+        core_1.default.setFailed((_b = error.message) !== null && _b !== void 0 ? _b : "Oops");
+    }
+};
+exports.fail = fail;
+
+
+/***/ }),
+
+/***/ 77086:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getEngineersFromS3 = void 0;
+const core_1 = __importDefault(__nccwpck_require__(42186));
+const client_s3_1 = __nccwpck_require__(19250);
+const fail_1 = __nccwpck_require__(40661);
+const getEngineersFromS3 = () => {
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log("Running getEngineersFromS3");
+        // required for this to work
+        const Bucket = core_1.default.getInput("aws-s3-bucket");
+        const Key = core_1.default.getInput("aws-s3-object-key");
+        const region = core_1.default.getInput("aws-region");
+        if (!Bucket || !Key || !region) {
+            throw "Missing required inputs for AWS";
+        }
+        const client = new client_s3_1.S3Client({ region });
+        const getObjectCommand = new client_s3_1.GetObjectCommand({
+            Bucket,
+            Key,
+        });
+        try {
+            const response = yield client.send(getObjectCommand);
+            // Store all of data chunks returned from the response data stream
+            // into an array then use Array#join() to use the returned contents as a String
+            let responseDataChunks = [];
+            if (response && response.Body) {
+                const body = response.Body;
+                // Handle an error while streaming the response body
+                body.once("error", (err) => reject(err));
+                // Attach a 'data' listener to add the chunks of data to our array
+                // Each chunk is a Buffer instance
+                body.on("data", (chunk) => responseDataChunks.push(chunk));
+                // Once the stream has no more data, join the chunks into a string and return the string
+                body.once("end", () => resolve(JSON.parse(responseDataChunks.join(""))));
+            }
+        }
+        catch (error) {
+            (0, fail_1.fail)(error);
+            // Handle the error or throw
+            return reject(error);
+        }
+    }));
+};
+exports.getEngineersFromS3 = getEngineersFromS3;
+
+
+/***/ }),
+
+/***/ 29988:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getPrForCommit = void 0;
+const core_1 = __importDefault(__nccwpck_require__(42186));
+const github_1 = __importDefault(__nccwpck_require__(95438));
+const fail_1 = __nccwpck_require__(40661);
+const getPrForCommit = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { commits, repository } = github_1.default.context.payload;
+        if (!commits || !commits.length) {
+            throw Error("No commits found");
+        }
+        if (!repository) {
+            throw Error("No repository found in github.context.payload");
+        }
+        const commit_sha = commits[0].id;
+        const octokit = github_1.default.getOctokit(core_1.default.getInput("github-token"));
+        const res = yield octokit.rest.repos.listPullRequestsAssociatedWithCommit({
+            owner: repository.owner.name,
+            repo: repository.name,
+            commit_sha,
+        });
+        const [pull_request] = res.data;
+        if (!pull_request) {
+            throw Error(`No pull_request found for commit: ${commit_sha}`);
+        }
+        return pull_request;
+    }
+    catch (error) {
+        (0, fail_1.fail)(error);
+        throw error;
+    }
+});
+exports.getPrForCommit = getPrForCommit;
+
+
+/***/ }),
+
+/***/ 1013:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getSlackMessageId = void 0;
+const github_1 = __importDefault(__nccwpck_require__(95438));
+const core_1 = __importDefault(__nccwpck_require__(42186));
+const fail_1 = __nccwpck_require__(40661);
+// requires pull_request and repository as inputs bc of the differently shaped action payloads
+const getSlackMessageId = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { pull_request, repository } = github_1.default.context.payload;
+        if (!pull_request) {
+            throw Error("No pull_request key on github.context.payload in getSlackMessageId");
+        }
+        else if (!repository) {
+            throw Error("No repository key on github.context.payload in getSlackMessageId");
+        }
+        // get slack id and PR number from pull comment
+        const octokit = github_1.default.getOctokit(core_1.default.getInput("github-token"));
+        const res = yield octokit.rest.issues.listComments({
+            owner: repository.owner.login,
+            repo: repository.name,
+            issue_number: pull_request.number,
+        });
+        let slackMessageId;
+        res.data.forEach((comment) => {
+            var _a;
+            const match = (_a = comment === null || comment === void 0 ? void 0 : comment.body) === null || _a === void 0 ? void 0 : _a.match(/SLACK_MESSAGE_ID:[0-9]{1,}.[0-9]{1,}/);
+            if (match) {
+                slackMessageId = match[0];
+            }
+        });
+        if (!slackMessageId) {
+            throw Error("Unable to find SLACK_MESSAGE_ID comment in PR comment thread.");
+        }
+        return slackMessageId;
+    }
+    catch (error) {
+        (0, fail_1.fail)(error);
+        throw error;
+    }
+});
+exports.getSlackMessageId = getSlackMessageId;
+
+
+/***/ }),
+
+/***/ 72338:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.slackWebClient = void 0;
+const core_1 = __importDefault(__nccwpck_require__(42186));
+const web_api_1 = __nccwpck_require__(60431);
+exports.slackWebClient = new web_api_1.WebClient(core_1.default.getInput("bot-token"));
+
+
+/***/ }),
+
 /***/ 20481:
 /***/ ((module) => {
 
@@ -59421,7 +59421,7 @@ module.exports = require("zlib");
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(94822);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(6144);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()
