@@ -1,3 +1,10 @@
+### [7.2.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.2.0...v7.2.1) (2022-05-17)
+
+
+### Bug Fixes
+
+* **core inputs:** move retrieval of core inputs out of function calls ([8016e87](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/8016e87f02b7c835ba14c501f6928b67e5d3add3))
+
 ## [7.2.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.1.3...v7.2.0) (2022-05-17)
 
 
