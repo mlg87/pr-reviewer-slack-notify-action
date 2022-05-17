@@ -33,8 +33,8 @@ jobs:
           node-version: 16.15.0
       - name: Install dependencies
         run: yarn
-      - name: Compile TS => JS
-        run: yarn build
+      # - name: Compile TS => JS
+      #   run: yarn build
       - name: Bundle code
         uses: tool3/ncc@master
         with:
