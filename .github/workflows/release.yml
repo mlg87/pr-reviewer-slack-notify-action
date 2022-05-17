@@ -42,7 +42,7 @@ jobs:
         with:
           default_author: github_actions
           message: 'Commiting dist for release'
-          add: 'dist'
+          add: 'dist/'
       - name: Cut release
         run: yarn release
       
