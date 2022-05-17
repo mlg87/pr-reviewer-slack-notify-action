@@ -58325,7 +58325,8 @@ const handleCommitPush = () => __awaiter(void 0, void 0, void 0, function* () {
         //
         // ─── NOTIFY REVIEWERS IN THREAD ──────────────────────────────────
         //
-        const octokit = github_1.default.getOctokit(core_1.default.getInput("github-token"));
+        const ghToken = core_1.default.getInput("github-token");
+        const octokit = github_1.default.getOctokit(ghToken);
         const res = yield octokit.rest.pulls.listReviews({
             owner: repository.owner.name,
             repo: repository.name,
@@ -58974,7 +58975,8 @@ const getPrForCommit = () => __awaiter(void 0, void 0, void 0, function* () {
             throw Error("No repository found in github.context.payload");
         }
         const commit_sha = commits[0].id;
-        const octokit = github_1.default.getOctokit(core_1.default.getInput("github-token"));
+        const ghToken = core_1.default.getInput("github-token");
+        const octokit = github_1.default.getOctokit(ghToken);
         const res = yield octokit.rest.repos.listPullRequestsAssociatedWithCommit({
             owner: repository.owner.name,
             repo: repository.name,
@@ -59070,7 +59072,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.slackWebClient = void 0;
 const core_1 = __importDefault(__nccwpck_require__(42186));
 const web_api_1 = __nccwpck_require__(60431);
-exports.slackWebClient = new web_api_1.WebClient(core_1.default.getInput("bot-token"));
+const token = core_1.default.getInput("bot-token");
+exports.slackWebClient = new web_api_1.WebClient(token);
 
 
 /***/ }),
