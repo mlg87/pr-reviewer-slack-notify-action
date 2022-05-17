@@ -1,10 +1,9 @@
-import core from "@actions/core"
-import github from "@actions/github"
+import core from "@actions/core";
+import github from "@actions/github";
 import { fail } from "../utils/fail";
 import { getEngineersFromS3 } from "../utils/getEngineersFromS3";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
 import { slackWebClient } from "../utils/slackWebClient";
-
 
 const reactionMap = {
   commented: "speech_balloon",
@@ -24,8 +23,9 @@ export const handlePullRequestReview = async () => {
     }
 
     if (!pull_request) {
-      throw Error('No pull_request found in handlePullRequestReivew (github.context.payload)')
-      
+      throw Error(
+        "No pull_request found in handlePullRequestReivew (github.context.payload)"
+      );
     }
 
     const slackMessageId = await getSlackMessageId();
@@ -58,8 +58,8 @@ export const handlePullRequestReview = async () => {
     //
 
     const userText = `<@${author.slack_id}>, *${reviewer.github_username}*`;
-    let actionText: string = '';
-    let reactionToAdd: string = '';
+    let actionText: string = "";
+    let reactionToAdd: string = "";
     switch (review.state) {
       case "changes_requested":
         actionText = "would like you to change some things in the code";
@@ -107,9 +107,7 @@ export const handlePullRequestReview = async () => {
     });
 
     let hasReaction = false;
-    if (
-      existingReactionsRes?.message?.reactions
-    ) {
+    if (existingReactionsRes?.message?.reactions) {
       // return out if the reaction we would add is already present (since we cant have the bot react on behalf of a user)
       existingReactionsRes.message.reactions.forEach((reaction) => {
         if (reaction.name === reactionToAdd) {
@@ -130,6 +128,6 @@ export const handlePullRequestReview = async () => {
     });
   } catch (error) {
     fail(error);
-    throw(error)
+    throw error;
   }
 };

@@ -1,12 +1,10 @@
-import core from "@actions/core"
-import github from "@actions/github"
+import core from "@actions/core";
+import github from "@actions/github";
 import { clearReactions } from "../utils/clearReactions";
 import { fail } from "../utils/fail";
 import { getPrForCommit } from "../utils/getPrForCommit";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
 import { slackWebClient } from "../utils/slackWebClient";
-
-
 
 // will only run on push to base branch (i.e. staging), so we can assume that a closed state for PR
 // equates to 'merged' (no specific event for 'merged' on PRs)
@@ -47,7 +45,8 @@ export const handleMerge = async () => {
       name: "ship-it",
     });
 
-    const text = "This PR has been merged. One-way ticket to Prod purchased. See you in Valhalla.";
+    const text =
+      "This PR has been merged. One-way ticket to Prod purchased. See you in Valhalla.";
     return await slackWebClient.chat.postMessage({
       channel: channelId,
       thread_ts: slackMessageId,
@@ -55,6 +54,6 @@ export const handleMerge = async () => {
     });
   } catch (error) {
     fail(error);
-    throw(error)
+    throw error;
   }
 };

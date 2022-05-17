@@ -1,6 +1,6 @@
-import core from "@actions/core"
-import github from "@actions/github"
-import { PullRequest } from "../types/github-api-types";
+import core from "@actions/core";
+import github from "@actions/github";
+import { Github } from "../types/github-api-types";
 import { createUsersToAtString } from "../utils/createUsersToAtString";
 import { fail } from "../utils/fail";
 import { slackWebClient } from "../utils/slackWebClient";
@@ -11,10 +11,10 @@ export const createInitialMessage = async (): Promise<void> => {
     const { number, pull_request, repository, sender } = github.context.payload;
 
     if (!pull_request || !repository || !sender) return;
-    
-    const requestedReviewers = (pull_request as PullRequest).requested_reviewers.map(
-      (user) => user.login
-    );
+
+    const requestedReviewers = (
+      pull_request as Github.PullRequest
+    ).requested_reviewers.map((user) => user.login);
 
     //
     // ─── RETURN IF THERE ARE NO REQUESTED REVIEWERS ──────────────────
@@ -54,7 +54,7 @@ export const createInitialMessage = async (): Promise<void> => {
 
     const ghToken = core.getInput("github-token");
     const octokit = github.getOctokit(ghToken);
-    await octokit.issues.createComment({
+    await octokit.rest.issues.createComment({
       owner: repository.owner.login,
       repo: repository.name,
       issue_number: number,
@@ -62,8 +62,8 @@ export const createInitialMessage = async (): Promise<void> => {
     });
     return;
   } catch (error: any) {
-    console.error('error in createInitialMessage::: ', error);
-    
+    console.error("error in createInitialMessage::: ", error);
+
     fail(error.message);
   }
 };

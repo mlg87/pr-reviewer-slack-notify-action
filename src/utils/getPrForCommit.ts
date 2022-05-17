@@ -1,8 +1,6 @@
-import core from "@actions/core"
-import github from "@actions/github"
-import fetch from "node-fetch"
+import core from "@actions/core";
+import github from "@actions/github";
 
-import { Github } from '../types/github-api-types'
 import { fail } from "./fail";
 
 export const getPrForCommit = async () => {
@@ -10,11 +8,11 @@ export const getPrForCommit = async () => {
     const { commits, repository } = github.context.payload;
 
     if (!commits || !commits.length) {
-      throw Error('No commits found')
+      throw Error("No commits found");
     }
 
     if (!repository) {
-      throw Error('No repository found in github.context.payload')
+      throw Error("No repository found in github.context.payload");
     }
 
     const commit_sha = commits[0].id;
@@ -24,17 +22,16 @@ export const getPrForCommit = async () => {
       repo: repository.name,
       commit_sha,
     });
-  
+
     const [pull_request] = res.data;
-    
 
     if (!pull_request) {
-      throw Error(`No pull_request found for commit: ${commit_sha}`)
+      throw Error(`No pull_request found for commit: ${commit_sha}`);
     }
 
     return pull_request;
   } catch (error) {
     fail(error);
-    throw(error)
+    throw error;
   }
 };

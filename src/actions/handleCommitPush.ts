@@ -1,5 +1,5 @@
-import core from "@actions/core"
-import github from "@actions/github"
+import core from "@actions/core";
+import github from "@actions/github";
 import { clearReactions } from "../utils/clearReactions";
 import { createUsersToAtString } from "../utils/createUsersToAtString";
 import { fail } from "../utils/fail";
@@ -15,7 +15,9 @@ export const handleCommitPush = async () => {
     const { repository } = github.context.payload;
 
     if (!repository) {
-      throw Error('no repository found in github.context.paylod in handleCommitPush')
+      throw Error(
+        "no repository found in github.context.paylod in handleCommitPush"
+      );
     }
 
     //
@@ -47,11 +49,8 @@ export const handleCommitPush = async () => {
       pull_number: pull_request.number,
     });
 
-
     if (res.data) {
-      const previousReviewers = res.data.map(
-        (review) => review!.user!.login
-      );
+      const previousReviewers = res.data.map((review) => review!.user!.login);
       const distinctPreviousReviewers = [...new Set(previousReviewers)];
       const baseMessage = `new code has been committed since your review of <${pull_request._links.html.href}|*PR ${pull_request.number}*>, please review the updates.`;
       const usersToAtString = createUsersToAtString(distinctPreviousReviewers);
@@ -77,6 +76,6 @@ export const handleCommitPush = async () => {
     }
   } catch (error) {
     fail(error);
-    throw(error)
+    throw error;
   }
 };

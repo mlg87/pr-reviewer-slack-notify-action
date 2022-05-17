@@ -1,11 +1,11 @@
-import github from '@actions/github'
-import core from '@actions/core'
-import { createInitialMessage } from './actions/createInitialMessage';
-import { handleLabelChange } from './actions/handleLabelChange';
-import { getSlackMessageId } from './utils/getSlackMessageId';
-import { handleMerge } from './actions/handleMerge';
-import { handleCommitPush } from './actions/handleCommitPush';
-import { handlePullRequestReview } from './actions/handlePullRequestReview';
+import github from "@actions/github";
+import core from "@actions/core";
+import { createInitialMessage } from "./actions/createInitialMessage";
+import { handleLabelChange } from "./actions/handleLabelChange";
+import { getSlackMessageId } from "./utils/getSlackMessageId";
+import { handleMerge } from "./actions/handleMerge";
+import { handleCommitPush } from "./actions/handleCommitPush";
+import { handlePullRequestReview } from "./actions/handlePullRequestReview";
 
 const run = async (): Promise<void> => {
   const { eventName, payload, ref } = github.context;
@@ -39,7 +39,7 @@ const run = async (): Promise<void> => {
       console.log("running createInitialMessage::: ", payload);
 
       await createInitialMessage();
-      return
+      return;
     }
 
     // notify thread of a PR label change
@@ -47,7 +47,7 @@ const run = async (): Promise<void> => {
       console.log("running handleLabelChange::: ", payload);
 
       await handleLabelChange();
-      return
+      return;
     }
   }
 
@@ -55,7 +55,7 @@ const run = async (): Promise<void> => {
   const slackMessageId = await getSlackMessageId();
   if (!slackMessageId) {
     await createInitialMessage();
-    return
+    return;
   }
 
   // push of commit
@@ -64,12 +64,14 @@ const run = async (): Promise<void> => {
     if (isActingOnBaseBranch) {
       console.log("running handleMerge::: ", payload);
 
-      return await handleMerge();
+      await handleMerge();
+      return;
     }
 
     console.log("running handleCommitPush::: ", payload);
 
-    return await handleCommitPush();
+    await handleCommitPush();
+    return;
   }
 
   // a review has been submitted
@@ -77,8 +79,8 @@ const run = async (): Promise<void> => {
     console.log("running handlePullRequestReview::: ", payload);
 
     await handlePullRequestReview();
-    return
+    return;
   }
-}
+};
 
 run();

@@ -1,12 +1,12 @@
-import core from "@actions/core"
-import github from "@actions/github"
+import core from "@actions/core";
+import github from "@actions/github";
 import { fail } from "../utils/fail";
 import { getEngineersFromS3 } from "../utils/getEngineersFromS3";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
 import { slackWebClient } from "../utils/slackWebClient";
 
 // TODO handle labels being removed
-export const handleLabelChange =  async () => {
+export const handleLabelChange = async () => {
   try {
     const channelId = core.getInput("channel-id");
     const labelNameToWatchFor = core.getInput("label-name-to-watch-for");
@@ -14,11 +14,11 @@ export const handleLabelChange =  async () => {
     const { pull_request, repository, sender } = github.context.payload;
 
     if (!pull_request) {
-      throw Error('No pull_request found on github.context.payload')
+      throw Error("No pull_request found on github.context.payload");
     }
 
     if (!sender) {
-      throw Error('No sender found on github.context.payload')
+      throw Error("No sender found on github.context.payload");
     }
 
     // if there is now a matching label added, notify the slack message
@@ -66,6 +66,6 @@ export const handleLabelChange =  async () => {
     });
   } catch (error) {
     fail(error);
-    throw(error)
+    throw error;
   }
 };

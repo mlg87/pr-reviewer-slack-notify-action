@@ -3,20 +3,22 @@ import { getEngineersFromS3 } from "./getEngineersFromS3";
 import { EngineerGithubSlackMapping } from "./getEngineersFromS3/types";
 
 // reviewers is string[], where the strings should be github user names
-export const createUsersToAtString = async (reviewers: string[]): Promise<string> => {
+export const createUsersToAtString = async (
+  reviewers: string[]
+): Promise<string> => {
   let engineers: EngineerGithubSlackMapping[] = [];
   try {
     const res = await getEngineersFromS3();
-    engineers = res.engineers
+    engineers = res.engineers;
   } catch (error) {
-    fail(error)
+    fail(error);
   }
 
   const usersToAt = engineers.filter((user) =>
     reviewers.includes(user.github_username)
   );
 
-  let usersToAtString: string = '';
+  let usersToAtString: string = "";
 
   usersToAt.forEach((user) => {
     if (!usersToAtString) {

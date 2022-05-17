@@ -38,19 +38,17 @@
   },
   "license": "MIT",
   "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx}": [
-      "yarn lint:staged:script",
-      "prettier --write"
-    ]
+    "src/**/*.{js,jsx,ts,tsx}": ["yarn format", "yarn lint:script"]
   },
   "main": "lib/index.js",
   "name": "pr-reviewer-slack-notify",
   "repository": "git@github.com:mlg87/pr-reviewer-slack-notify.git",
   "scripts": {
     "build": "tsc",
-    "lint:staged:script": "eslint --fix",
-    "release": "semantic-release",
+    "format": "prettier --write '**/*.ts'",
+    "lint:script": "eslint --fix",
     "package": "ncc build --source-map --license licenses.txt",
+    "release": "semantic-release",
     "test": "jest"
   },
   "version": "6.0.0"

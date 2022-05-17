@@ -1,16 +1,19 @@
-import github from '@actions/github'
-import core from '@actions/core'
-import { fail } from './fail';
-
+import github from "@actions/github";
+import core from "@actions/core";
+import { fail } from "./fail";
 
 // requires pull_request and repository as inputs bc of the differently shaped action payloads
 export const getSlackMessageId = async (): Promise<string> => {
   try {
     const { pull_request, repository } = github.context.payload;
     if (!pull_request) {
-      throw Error('No pull_request key on github.context.payload in getSlackMessageId')
+      throw Error(
+        "No pull_request key on github.context.payload in getSlackMessageId"
+      );
     } else if (!repository) {
-      throw Error('No repository key on github.context.payload in getSlackMessageId')
+      throw Error(
+        "No repository key on github.context.payload in getSlackMessageId"
+      );
     }
     // get slack id and PR number from pull comment
     const octokit = github.getOctokit(core.getInput("github-token"));
@@ -21,7 +24,9 @@ export const getSlackMessageId = async (): Promise<string> => {
     });
     let slackMessageId;
     res.data.forEach((comment) => {
-      const match = comment?.body?.match(/SLACK_MESSAGE_ID:[0-9]{1,}.[0-9]{1,}/);
+      const match = comment?.body?.match(
+        /SLACK_MESSAGE_ID:[0-9]{1,}.[0-9]{1,}/
+      );
       if (match) {
         slackMessageId = match[0];
       }
@@ -35,7 +40,7 @@ export const getSlackMessageId = async (): Promise<string> => {
 
     return slackMessageId;
   } catch (error) {
-    fail(error)
-    throw(error)
+    fail(error);
+    throw error;
   }
 };
