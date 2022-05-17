@@ -1,3 +1,10 @@
+### [7.1.3](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.1.2...v7.1.3) (2022-05-17)
+
+
+### CI
+
+* **release:** try more shit ([14625d8](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/14625d8f294641a440effd7a9c33a6da52fe82d0))
+
 ### [7.1.2](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.1.1...v7.1.2) (2022-05-17)
 
 
