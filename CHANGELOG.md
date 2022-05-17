@@ -1,3 +1,10 @@
+## [7.1.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.0.0...v7.1.0) (2022-05-17)
+
+
+### Build System
+
+* dont minify bundle ([10512b5](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/10512b546d6e3fdbf27a84b4cd69b49246ad7e8e))
+
 ## [7.0.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v6.0.0...v7.0.0) (2022-05-17)
 
 
