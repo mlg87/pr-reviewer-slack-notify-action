@@ -38,7 +38,10 @@
   },
   "license": "MIT",
   "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx}": ["yarn format", "yarn lint:script"]
+    "src/**/*.{js,jsx,ts,tsx}": [
+      "yarn format",
+      "yarn lint:script"
+    ]
   },
   "main": "lib/index.js",
   "name": "pr-reviewer-slack-notify",
@@ -51,5 +54,5 @@
     "release": "semantic-release",
     "test": "jest"
   },
-  "version": "6.0.0"
+  "version": "7.0.0"
 }

@@ -1,3 +1,20 @@
+## [7.0.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v6.0.0...v7.0.0) (2022-05-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* **typescript:** JS => TS
+
+### CI
+
+* **release:** add dist dir to assets checked in as part of release action ([d1be2df](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/d1be2dfe5de6e5875461bcedb40b4a1d096ed347))
+* **release:** package and commit the minified action prior to cutting release in ci ([f4339cf](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/f4339cf9641aee43e4466d7594c13801faa0251c))
+
+
+### Refactors
+
+* **typescript:** converts app to typescript ([152520d](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/152520d1787981bdac2689f449287617b631cfb4))
+
 ## [6.0.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v5.0.3...v6.0.0) (2022-05-03)
 
 
