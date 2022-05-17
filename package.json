@@ -43,7 +43,7 @@
       "yarn lint:script"
     ]
   },
-  "main": "lib/index.js",
+  "main": "index.ts",
   "name": "pr-reviewer-slack-notify",
   "repository": "git@github.com:mlg87/pr-reviewer-slack-notify.git",
   "scripts": {
