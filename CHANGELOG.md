@@ -1,3 +1,10 @@
+### [7.1.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.1.0...v7.1.1) (2022-05-17)
+
+
+### CI
+
+* **release:** try to get add-and-commit action to work ([f24963c](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/f24963cab7f16ceee351ca8e0efff3c4def628be))
+
 ## [7.1.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.0.0...v7.1.0) (2022-05-17)
 
 
