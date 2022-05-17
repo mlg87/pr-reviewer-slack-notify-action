@@ -50,7 +50,7 @@
     "build": "tsc",
     "format": "prettier --write '**/*.ts'",
     "lint:script": "eslint --fix",
-    "package": "ncc build --source-map --license licenses.txt",
+    "package": "ncc build --source-map --license licenses.txt --minify",
     "release": "semantic-release",
     "test": "jest"
   },
