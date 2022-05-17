@@ -1,4 +1,5 @@
 import core from "@actions/core";
 import { WebClient } from "@slack/web-api";
 
-export const slackWebClient = new WebClient(core.getInput("bot-token"));
+const token = core.getInput("bot-token");
+export const slackWebClient = new WebClient(token);

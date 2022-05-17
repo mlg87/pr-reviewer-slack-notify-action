@@ -16,7 +16,8 @@ export const getPrForCommit = async () => {
     }
 
     const commit_sha = commits[0].id;
-    const octokit = github.getOctokit(core.getInput("github-token"));
+    const ghToken = core.getInput("github-token");
+    const octokit = github.getOctokit(ghToken);
     const res = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
       owner: repository.owner.name!,
       repo: repository.name,

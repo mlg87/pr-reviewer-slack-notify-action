@@ -42,7 +42,8 @@ export const handleCommitPush = async () => {
     // ─── NOTIFY REVIEWERS IN THREAD ──────────────────────────────────
     //
 
-    const octokit = github.getOctokit(core.getInput("github-token"));
+    const ghToken = core.getInput("github-token");
+    const octokit = github.getOctokit(ghToken);
     const res = await octokit.rest.pulls.listReviews({
       owner: repository.owner.name!,
       repo: repository.name,
