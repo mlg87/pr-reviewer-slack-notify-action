@@ -1,3 +1,10 @@
+### [7.4.3](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.4.2...v7.4.3) (2022-05-18)
+
+
+### Bug Fixes
+
+* await a promise instead of not ([ec828d4](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/ec828d48dbbb65e37fa0b4727f949b7d07e96f4f))
+
 ### [7.4.2](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.4.1...v7.4.2) (2022-05-18)
 
 
