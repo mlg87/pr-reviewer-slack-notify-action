@@ -32,7 +32,7 @@ export const handleLabelChange = async (): Promise<void> => {
     });
 
     if (!hasLabel) {
-      return null;
+      return;
     }
 
     const [labeler] = slackUsers.engineers.filter((user) => {
