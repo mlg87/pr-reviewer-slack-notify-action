@@ -1,3 +1,10 @@
+### [7.3.2](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.3.1...v7.3.2) (2022-05-18)
+
+
+### Bug Fixes
+
+* **dependencies:** change github package imports to import * as ___ ([9b5a58b](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/9b5a58b1f8aa2a703e76f5c2356ef266fbdbc4b2))
+
 ### [7.3.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.3.0...v7.3.1) (2022-05-17)
 
 
