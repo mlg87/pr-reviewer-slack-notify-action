@@ -1,3 +1,10 @@
+### [7.4.2](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.4.1...v7.4.2) (2022-05-18)
+
+
+### Bug Fixes
+
+* handle pull_request not being on the context.payload ([03df4d7](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/03df4d739f283538eac942c46f7c3941931aec99))
+
 ### [7.4.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.4.0...v7.4.1) (2022-05-18)
 
 
