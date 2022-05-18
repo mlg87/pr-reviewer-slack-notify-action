@@ -3,10 +3,12 @@ import * as github from "@actions/github";
 import { fail } from "../utils/fail";
 import { getEngineersFromS3 } from "../utils/getEngineersFromS3";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
+import { logger } from "../utils/logger";
 import { slackWebClient } from "../utils/slackWebClient";
 
 // TODO handle labels being removed
-export const handleLabelChange = async () => {
+export const handleLabelChange = async (): Promise<void> => {
+  logger.info('START handleLableChange')
   try {
     const channelId = core.getInput("channel-id");
     const labelNameToWatchFor = core.getInput("label-name-to-watch-for");
@@ -59,11 +61,14 @@ export const handleLabelChange = async () => {
       ],
     });
 
-    return await slackWebClient.reactions.add({
+    await slackWebClient.reactions.add({
       channel: channelId,
       timestamp: slackMessageId,
       name: "heart_eyes",
     });
+
+    logger.info('END handleLableChange')
+    return;
   } catch (error) {
     fail(error);
     throw error;

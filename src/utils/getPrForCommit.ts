@@ -2,8 +2,10 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 
 import { fail } from "./fail";
+import { logger } from "./logger";
 
 export const getPrForCommit = async () => {
+  logger.info('START getPrForCommit')
   try {
     const { commits, repository } = github.context.payload;
 
@@ -30,6 +32,7 @@ export const getPrForCommit = async () => {
       throw Error(`No pull_request found for commit: ${commit_sha}`);
     }
 
+    logger.info(`END getPrForCommit: ${JSON.stringify(pull_request)}`)
     return pull_request;
   } catch (error) {
     fail(error);

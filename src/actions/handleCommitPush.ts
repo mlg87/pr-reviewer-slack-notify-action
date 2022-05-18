@@ -5,11 +5,13 @@ import { createUsersToAtString } from "../utils/createUsersToAtString";
 import { fail } from "../utils/fail";
 import { getPrForCommit } from "../utils/getPrForCommit";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
+import { logger } from "../utils/logger";
 import { slackWebClient } from "../utils/slackWebClient";
 
 // NOTE in the future we may want to wait to notify everyone that they can review it again when the PR author
 // explicitly asks for a re-review
-export const handleCommitPush = async () => {
+export const handleCommitPush = async (): Promise<void> => {
+  logger.info('START handleCommitPush')
   try {
     const channelId = core.getInput("channel-id");
     const { repository } = github.context.payload;
@@ -72,9 +74,12 @@ export const handleCommitPush = async () => {
       });
 
       if (!threadUpdateRes.ok || !threadUpdateRes.ts) {
-        throw Error("Failed to post message to thread requesting re-reviewe");
+        throw Error("Failed to post message to thread requesting re-review");
       }
     }
+
+    logger.info('END handleCommitPush')
+    return;
   } catch (error) {
     fail(error);
     throw error;

@@ -1,13 +1,14 @@
 import * as core from "@actions/core";
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { fail } from "../fail";
+import { logger } from "../logger";
 import { EngineerGithubSlackMapping } from "./types";
 
 export const getEngineersFromS3 = (): Promise<{
   engineers: EngineerGithubSlackMapping[];
 }> => {
   return new Promise(async (resolve, reject) => {
-    console.log("Running getEngineersFromS3");
+    logger.info('START getEngineersFromS3')
     // required for this to work
     const Bucket = core.getInput("aws-s3-bucket");
     const Key = core.getInput("aws-s3-object-key");

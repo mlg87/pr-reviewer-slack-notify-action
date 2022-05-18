@@ -3,6 +3,7 @@ import * as github from "@actions/github";
 import { fail } from "../utils/fail";
 import { getEngineersFromS3 } from "../utils/getEngineersFromS3";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
+import { logger } from "../utils/logger";
 import { slackWebClient } from "../utils/slackWebClient";
 
 const reactionMap = {
@@ -11,7 +12,8 @@ const reactionMap = {
   changes_requested: "octagonal_sign",
 };
 
-export const handlePullRequestReview = async () => {
+export const handlePullRequestReview = async (): Promise<void> => {
+  logger.info('START handlePullRequestReview')
   try {
     const channelId = core.getInput("channel-id");
     const slackUsers = await getEngineersFromS3();
@@ -117,15 +119,19 @@ export const handlePullRequestReview = async () => {
     }
 
     if (hasReaction) {
+      logger.info('END handlePullRequestReview: hasReaction')
       return;
     }
 
     // add new reactions
-    return await slackWebClient.reactions.add({
+    await slackWebClient.reactions.add({
       channel: channelId,
       timestamp: slackMessageId,
       name: reactionToAdd,
     });
+
+    logger.info('END handlePullRequestReview: new reactions added')
+    return
   } catch (error) {
     fail(error);
     throw error;

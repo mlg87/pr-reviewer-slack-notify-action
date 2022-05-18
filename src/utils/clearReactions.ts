@@ -1,8 +1,10 @@
 import * as core from "@actions/core";
 import { fail } from "./fail";
+import { logger } from "./logger";
 import { slackWebClient } from "./slackWebClient";
 
 export const clearReactions = async (slackMessageId: string) => {
+  logger.info(`START clearReactions: ${slackMessageId}`)
   try {
     const channelId = core.getInput("channel-id");
 
@@ -25,6 +27,7 @@ export const clearReactions = async (slackMessageId: string) => {
       }
     }
 
+    logger.info('END clearReactions')
     return;
   } catch (error) {
     fail(error);

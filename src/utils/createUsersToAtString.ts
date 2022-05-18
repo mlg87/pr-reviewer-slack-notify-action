@@ -1,11 +1,13 @@
 import { fail } from "./fail";
 import { getEngineersFromS3 } from "./getEngineersFromS3";
 import { EngineerGithubSlackMapping } from "./getEngineersFromS3/types";
+import { logger } from "./logger";
 
 // reviewers is string[], where the strings should be github user names
 export const createUsersToAtString = async (
   reviewers: string[]
 ): Promise<string> => {
+  logger.info('START createUsersToAtString')
   let engineers: EngineerGithubSlackMapping[] = [];
   try {
     const res = await getEngineersFromS3();
@@ -29,5 +31,6 @@ export const createUsersToAtString = async (
     return;
   });
 
+  logger.info(`END createUsersToAtString: ${JSON.stringify(usersToAtString)}`)
   return usersToAtString;
 };

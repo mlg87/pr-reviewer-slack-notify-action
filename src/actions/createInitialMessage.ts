@@ -3,9 +3,11 @@ import * as github from "@actions/github";
 import { Github } from "../types/github-api-types";
 import { createUsersToAtString } from "../utils/createUsersToAtString";
 import { fail } from "../utils/fail";
+import { logger } from "../utils/logger";
 import { slackWebClient } from "../utils/slackWebClient";
 
 export const createInitialMessage = async (): Promise<void> => {
+  logger.info('START createInitialMessage')
   try {
     const channelId = core.getInput("channel-id");
     const { number, pull_request, repository, sender } = github.context.payload;
@@ -60,6 +62,8 @@ export const createInitialMessage = async (): Promise<void> => {
       issue_number: number,
       body: `SLACK_MESSAGE_ID:${prSlackMsg.ts}`,
     });
+
+    logger.info('END createInitialMessage')
     return;
   } catch (error: any) {
     console.error("error in createInitialMessage::: ", error);

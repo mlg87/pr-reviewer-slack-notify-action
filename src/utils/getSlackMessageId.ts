@@ -1,11 +1,14 @@
 import * as github from "@actions/github";
 import * as core from "@actions/core";
 import { fail } from "./fail";
+import { logger } from "./logger";
 
 // requires pull_request and repository as inputs bc of the differently shaped action payloads
 export const getSlackMessageId = async (): Promise<string> => {
+  logger.info('START getSlackMessageId')
   try {
     const { pull_request, repository } = github.context.payload;
+    logger.info(`github.context.payload: ${JSON.stringify(github.context.payload)}`)
     if (!pull_request) {
       throw Error(
         "No pull_request key on github.context.payload in getSlackMessageId"
@@ -38,6 +41,7 @@ export const getSlackMessageId = async (): Promise<string> => {
       );
     }
 
+    logger.info(`END getSlackMessageId: ${slackMessageId}`)
     return slackMessageId;
   } catch (error) {
     fail(error);
