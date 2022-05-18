@@ -1,3 +1,10 @@
+### [7.4.4](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.4.3...v7.4.4) (2022-05-18)
+
+
+### Bug Fixes
+
+* **initial slack message:** ensure that it is created on push event ([42faa63](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/42faa630bdc5167d17c53087bbd6b1d429b113b1))
+
 ### [7.4.3](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.4.2...v7.4.3) (2022-05-18)
 
 
