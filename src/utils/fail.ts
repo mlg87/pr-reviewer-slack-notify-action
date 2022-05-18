@@ -1,4 +1,4 @@
-import core from "@actions/core";
+import * as core from "@actions/core";
 
 export const fail = (error: any) => {
   const failSilently = core.getInput("fail-silently");

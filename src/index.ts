@@ -1,5 +1,5 @@
-import github from "@actions/github";
-import core from "@actions/core";
+import * as github from "@actions/github";
+import * as core from "@actions/core";
 import { createInitialMessage } from "./actions/createInitialMessage";
 import { handleLabelChange } from "./actions/handleLabelChange";
 import { getSlackMessageId } from "./utils/getSlackMessageId";

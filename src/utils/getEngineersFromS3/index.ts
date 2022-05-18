@@ -1,4 +1,4 @@
-import core from "@actions/core";
+import * as core from "@actions/core";
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { fail } from "../fail";
 import { EngineerGithubSlackMapping } from "./types";

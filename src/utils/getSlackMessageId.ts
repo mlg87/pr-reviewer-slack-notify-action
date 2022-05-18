@@ -1,5 +1,5 @@
-import github from "@actions/github";
-import core from "@actions/core";
+import * as github from "@actions/github";
+import * as core from "@actions/core";
 import { fail } from "./fail";
 
 // requires pull_request and repository as inputs bc of the differently shaped action payloads
