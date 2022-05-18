@@ -1,15 +1,13 @@
 import formatISO from 'date-fns/formatISO';
 import winston from 'winston';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const package_json = require('../../package.json');
 
 const alignColorsAndTime = winston.format.combine(
   winston.format.colorize({
     all: true,
   }),
   winston.format.label({
-    label: `[PR-REVIEWER-SLACK-NOTIFY-ACTION v${package_json.version}]`,
+    label: `[PR-REVIEWER-SLACK-NOTIFY-ACTION]`,
   }),
   winston.format.timestamp({
     format: 'YYYY-MM-DD HH:MM:SS',
@@ -48,7 +46,6 @@ export const logger = winston.createLogger({
   level: 'info',
   defaultMeta: {
     service: 'pr-reviewer-slack-notify-action',
-    version: package_json.version,
   },
   transports: [
     new winston.transports.Console({

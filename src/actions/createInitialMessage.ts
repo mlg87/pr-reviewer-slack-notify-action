@@ -6,7 +6,7 @@ import { fail } from "../utils/fail";
 import { logger } from "../utils/logger";
 import { slackWebClient } from "../utils/slackWebClient";
 
-export const createInitialMessage = async (): Promise<void> => {
+export const createInitialMessage = async (): Promise<string | void> => {
   logger.info('START createInitialMessage')
   try {
     const channelId = core.getInput("channel-id");
@@ -56,15 +56,16 @@ export const createInitialMessage = async (): Promise<void> => {
 
     const ghToken = core.getInput("github-token");
     const octokit = github.getOctokit(ghToken);
+    const slackMessageId = `SLACK_MESSAGE_ID:${prSlackMsg.ts}`;
     await octokit.rest.issues.createComment({
       owner: repository.owner.login,
       repo: repository.name,
       issue_number: number,
-      body: `SLACK_MESSAGE_ID:${prSlackMsg.ts}`,
+      body: slackMessageId
     });
 
-    logger.info('END createInitialMessage')
-    return;
+    logger.info(`END createInitialMessage: ${slackMessageId}`)
+    return slackMessageId;
   } catch (error: any) {
     console.error("error in createInitialMessage::: ", error);
 

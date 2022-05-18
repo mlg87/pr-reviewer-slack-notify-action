@@ -3,6 +3,7 @@ import * as core from "@actions/core";
 import { fail } from "./fail";
 import { logger } from "./logger";
 import { getPrForCommit } from "./getPrForCommit";
+import { createInitialMessage } from "../actions/createInitialMessage";
 
 // requires pull_request and repository as inputs bc of the differently shaped action payloads
 export const getSlackMessageId = async (): Promise<string> => {
@@ -42,9 +43,14 @@ export const getSlackMessageId = async (): Promise<string> => {
     });
 
     if (!slackMessageId) {
-      throw Error(
-        "Unable to find SLACK_MESSAGE_ID comment in PR comment thread."
-      );
+      logger.info('no SLACK_MESSAGE_ID found, attempting to create initial message')
+      slackMessageId = await createInitialMessage();
+
+      if (!slackMessageId) {
+        throw Error(
+          "Unable to create SLACK_MESSAGE_ID comment in PR comment thread. Please file a new issue https://github.com/mlg87/pr-reviewer-slack-notify-action/issues/new/choose"
+        );
+      }
     }
 
     logger.info(`END getSlackMessageId: ${slackMessageId}`)
