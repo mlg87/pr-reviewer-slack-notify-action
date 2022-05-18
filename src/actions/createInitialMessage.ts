@@ -1,8 +1,8 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import { Github } from "../types/github-api-types";
 import { createUsersToAtString } from "../utils/createUsersToAtString";
 import { fail } from "../utils/fail";
+import { getPrForCommit } from "../utils/getPrForCommit";
 import { logger } from "../utils/logger";
 import { slackWebClient } from "../utils/slackWebClient";
 
@@ -10,13 +10,12 @@ export const createInitialMessage = async (): Promise<string | void> => {
   logger.info('START createInitialMessage')
   try {
     const channelId = core.getInput("channel-id");
-    const { number, pull_request, repository, sender } = github.context.payload;
+    const pull_request = await getPrForCommit();
+    const { repository } = github.context.payload;
 
-    if (!pull_request || !repository || !sender) return;
+    if (!pull_request || !repository) return;
 
-    const requestedReviewers = (
-      pull_request as Github.PullRequest
-    ).requested_reviewers.map((user) => user.login);
+    const requestedReviewers = pull_request.requested_reviewers ? pull_request.requested_reviewers.map((user) => user.login) : [];
 
     //
     // ─── RETURN IF THERE ARE NO REQUESTED REVIEWERS ──────────────────
@@ -26,7 +25,7 @@ export const createInitialMessage = async (): Promise<string | void> => {
       return;
     }
 
-    let baseMessage = `*${sender.login}* is requesting your review on <${pull_request._links.html.href}|*${pull_request.title}*>`;
+    let baseMessage = `*${pull_request.user?.login}* is requesting your review on <${pull_request._links.html.href}|*${pull_request.title}*>`;
     if (!!pull_request.body) {
       baseMessage = `${baseMessage}\n>${pull_request.body}`;
     }
@@ -60,7 +59,7 @@ export const createInitialMessage = async (): Promise<string | void> => {
     await octokit.rest.issues.createComment({
       owner: repository.owner.login,
       repo: repository.name,
-      issue_number: number,
+      issue_number: pull_request.number,
       body: slackMessageId
     });
 
