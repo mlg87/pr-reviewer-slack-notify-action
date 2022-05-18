@@ -2,18 +2,24 @@ import * as github from "@actions/github";
 import * as core from "@actions/core";
 import { fail } from "./fail";
 import { logger } from "./logger";
+import { getPrForCommit } from "./getPrForCommit";
 
 // requires pull_request and repository as inputs bc of the differently shaped action payloads
 export const getSlackMessageId = async (): Promise<string> => {
   logger.info('START getSlackMessageId')
   try {
-    const { pull_request, repository } = github.context.payload;
-    logger.info(`github.context: ${JSON.stringify(github.context)}`)
+    const { repository } = github.context.payload;
+    let pull_request: any = github.context.payload.pull_request;
+    // pull_request is not on the payload for push events
+    if (github.context.eventName === 'push') {
+      pull_request = await getPrForCommit();
+    }
     if (!pull_request) {
       throw Error(
         "No pull_request key on github.context.payload in getSlackMessageId"
       );
-    } else if (!repository) {
+    }
+    if (!repository) {
       throw Error(
         "No repository key on github.context.payload in getSlackMessageId"
       );
