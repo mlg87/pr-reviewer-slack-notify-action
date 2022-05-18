@@ -8,7 +8,7 @@ export const getSlackMessageId = async (): Promise<string> => {
   logger.info('START getSlackMessageId')
   try {
     const { pull_request, repository } = github.context.payload;
-    logger.info(`github.context.payload: ${JSON.stringify(github.context.payload)}`)
+    logger.info(`github.context: ${JSON.stringify(github.context)}`)
     if (!pull_request) {
       throw Error(
         "No pull_request key on github.context.payload in getSlackMessageId"
