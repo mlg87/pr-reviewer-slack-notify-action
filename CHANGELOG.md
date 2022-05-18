@@ -1,3 +1,15 @@
+## [7.4.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.3.2...v7.4.0) (2022-05-18)
+
+
+### Build System
+
+* **ts:** fix return value for function typed as Promise<void> ([091a50e](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/091a50e119764d587b7089abe26d2532efb955f7))
+
+
+### Performance
+
+* **logging:** add a logger util (winston) ([0336d1a](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/0336d1a10b201f0ab087427f4c9e220d6eb9b749))
+
 ### [7.3.2](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.3.1...v7.3.2) (2022-05-18)
 
 
