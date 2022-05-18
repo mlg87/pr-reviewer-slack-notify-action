@@ -1,3 +1,10 @@
+### [7.4.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.4.0...v7.4.1) (2022-05-18)
+
+
+### Performance
+
+* **logging:** more logging ([8b5ec42](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/8b5ec42a928e9dc5c71135aefd788b63ec4fd785))
+
 ## [7.4.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.3.2...v7.4.0) (2022-05-18)
 
 
