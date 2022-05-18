@@ -56,7 +56,7 @@ export const handleCommitPush = async (): Promise<void> => {
       const previousReviewers = res.data.map((review) => review!.user!.login);
       const distinctPreviousReviewers = [...new Set(previousReviewers)];
       const baseMessage = `new code has been committed since your review of <${pull_request._links.html.href}|*PR ${pull_request.number}*>, please review the updates.`;
-      const usersToAtString = createUsersToAtString(distinctPreviousReviewers);
+      const usersToAtString = await createUsersToAtString(distinctPreviousReviewers);
       const text = `${usersToAtString} ${baseMessage}`;
       const threadUpdateRes = await slackWebClient.chat.postMessage({
         channel: channelId,
