@@ -7,7 +7,11 @@ import { logger } from "./logger";
 export const getPrForCommit = async () => {
   logger.info('START getPrForCommit')
   try {
-    const { commits, repository } = github.context.payload;
+    const { commits, pull_request: pr, repository } = github.context.payload;
+
+    if (pr) {
+      return pr;
+    }
 
     if (!commits || !commits.length) {
       throw Error("No commits found");
