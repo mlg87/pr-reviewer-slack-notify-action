@@ -1,3 +1,15 @@
+## [7.5.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.4.5...v7.5.0) (2022-05-19)
+
+
+### Bug Fixes
+
+* fix createInitiialMessage for action === "opened" ([0cc0a98](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/0cc0a98dc89c08b9c3d79482fd2070b6e1b9d7f6))
+
+
+### Build System
+
+* **ts:** no implicit any, only explicit any here ([7e0ca29](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/7e0ca2995da02f3be85aef6b83aafe4f4a787696))
+
 ### [7.4.5](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.4.4...v7.4.5) (2022-05-18)
 
 
