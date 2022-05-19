@@ -1,3 +1,10 @@
+### [7.4.5](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.4.4...v7.4.5) (2022-05-18)
+
+
+### Bug Fixes
+
+* **slack messages:** ensure there is a pr found when creating the initial message ([cd5cab7](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/cd5cab7ddc8b4045975c10922f26cadaf9939b68))
+
 ### [7.4.4](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.4.3...v7.4.4) (2022-05-18)
 
 
