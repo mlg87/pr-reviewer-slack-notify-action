@@ -1,3 +1,10 @@
+### [7.5.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.5.0...v7.5.1) (2022-05-19)
+
+
+### Bug Fixes
+
+* **retrieving the pr:** should handle all scenarios now ([37c94a2](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/37c94a2824053cfb6dc71628c3bf27d4f5bf74fc))
+
 ## [7.5.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.4.5...v7.5.0) (2022-05-19)
 
 
