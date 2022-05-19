@@ -12,7 +12,7 @@ export const getSlackMessageId = async (): Promise<string> => {
     const { repository } = github.context.payload;
     let pull_request: any = github.context.payload.pull_request;
     // pull_request is not on the payload for push events
-    if (github.context.eventName === 'push') {
+    if (github.context.eventName === 'push' && !pull_request) {
       pull_request = await getPrForCommit();
     }
     if (!pull_request) {

@@ -10,8 +10,9 @@ export const createInitialMessage = async (): Promise<string | void> => {
   logger.info('START createInitialMessage')
   try {
     const channelId = core.getInput("channel-id");
-    const pull_request = await getPrForCommit();
-    const { repository } = github.context.payload;
+    const { action, repository } = github.context.payload;
+    // pull_request is not always on the context, but it is present for action === "opened", so no need to retrieve it
+    const pull_request = action === "opened" ? await getPrForCommit() : github.context.payload.pull_request;
 
     if (!pull_request || !repository) return;
 
