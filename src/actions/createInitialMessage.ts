@@ -7,7 +7,7 @@ import { logger } from "../utils/logger";
 import { slackWebClient } from "../utils/slackWebClient";
 
 export const createInitialMessage = async (): Promise<string | void> => {
-  logger.info('START createInitialMessage')
+  logger.info("START createInitialMessage");
   try {
     const channelId = core.getInput("channel-id");
     const { repository } = github.context.payload;
@@ -15,7 +15,9 @@ export const createInitialMessage = async (): Promise<string | void> => {
 
     if (!pull_request || !repository) return;
 
-    const requestedReviewers = pull_request.requested_reviewers ? pull_request.requested_reviewers.map((user: any) => user.login) : [];
+    const requestedReviewers = pull_request.requested_reviewers
+      ? pull_request.requested_reviewers.map((user: any) => user.login)
+      : [];
 
     //
     // ─── RETURN IF THERE ARE NO REQUESTED REVIEWERS ──────────────────
@@ -60,10 +62,10 @@ export const createInitialMessage = async (): Promise<string | void> => {
       owner: repository.owner.login,
       repo: repository.name,
       issue_number: pull_request.number,
-      body: slackMessageId
+      body: slackMessageId,
     });
 
-    logger.info(`END createInitialMessage: ${slackMessageId}`)
+    logger.info(`END createInitialMessage: ${slackMessageId}`);
     return slackMessageId;
   } catch (error: any) {
     console.error("error in createInitialMessage::: ", error);

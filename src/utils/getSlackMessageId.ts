@@ -7,12 +7,12 @@ import { createInitialMessage } from "../actions/createInitialMessage";
 
 // requires pull_request and repository as inputs bc of the differently shaped action payloads
 export const getSlackMessageId = async (): Promise<string> => {
-  logger.info('START getSlackMessageId')
+  logger.info("START getSlackMessageId");
   try {
     const { repository } = github.context.payload;
     let pull_request: any = github.context.payload.pull_request;
     // pull_request is not on the payload for push events
-    if (github.context.eventName === 'push' && !pull_request) {
+    if (github.context.eventName === "push" && !pull_request) {
       pull_request = await getPrForCommit();
     }
     if (!pull_request) {
@@ -43,7 +43,9 @@ export const getSlackMessageId = async (): Promise<string> => {
     });
 
     if (!slackMessageId) {
-      logger.info('no SLACK_MESSAGE_ID found, attempting to create initial message')
+      logger.info(
+        "no SLACK_MESSAGE_ID found, attempting to create initial message"
+      );
       slackMessageId = await createInitialMessage();
 
       if (!slackMessageId) {
@@ -53,7 +55,7 @@ export const getSlackMessageId = async (): Promise<string> => {
       }
     }
 
-    logger.info(`END getSlackMessageId: ${slackMessageId}`)
+    logger.info(`END getSlackMessageId: ${slackMessageId}`);
     return slackMessageId;
   } catch (error) {
     fail(error);

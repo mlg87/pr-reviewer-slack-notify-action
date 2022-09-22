@@ -4,7 +4,7 @@ import { logger } from "./logger";
 import { slackWebClient } from "./slackWebClient";
 
 export const clearReactions = async (slackMessageId: string) => {
-  logger.info(`START clearReactions: ${slackMessageId}`)
+  logger.info(`START clearReactions: ${slackMessageId}`);
   try {
     const channelId = core.getInput("channel-id");
 
@@ -27,7 +27,7 @@ export const clearReactions = async (slackMessageId: string) => {
       }
     }
 
-    logger.info('END clearReactions')
+    logger.info("END clearReactions");
     return;
   } catch (error) {
     fail(error);

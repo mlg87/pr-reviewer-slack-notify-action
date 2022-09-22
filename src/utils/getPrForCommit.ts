@@ -5,7 +5,7 @@ import { fail } from "./fail";
 import { logger } from "./logger";
 
 export const getPrForCommit = async () => {
-  logger.info('START getPrForCommit')
+  logger.info("START getPrForCommit");
   try {
     const { commits, pull_request: pr, repository } = github.context.payload;
 
@@ -32,11 +32,14 @@ export const getPrForCommit = async () => {
 
     const [pull_request] = res.data;
 
-    if (!pull_request) {
+    const ignoreNoPrFoundError = core.getInput("ignore-no-pr-found-error")
+      ? core.getInput("ignore-no-pr-found-error")
+      : false;
+    if (!pull_request && !ignoreNoPrFoundError) {
       throw Error(`No pull_request found for commit: ${commit_sha}`);
     }
 
-    logger.info(`END getPrForCommit: ${JSON.stringify(pull_request)}`)
+    logger.info(`END getPrForCommit: ${JSON.stringify(pull_request)}`);
     return pull_request;
   } catch (error) {
     fail(error);

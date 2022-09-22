@@ -1,6 +1,5 @@
-import formatISO from 'date-fns/formatISO';
-import winston from 'winston';
-
+import formatISO from "date-fns/formatISO";
+import winston from "winston";
 
 const alignColorsAndTime = winston.format.combine(
   winston.format.colorize({
@@ -10,7 +9,7 @@ const alignColorsAndTime = winston.format.combine(
     label: `[PR-REVIEWER-SLACK-NOTIFY-ACTION]`,
   }),
   winston.format.timestamp({
-    format: 'YYYY-MM-DD HH:MM:SS',
+    format: "YYYY-MM-DD HH:MM:SS",
   }),
   winston.format.printf(
     (info) =>
@@ -35,17 +34,17 @@ log levels
 */
 
 winston.addColors({
-  info: 'bold cyan', // fontStyle color
-  warn: 'italic yellow',
-  error: 'red',
-  debug: 'green',
-  crit: 'bold red',
+  info: "bold cyan", // fontStyle color
+  warn: "italic yellow",
+  error: "red",
+  debug: "green",
+  crit: "bold red",
 });
 
 export const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   defaultMeta: {
-    service: 'pr-reviewer-slack-notify-action',
+    service: "pr-reviewer-slack-notify-action",
   },
   transports: [
     new winston.transports.Console({
