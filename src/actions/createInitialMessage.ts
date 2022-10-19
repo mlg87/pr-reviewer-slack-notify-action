@@ -7,7 +7,7 @@ import { logger } from "../utils/logger";
 import { slackWebClient } from "../utils/slackWebClient";
 
 export const createInitialMessage = async (): Promise<string | void> => {
-  const verbose: boolean = core.getInput("verbose");
+  const verbose: boolean = core.getBooleanInput("verbose");
   logger.info(`START createInitialMessage. Verbose? ${verbose}`)
 
   try {
