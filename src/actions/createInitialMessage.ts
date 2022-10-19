@@ -7,7 +7,9 @@ import { logger } from "../utils/logger";
 import { slackWebClient } from "../utils/slackWebClient";
 
 export const createInitialMessage = async (): Promise<string | void> => {
-  logger.info('START createInitialMessage')
+  const verbose: boolean = core.getInput("verbose");
+  logger.info(`START createInitialMessage. Verbose? ${verbose}`)
+
   try {
     const channelId = core.getInput("channel-id");
     const { repository } = github.context.payload;
@@ -26,8 +28,8 @@ export const createInitialMessage = async (): Promise<string | void> => {
     }
 
     let baseMessage = `*${pull_request.user?.login}* is requesting your review on <${pull_request._links.html.href}|*${pull_request.title}*>`;
-    if (!!pull_request.body) {
-      baseMessage = `${baseMessage}`;
+    if (!!pull_request.body && verbose) {
+      baseMessage = `${baseMessage}\n>${pull_request.body}`;
     }
 
     // build users to mention string

@@ -41,6 +41,10 @@ inputs:
     description: "Allow action to fail silently to hide the red X of death"
     required: false
     default: false
+  verbose:
+    description: "If verbose is set to true, the entire PR text is posted to Slack. If false, just the title is posted."
+    required: false
+    default: true
   
 runs:
   using: "node16"
