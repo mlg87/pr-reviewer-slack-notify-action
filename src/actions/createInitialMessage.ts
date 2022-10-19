@@ -27,7 +27,7 @@ export const createInitialMessage = async (): Promise<string | void> => {
 
     let baseMessage = `*${pull_request.user?.login}* is requesting your review on <${pull_request._links.html.href}|*${pull_request.title}*>`;
     if (!!pull_request.body) {
-      baseMessage = `${baseMessage}\n>${pull_request.body}`;
+      baseMessage = `${baseMessage}`;
     }
 
     // build users to mention string
