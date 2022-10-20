@@ -1,3 +1,10 @@
+## [7.6.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.5.1...v7.6.0) (2022-10-20)
+
+
+### Features
+
+* add verbose mode option to minimize slack notification size ([#51](https://github.com/mlg87/pr-reviewer-slack-notify-action/issues/51)) ([f19b20f](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/f19b20fcad711393f2050a56ef67f181aa7827bc))
+
 ### [7.5.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.5.0...v7.5.1) (2022-05-19)
 
 
