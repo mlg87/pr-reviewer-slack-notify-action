@@ -1,3 +1,10 @@
+## [7.7.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.6.0...v7.7.0) (2023-02-10)
+
+
+### Build System
+
+* **deps:** bump npm from 8.8.0 to 8.12.0 ([8110d13](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/8110d135662f77f29bb9309aa5f8c023f47599b8))
+
 ## [7.6.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.5.1...v7.6.0) (2022-10-20)
 
 
