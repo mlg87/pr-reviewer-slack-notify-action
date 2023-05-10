@@ -1,3 +1,10 @@
+### [7.8.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.8.0...v7.8.1) (2023-05-10)
+
+
+### Bug Fixes
+
+* **pr review dismiss:** pull action from payload ([b513e2f](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/b513e2f4a323c0d2c619c484a4a64c8a31746162))
+
 ## [7.8.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.7.0...v7.8.0) (2023-05-10)
 
 
