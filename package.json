@@ -1,7 +1,7 @@
 {
   "author": "Mason Goetz <masonlgoetz@gmail.com>",
   "dependencies": {
-    "@actions/core": "^1.8.0",
+    "@actions/core": "^1.9.1",
     "@actions/github": "^5.0.1",
     "@aws-sdk/client-s3": "^3.58.0",
     "@slack/web-api": "^6.7.1",
