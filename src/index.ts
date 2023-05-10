@@ -8,7 +8,7 @@ import { handleCommitPush } from "./actions/handleCommitPush";
 import { handlePullRequestReview } from "./actions/handlePullRequestReview";
 
 const run = async (): Promise<void> => {
-  const { eventName, payload, ref } = github.context;
+  const { action, eventName, payload, ref } = github.context;
   const baseBranch = core.getInput("base-branch");
   const isActingOnBaseBranch = ref.includes(baseBranch);
 
@@ -58,8 +58,11 @@ const run = async (): Promise<void> => {
     return;
   }
 
-  // push of commit
-  if (eventName === "push") {
+  // push of commit / review dismissed
+  if (
+    eventName === "push" ||
+    (eventName === "pull_request_review" && action === "dismissed")
+  ) {
     // merge of PR to base branch
     if (isActingOnBaseBranch) {
       console.log("running handleMerge::: ", payload);
