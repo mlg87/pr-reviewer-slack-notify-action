@@ -1,3 +1,10 @@
+## [7.8.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.7.0...v7.8.0) (2023-05-10)
+
+
+### Features
+
+* **run:** add handler for pr review dismissals ([fbcc4bf](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/fbcc4bf52f5238f627f6ed784c83747bb9deacc9))
+
 ## [7.7.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.6.0...v7.7.0) (2023-02-10)
 
 
