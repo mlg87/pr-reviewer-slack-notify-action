@@ -12,10 +12,7 @@ export const getPrForCommit = async () => {
     const { commits, pull_request: pr, repository } = github.context.payload;
 
 
-    console.log(JSON.stringify(repository?.owner))
-    console.log(JSON.stringify(pr))
-
-    const {data: fetchedPr} = (await octokit.request('GET repos/{owner}/{repo}/pulls/{pull_number}', {
+    const {data: fetchedPr} = (await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
       // @ts-ignore
       owner: repository?.owner?.login, // remove leading slash
       // @ts-ignore
@@ -27,10 +24,8 @@ export const getPrForCommit = async () => {
       }
     }))
 
-
-
     if (fetchedPr) {
-      return pr;
+      return fetchedPr;
     }
 
     if (!commits || !commits.length) {

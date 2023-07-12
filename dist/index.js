@@ -74398,9 +74398,7 @@ const getPrForCommit = () => __awaiter(void 0, void 0, void 0, function* () {
         const ghToken = core.getInput("github-token");
         const octokit = github.getOctokit(ghToken);
         const { commits, pull_request: pr, repository } = github.context.payload;
-        console.log(JSON.stringify(repository === null || repository === void 0 ? void 0 : repository.owner));
-        console.log(JSON.stringify(pr));
-        const { data: fetchedPr } = (yield octokit.request('GET repos/{owner}/{repo}/pulls/{pull_number}', {
+        const { data: fetchedPr } = (yield octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
             // @ts-ignore
             owner: (_a = repository === null || repository === void 0 ? void 0 : repository.owner) === null || _a === void 0 ? void 0 : _a.login,
             // @ts-ignore
@@ -74412,7 +74410,7 @@ const getPrForCommit = () => __awaiter(void 0, void 0, void 0, function* () {
             }
         }));
         if (fetchedPr) {
-            return pr;
+            return fetchedPr;
         }
         if (!commits || !commits.length) {
             throw Error("No commits found");
