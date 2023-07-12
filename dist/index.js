@@ -74392,14 +74392,17 @@ const github = __importStar(__nccwpck_require__(95438));
 const fail_1 = __nccwpck_require__(40661);
 const logger_1 = __nccwpck_require__(38836);
 const getPrForCommit = () => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     logger_1.logger.info('START getPrForCommit');
     try {
         const ghToken = core.getInput("github-token");
         const octokit = github.getOctokit(ghToken);
         const { commits, pull_request: pr, repository } = github.context.payload;
-        const fetchedPr = (yield octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
+        console.log(JSON.stringify(repository === null || repository === void 0 ? void 0 : repository.owner));
+        console.log(JSON.stringify(pr));
+        const { data: fetchedPr } = (yield octokit.request('GET repos/{owner}/{repo}/pulls/{pull_number}', {
             // @ts-ignore
-            owner: repository.owner.name,
+            owner: (_a = repository === null || repository === void 0 ? void 0 : repository.owner) === null || _a === void 0 ? void 0 : _a.login,
             // @ts-ignore
             repo: repository === null || repository === void 0 ? void 0 : repository.name,
             // @ts-ignore
@@ -74407,7 +74410,7 @@ const getPrForCommit = () => __awaiter(void 0, void 0, void 0, function* () {
             headers: {
                 'X-GitHub-Api-Version': '2022-11-28'
             }
-        })).data;
+        }));
         if (fetchedPr) {
             return pr;
         }

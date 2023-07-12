@@ -12,9 +12,12 @@ export const getPrForCommit = async () => {
     const { commits, pull_request: pr, repository } = github.context.payload;
 
 
-    const fetchedPr = (await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
+    console.log(JSON.stringify(repository?.owner))
+    console.log(JSON.stringify(pr))
+
+    const {data: fetchedPr} = (await octokit.request('GET repos/{owner}/{repo}/pulls/{pull_number}', {
       // @ts-ignore
-      owner: repository.owner.name,
+      owner: repository?.owner?.login, // remove leading slash
       // @ts-ignore
       repo: repository?.name,
       // @ts-ignore
@@ -22,7 +25,8 @@ export const getPrForCommit = async () => {
       headers: {
         'X-GitHub-Api-Version': '2022-11-28'
       }
-    })).data
+    }))
+
 
 
     if (fetchedPr) {
