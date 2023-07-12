@@ -7,9 +7,25 @@ import { logger } from "./logger";
 export const getPrForCommit = async () => {
   logger.info('START getPrForCommit')
   try {
+    const ghToken = core.getInput("github-token");
+    const octokit = github.getOctokit(ghToken);
     const { commits, pull_request: pr, repository } = github.context.payload;
 
-    if (pr) {
+
+    const fetchedPr = (await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
+      // @ts-ignore
+      owner: repository.owner.name,
+      // @ts-ignore
+      repo: repository?.name,
+      // @ts-ignore
+      pull_number: pr?.number,
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    })).data
+
+
+    if (fetchedPr) {
       return pr;
     }
 
@@ -22,8 +38,8 @@ export const getPrForCommit = async () => {
     }
 
     const commit_sha = commits[0].id;
-    const ghToken = core.getInput("github-token");
-    const octokit = github.getOctokit(ghToken);
+
+
     const res = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
       owner: repository.owner.name!,
       repo: repository.name,
