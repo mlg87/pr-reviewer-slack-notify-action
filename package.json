@@ -19,7 +19,7 @@
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^8.0.4",
     "@semantic-release/npm": "^9.0.1",
-    "@types/node": "^16.10.5",
+    "@types/node": "^20.11.30",
     "@types/node-fetch": "^2.6.1",
     "@typescript-eslint/parser": "^5.8.1",
     "@vercel/ncc": "^0.31.1",

@@ -13,12 +13,12 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0 # gives semantic-release access to all previous commits
           token: ${{ secrets.GH_TOKEN }} # admin token
       - name: Cache node_modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
         with:
@@ -28,9 +28,9 @@ jobs:
             ${{ runner.OS }}-${{ env.cache-name }}-
             ${{ runner.OS }}-
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: 16.15.0
+          node-version-file: .nvmrc
       - name: Install dependencies
         run: yarn
       # - name: Compile TS => JS
