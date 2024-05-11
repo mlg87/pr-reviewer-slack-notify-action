@@ -1,4 +1,4 @@
-import formatISO from "date-fns/formatISO";
+import { formatISO } from "date-fns/formatISO";
 import winston from "winston";
 
 const alignColorsAndTime = winston.format.combine(
