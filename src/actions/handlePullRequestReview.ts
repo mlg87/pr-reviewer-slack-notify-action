@@ -13,7 +13,7 @@ const reactionMap = {
 };
 
 export const handlePullRequestReview = async (): Promise<void> => {
-  logger.info('START handlePullRequestReview')
+  logger.info("START handlePullRequestReview");
   try {
     const channelId = core.getInput("channel-id");
     const slackUsers = await getEngineersFromS3();
@@ -119,7 +119,7 @@ export const handlePullRequestReview = async (): Promise<void> => {
     }
 
     if (hasReaction) {
-      logger.info('END handlePullRequestReview: hasReaction')
+      logger.info("END handlePullRequestReview: hasReaction");
       return;
     }
 
@@ -130,8 +130,8 @@ export const handlePullRequestReview = async (): Promise<void> => {
       name: reactionToAdd,
     });
 
-    logger.info('END handlePullRequestReview: new reactions added')
-    return
+    logger.info("END handlePullRequestReview: new reactions added");
+    return;
   } catch (error) {
     fail(error);
     throw error;

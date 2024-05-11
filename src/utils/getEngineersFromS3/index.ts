@@ -8,7 +8,7 @@ export const getEngineersFromS3 = (): Promise<{
   engineers: EngineerGithubSlackMapping[];
 }> => {
   return new Promise(async (resolve, reject) => {
-    logger.info('START getEngineersFromS3')
+    logger.info("START getEngineersFromS3");
     // required for this to work
     const Bucket = core.getInput("aws-s3-bucket");
     const Key = core.getInput("aws-s3-object-key");
