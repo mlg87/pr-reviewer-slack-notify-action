@@ -11,7 +11,7 @@ import { slackWebClient } from "../utils/slackWebClient";
 // NOTE in the future we may want to wait to notify everyone that they can review it again when the PR author
 // explicitly asks for a re-review
 export const handleCommitPush = async (): Promise<void> => {
-  logger.info('START handleCommitPush')
+  logger.info("START handleCommitPush");
   try {
     const channelId = core.getInput("channel-id");
     const { repository } = github.context.payload;
@@ -56,7 +56,9 @@ export const handleCommitPush = async (): Promise<void> => {
       const previousReviewers = res.data.map((review) => review!.user!.login);
       const distinctPreviousReviewers = [...new Set(previousReviewers)];
       const baseMessage = `new code has been committed since your review of <${pull_request._links.html.href}|*PR ${pull_request.number}*>, please review the updates.`;
-      const usersToAtString = await createUsersToAtString(distinctPreviousReviewers);
+      const usersToAtString = await createUsersToAtString(
+        distinctPreviousReviewers
+      );
       const text = `${usersToAtString} ${baseMessage}`;
       const threadUpdateRes = await slackWebClient.chat.postMessage({
         channel: channelId,
@@ -78,7 +80,7 @@ export const handleCommitPush = async (): Promise<void> => {
       }
     }
 
-    logger.info('END handleCommitPush')
+    logger.info("END handleCommitPush");
     return;
   } catch (error) {
     fail(error);

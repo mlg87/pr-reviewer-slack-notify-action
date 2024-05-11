@@ -10,7 +10,7 @@ import { slackWebClient } from "../utils/slackWebClient";
 // will only run on push to base branch (i.e. staging), so we can assume that a closed state for PR
 // equates to 'merged' (no specific event for 'merged' on PRs)
 export const handleMerge = async (): Promise<void> => {
-  logger.info('START handleMerge')
+  logger.info("START handleMerge");
   try {
     const channelId = core.getInput("channel-id");
     const { commits, repository } = github.context.payload;
@@ -55,7 +55,7 @@ export const handleMerge = async (): Promise<void> => {
       text,
     });
 
-    logger.info('END handleMerge')
+    logger.info("END handleMerge");
     return;
   } catch (error) {
     fail(error);

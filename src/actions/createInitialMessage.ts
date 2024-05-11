@@ -5,10 +5,11 @@ import { fail } from "../utils/fail";
 import { getPullRequest } from "../utils/getPullRequest";
 import { logger } from "../utils/logger";
 import { slackWebClient } from "../utils/slackWebClient";
+import { getRequestedReviewersAsIndividuals } from "../utils/getRequestedReviewersAsIndividuals";
 
 export const createInitialMessage = async (): Promise<string | void> => {
   const verbose: boolean = core.getBooleanInput("verbose");
-  logger.info(`START createInitialMessage. Verbose? ${verbose}`)
+  logger.info(`START createInitialMessage. Verbose? ${verbose}`);
 
   try {
     const channelId = core.getInput("channel-id");
@@ -17,7 +18,6 @@ export const createInitialMessage = async (): Promise<string | void> => {
 
     if (!pull_request || !repository) return;
 
-    const requestedReviewers = pull_request.requested_reviewers ? pull_request.requested_reviewers.map((user: any) => user.login) : [];
     const requestedReviewers = await getRequestedReviewersAsIndividuals();
 
     //
@@ -63,10 +63,10 @@ export const createInitialMessage = async (): Promise<string | void> => {
       owner: repository.owner.login,
       repo: repository.name,
       issue_number: pull_request.number,
-      body: slackMessageId
+      body: slackMessageId,
     });
 
-    logger.info(`END createInitialMessage: ${slackMessageId}`)
+    logger.info(`END createInitialMessage: ${slackMessageId}`);
     return slackMessageId;
   } catch (error: any) {
     console.error("error in createInitialMessage::: ", error);

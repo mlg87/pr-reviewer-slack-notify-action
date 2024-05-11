@@ -8,7 +8,7 @@ import { slackWebClient } from "../utils/slackWebClient";
 
 // TODO handle labels being removed
 export const handleLabelChange = async (): Promise<void> => {
-  logger.info('START handleLableChange')
+  logger.info("START handleLableChange");
   try {
     const channelId = core.getInput("channel-id");
     const labelNameToWatchFor = core.getInput("label-name-to-watch-for");
@@ -67,7 +67,7 @@ export const handleLabelChange = async (): Promise<void> => {
       name: "heart_eyes",
     });
 
-    logger.info('END handleLableChange')
+    logger.info("END handleLableChange");
     return;
   } catch (error) {
     fail(error);
