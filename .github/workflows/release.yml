@@ -13,12 +13,12 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0 # gives semantic-release access to all previous commits
           token: ${{ secrets.GH_TOKEN }} # admin token
       - name: Cache node_modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
         with:
@@ -28,33 +28,17 @@ jobs:
             ${{ runner.OS }}-${{ env.cache-name }}-
             ${{ runner.OS }}-
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: 16.15.0
+          node-version: 20.13.1
       - name: Install dependencies
         run: yarn
-      # - name: Compile TS => JS
-      #   run: yarn build
       - name: Package code
         run: yarn package
-      # - name: Bundle code
-      #   uses: tool3/ncc@master
-      #   with:
-      #     github_token: ${{ secrets.GH_TOKEN }}
-      #     src: 'src/index.ts'
-      #     branch: 'main'
-      #     ncc_args: '--source-map, --license, licenses.txt'
-      # - name: Upload artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: dist
-      #     path: dist/
       - name: Commit dist
         uses: EndBug/add-and-commit@v9
         with:
           default_author: github_actions
-          message: 'Commiting for release'
+          message: "Commiting for release"
       - name: Cut release
         run: yarn release
-        # white space
-      
