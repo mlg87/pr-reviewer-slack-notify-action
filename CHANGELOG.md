@@ -1,3 +1,31 @@
+### [7.8.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.8.0...v7.8.1) (2023-05-10)
+
+
+### Bug Fixes
+
+* **pr review dismiss:** pull action from payload ([b513e2f](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/b513e2f4a323c0d2c619c484a4a64c8a31746162))
+
+## [7.8.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.7.0...v7.8.0) (2023-05-10)
+
+
+### Features
+
+* **run:** add handler for pr review dismissals ([fbcc4bf](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/fbcc4bf52f5238f627f6ed784c83747bb9deacc9))
+
+## [7.7.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.6.0...v7.7.0) (2023-02-10)
+
+
+### Build System
+
+* **deps:** bump npm from 8.8.0 to 8.12.0 ([8110d13](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/8110d135662f77f29bb9309aa5f8c023f47599b8))
+
+## [7.6.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.5.1...v7.6.0) (2022-10-20)
+
+
+### Features
+
+* add verbose mode option to minimize slack notification size ([#51](https://github.com/mlg87/pr-reviewer-slack-notify-action/issues/51)) ([f19b20f](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/f19b20fcad711393f2050a56ef67f181aa7827bc))
+
 ### [7.5.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.5.0...v7.5.1) (2022-05-19)
 
 

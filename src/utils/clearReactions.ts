@@ -2,9 +2,10 @@ import * as core from "@actions/core";
 import { fail } from "./fail";
 import { logger } from "./logger";
 import { slackWebClient } from "./slackWebClient";
+import { WebAPIPlatformError } from "@slack/web-api";
 
 export const clearReactions = async (slackMessageId: string) => {
-  logger.info(`START clearReactions: ${slackMessageId}`)
+  logger.info(`START clearReactions: ${slackMessageId}`);
   try {
     const channelId = core.getInput("channel-id");
 
@@ -27,9 +28,15 @@ export const clearReactions = async (slackMessageId: string) => {
       }
     }
 
-    logger.info('END clearReactions')
+    logger.info("END clearReactions");
     return;
   } catch (error) {
+    if ((error as WebAPIPlatformError)?.data?.error === "no_reaction") {
+      // Fail silently
+      logger.info(`END clearReactions with error: ${JSON.stringify(error)}`);
+      return;
+    }
+
     fail(error);
     throw error;
   }

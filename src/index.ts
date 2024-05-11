@@ -60,8 +60,11 @@ const run = async (): Promise<void> => {
     return;
   }
 
-  // push of commit
-  if (eventName === "push") {
+  // push of commit / review dismissed
+  if (
+    eventName === "push" ||
+    (eventName === "pull_request_review" && payload.action === "dismissed")
+  ) {
     // merge of PR to base branch
     if (isActingOnBaseBranch) {
       console.log("running handleMerge::: ", payload);
