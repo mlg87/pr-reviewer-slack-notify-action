@@ -2,7 +2,7 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import { clearReactions } from "../utils/clearReactions";
 import { fail } from "../utils/fail";
-import { getPrForCommit } from "../utils/getPrForCommit";
+import { getPullRequest } from "../utils/getPullRequest";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
 import { logger } from "../utils/logger";
 import { slackWebClient } from "../utils/slackWebClient";
@@ -19,7 +19,7 @@ export const handleMerge = async (): Promise<void> => {
     // ─── CONFIRM COMMIT IS ASSOCIATED WITH A PR IN CLOSED STATE ──────
     //
 
-    const pull_request = await getPrForCommit();
+    const pull_request = await getPullRequest();
 
     if (!pull_request) {
       throw Error(`No pull_request found for commit: ${commitSha}`);

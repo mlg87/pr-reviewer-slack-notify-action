@@ -2,7 +2,7 @@ import * as github from "@actions/github";
 import * as core from "@actions/core";
 import { fail } from "./fail";
 import { logger } from "./logger";
-import { getPrForCommit } from "./getPrForCommit";
+import { getPullRequest } from "./getPullRequest";
 import { createInitialMessage } from "../actions/createInitialMessage";
 
 // requires pull_request and repository as inputs bc of the differently shaped action payloads
@@ -13,7 +13,7 @@ export const getSlackMessageId = async (): Promise<string> => {
     let pull_request: any = github.context.payload.pull_request;
     // pull_request is not on the payload for push events
     if (github.context.eventName === 'push' && !pull_request) {
-      pull_request = await getPrForCommit();
+      pull_request = await getPullRequest();
     }
     if (!pull_request) {
       throw Error(

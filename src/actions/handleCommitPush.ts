@@ -3,7 +3,7 @@ import * as github from "@actions/github";
 import { clearReactions } from "../utils/clearReactions";
 import { createUsersToAtString } from "../utils/createUsersToAtString";
 import { fail } from "../utils/fail";
-import { getPrForCommit } from "../utils/getPrForCommit";
+import { getPullRequest } from "../utils/getPullRequest";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
 import { logger } from "../utils/logger";
 import { slackWebClient } from "../utils/slackWebClient";
@@ -26,7 +26,7 @@ export const handleCommitPush = async (): Promise<void> => {
     // ─── GET THE ISSUE NUMBER FOR THE COMMIT ─────────────────────────
     //
 
-    const pull_request = await getPrForCommit();
+    const pull_request = await getPullRequest();
     // dont spam everyone on slack
     if (!pull_request || pull_request.state === "closed") {
       return;

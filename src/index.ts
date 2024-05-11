@@ -6,8 +6,10 @@ import { getSlackMessageId } from "./utils/getSlackMessageId";
 import { handleMerge } from "./actions/handleMerge";
 import { handleCommitPush } from "./actions/handleCommitPush";
 import { handlePullRequestReview } from "./actions/handlePullRequestReview";
+import { logger } from "./utils/logger";
 
 const run = async (): Promise<void> => {
+  logger.info(`START run (github.context): ${JSON.stringify(github.context)}`)
   const { eventName, payload, ref } = github.context;
   const baseBranch = core.getInput("base-branch");
   const isActingOnBaseBranch = ref.includes(baseBranch);

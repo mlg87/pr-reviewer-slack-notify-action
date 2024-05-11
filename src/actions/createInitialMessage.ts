@@ -2,7 +2,7 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import { createUsersToAtString } from "../utils/createUsersToAtString";
 import { fail } from "../utils/fail";
-import { getPrForCommit } from "../utils/getPrForCommit";
+import { getPullRequest } from "../utils/getPullRequest";
 import { logger } from "../utils/logger";
 import { slackWebClient } from "../utils/slackWebClient";
 
@@ -11,11 +11,12 @@ export const createInitialMessage = async (): Promise<string | void> => {
   try {
     const channelId = core.getInput("channel-id");
     const { repository } = github.context.payload;
-    const pull_request = await getPrForCommit();
+    const pull_request = await getPullRequest();
 
     if (!pull_request || !repository) return;
 
     const requestedReviewers = pull_request.requested_reviewers ? pull_request.requested_reviewers.map((user: any) => user.login) : [];
+    const requestedReviewers = await getRequestedReviewersAsIndividuals();
 
     //
     // ─── RETURN IF THERE ARE NO REQUESTED REVIEWERS ──────────────────
