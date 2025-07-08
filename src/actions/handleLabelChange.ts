@@ -71,6 +71,13 @@ export const handleLabelChange = async (): Promise<void> => {
       const richText = `<@${author.slack_id}>, *${labeler.github_username}* added the label *${labelNameToWatchFor}* to your PR`;
       const slackMessageId = await getSlackMessageId();
 
+      if (!slackMessageId) {
+        core.warning(
+          `Unable to notify about label '${labelNameToWatchFor}' because no Slack message ID could be found or created. This may be because the required label is not present.`
+        );
+        return;
+      }
+
       await slackWebClient.chat.postMessage({
         channel: channelId,
         thread_ts: slackMessageId,
