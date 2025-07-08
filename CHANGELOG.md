@@ -1,3 +1,10 @@
+## [8.2.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v8.2.0...v8.2.1) (2025-07-08)
+
+
+### Bug Fixes
+
+* prevent action from failing when label-for-initial-notification is missing ([5a4a26a](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/5a4a26a3750aea9c0afb1f8d18af63e81638a733))
+
 ## [8.2.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v8.1.0...v8.2.0) (2025-07-08)
 
 
