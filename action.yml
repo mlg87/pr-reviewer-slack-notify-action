@@ -29,23 +29,27 @@ inputs:
     description: "If you would like to notify the thread of a label being applied to a PR, set this."
     required: false
     default: ""
+  label-for-initial-notification:
+    description: "If set, the action will wait for this label to be added to the PR before running initial notifications."
+    required: false
+    default: ""
   ignore-draft-prs:
     description: "Do not message on draft PRs"
     required: false
-    default: false
+    default: "false"
   silence-on-quiet-label:
     description: "Do not message if the PR has the `quiet` label"
     required: false
-    default: false
+    default: "false"
   fail-silently:
     description: "Allow action to fail silently to hide the red X of death"
     required: false
-    default: false
+    default: "false"
   verbose:
     description: "If verbose is set to true, the entire PR text is posted to Slack. If false, just the title is posted."
     required: false
-    default: true
+    default: "true"
   
 runs:
-  using: "node16"
+  using: "node20"
   main: "dist/index.js"

@@ -15,17 +15,33 @@ const run = async (): Promise<void> => {
   const isActingOnBaseBranch = ref.includes(baseBranch);
 
   let hasQuietLabel = false;
+  let hasRequiredLabel = true; // Default to true if no label is required
   const pull_request = payload.pull_request;
 
   const ignoreDraft = core.getInput("ignore-draft-prs");
   const silenceQuiet = core.getInput("silence-on-quiet-label");
+  const labelForInitialNotification = core.getInput(
+    "label-for-initial-notification"
+  );
 
   // need to prevent unhandled errors here
   if (pull_request) {
+    // Check for quiet label
     for (const label of pull_request.labels) {
       if (label.name === "quiet") {
         hasQuietLabel = true;
         break;
+      }
+    }
+
+    // Check for required label for initial notification
+    if (labelForInitialNotification) {
+      hasRequiredLabel = false; // Reset to false if we need to check for a specific label
+      for (const label of pull_request.labels) {
+        if (label.name === labelForInitialNotification) {
+          hasRequiredLabel = true;
+          break;
+        }
       }
     }
 
@@ -40,7 +56,14 @@ const run = async (): Promise<void> => {
     if (payload.action === "opened" || payload.action === "ready_for_review") {
       console.log("running createInitialMessage::: ", payload);
 
-      await createInitialMessage();
+      // Only create initial message if the required label is present (or no label is required)
+      if (hasRequiredLabel) {
+        await createInitialMessage();
+      } else {
+        logger.info(
+          `Skipping initial message creation because required label '${labelForInitialNotification}' is not present`
+        );
+      }
       return;
     }
 

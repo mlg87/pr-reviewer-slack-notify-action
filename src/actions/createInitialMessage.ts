@@ -9,6 +9,9 @@ import { getRequestedReviewersAsIndividuals } from "../utils/getRequestedReviewe
 
 export const createInitialMessage = async (): Promise<string | void> => {
   const verbose: boolean = core.getBooleanInput("verbose");
+  const labelForInitialNotification = core.getInput(
+    "label-for-initial-notification"
+  );
   logger.info(`START createInitialMessage. Verbose? ${verbose}`);
 
   try {
@@ -17,6 +20,24 @@ export const createInitialMessage = async (): Promise<string | void> => {
     const pull_request = await getPullRequest();
 
     if (!pull_request || !repository) return;
+
+    // Check if the required label is present (if one is configured)
+    if (labelForInitialNotification) {
+      let hasRequiredLabel = false;
+      for (const label of pull_request.labels || []) {
+        if (label.name === labelForInitialNotification) {
+          hasRequiredLabel = true;
+          break;
+        }
+      }
+
+      if (!hasRequiredLabel) {
+        logger.info(
+          `Skipping initial message creation because required label '${labelForInitialNotification}' is not present`
+        );
+        return;
+      }
+    }
 
     const requestedReviewers = await getRequestedReviewersAsIndividuals();
 
