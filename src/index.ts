@@ -79,7 +79,15 @@ const run = async (): Promise<void> => {
   // reduce spamming channels by adding a message if one didn't get created somehow
   const slackMessageId = await getSlackMessageId();
   if (!slackMessageId) {
-    await createInitialMessage();
+    // If we can't get a slack message ID, it might be because the required label is not present
+    // In this case, we should try to create an initial message, but if that also fails, we should warn and return
+    const initialMessageId = await createInitialMessage();
+    if (!initialMessageId) {
+      core.warning(
+        "Unable to create or retrieve Slack message ID. This may be because the required label is not present."
+      );
+      return;
+    }
     return;
   }
 

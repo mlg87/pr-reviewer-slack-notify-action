@@ -32,6 +32,13 @@ export const handlePullRequestReview = async (): Promise<void> => {
 
     const slackMessageId = await getSlackMessageId();
 
+    if (!slackMessageId) {
+      core.warning(
+        "Unable to post pull request review notification because no Slack message ID could be found. This may be because the required label is not present."
+      );
+      return;
+    }
+
     //
     // ─── MAP USERS ───────────────────────────────────────────────────
     //
