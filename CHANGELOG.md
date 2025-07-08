@@ -1,3 +1,10 @@
+## [8.1.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v8.0.0...v8.1.0) (2025-07-08)
+
+
+### Build System
+
+* **deps:** bump braces from 3.0.2 to 3.0.3 ([8f6d2cb](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/8f6d2cbc17ca4ecfa21272cbb0f4e5d45dc86f2d))
+
 ## [8.0.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v7.8.1...v8.0.0) (2024-05-11)
 
 
