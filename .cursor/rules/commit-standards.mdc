@@ -1,0 +1,281 @@
+---
+alwaysApply: false
+---
+
+# Conventional Commits Standards for Student Lifecycle Repos
+
+## Basic Format
+
+Follow this format for all commit messages:
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+## Valid Types (Per Conventional Commits Specification)
+
+Use ONLY these standardized types:
+
+- `feat`: A new feature for the user
+- `fix`: A bug fix for the user
+- `docs`: Documentation only changes
+- `style`: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+- `refactor`: A code change that neither fixes a bug nor adds a feature
+- `perf`: A code change that improves performance
+- `test`: Adding missing tests or correcting existing tests
+- `build`: Changes that affect the build system or external dependencies
+- `ci`: Changes to CI configuration files and scripts
+- `chore`: Other changes that don't modify src or test files
+- `revert`: Reverts a previous commit
+
+## Scopes (Examples - Not Exhaustive)
+
+Scope should indicate the module or component affected. These are examples, not requirements:
+
+- `api`: API or endpoint changes
+- `auth`: Authentication-related changes
+- `lambda`: Lambda function changes
+- `db`: Database-related changes
+- `stack`: CDK stack configuration
+- `webhook`: Webhook handlers
+- `helpers`: Helper functions
+- `logger`: Logging functionality
+- `jira`: Jira integration components
+- `slack`: Slack integration components
+
+Feel free to use other scopes that make sense for your specific change.
+
+## Commit Strategy & Sequencing
+
+### Sequential Dependency Management
+
+Commit changes in logical order where dependencies are committed before dependents:
+
+1. **Infrastructure/Types First**: Database schemas, type definitions, interfaces
+2. **Core Logic**: Business logic, algorithms, core functions
+3. **Integration**: API endpoints, webhooks, external service integrations
+4. **Configuration**: Environment configs, deployment settings
+5. **Documentation**: README updates, code comments, documentation
+
+### Atomic Commits
+
+- Each commit should represent a complete, working unit of change
+- All files related to a single logical change should be committed together
+- Commits should be reversible without breaking functionality
+- Test that each commit builds and passes tests individually
+
+### Commit All Changes Directive
+
+**When the user writes "commit"**: Stage and commit ALL changed files in the repository. Do not ask for confirmation or selection - commit everything that has been modified.
+
+## Breaking Changes
+
+- Indicate breaking changes with a `!` before the colon
+- Example: `feat(api)!: change program enrollment response format`
+- Include `BREAKING CHANGE:` in the footer with detailed description
+
+## Commit Message Guidelines
+
+- Keep the first line under 72 characters
+- Use imperative mood ("Add feature" not "Added feature")
+- Be descriptive but concise
+- In body, explain "why" not just "what"
+- Reference Jira tickets: `SLYFE-123`
+
+## Examples of Proper Commit Sequencing
+
+```
+# Step 1: Foundation changes
+feat(types): add enrollment verification status enum
+
+# Step 2: Core logic that depends on types
+feat(helpers): implement enrollment verification algorithm
+
+# Step 3: API that uses the helper
+feat(api): add enrollment verification webhook endpoint
+
+# Step 4: Configuration for deployment
+build(stack): add lambda function for verification webhook
+
+# Step 5: Documentation
+docs(api): add enrollment verification endpoint documentation
+```
+
+## Examples of Good Commits
+
+```
+feat(webhook): add Jira issue ranking automation
+
+Implements automatic ranking of triage bugs based on priority and
+labels. The webhook triggers when issues are moved to the triage
+state and ranks them using the existing ranking algorithm.
+
+Related to: SLYFE-456
+```
+
+```
+fix(helpers): handle null values in Atlassian user lookup
+
+The findAtlassianUserByApproximateEmail function was throwing errors
+when users had null email fields. Added proper null checking and
+fallback logic.
+
+Fixes: SLYFE-789
+```
+
+```
+refactor(logger): extract console replacement logic
+
+Moved console replacement functionality into separate utility for
+better testability and reusability across different log levels.
+```
+
+## Pull Request Workflow
+
+- Reference Jira ticket numbers in commit messages and PR titles
+- Ensure each commit in the PR could be cherry-picked independently
+- Squash only when commits are truly incremental (not when they represent distinct logical changes)
+- PR description should explain the overall change and any deployment considerations
+
+# Conventional Commits Standards for Student Lifecycle Repos
+
+## Basic Format
+
+Follow this format for all commit messages:
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+## Valid Types (Per Conventional Commits Specification)
+
+Use ONLY these standardized types:
+
+- `feat`: A new feature for the user
+- `fix`: A bug fix for the user
+- `docs`: Documentation only changes
+- `style`: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+- `refactor`: A code change that neither fixes a bug nor adds a feature
+- `perf`: A code change that improves performance
+- `test`: Adding missing tests or correcting existing tests
+- `build`: Changes that affect the build system or external dependencies
+- `ci`: Changes to CI configuration files and scripts
+- `chore`: Other changes that don't modify src or test files
+- `revert`: Reverts a previous commit
+
+## Scopes (Examples - Not Exhaustive)
+
+Scope should indicate the module or component affected. These are examples, not requirements:
+
+- `api`: API or endpoint changes
+- `auth`: Authentication-related changes
+- `lambda`: Lambda function changes
+- `db`: Database-related changes
+- `stack`: CDK stack configuration
+- `webhook`: Webhook handlers
+- `helpers`: Helper functions
+- `logger`: Logging functionality
+- `jira`: Jira integration components
+- `slack`: Slack integration components
+
+Feel free to use other scopes that make sense for your specific change.
+
+## Commit Strategy & Sequencing
+
+### Sequential Dependency Management
+
+Commit changes in logical order where dependencies are committed before dependents:
+
+1. **Infrastructure/Types First**: Database schemas, type definitions, interfaces
+2. **Core Logic**: Business logic, algorithms, core functions
+3. **Integration**: API endpoints, webhooks, external service integrations
+4. **Configuration**: Environment configs, deployment settings
+5. **Documentation**: README updates, code comments, documentation
+
+### Atomic Commits
+
+- Each commit should represent a complete, working unit of change
+- All files related to a single logical change should be committed together
+- Commits should be reversible without breaking functionality
+- Test that each commit builds and passes tests individually
+
+### Commit All Changes Directive
+
+**When the user writes "commit"**: Stage and commit ALL changed files in the repository. Do not ask for confirmation or selection - commit everything that has been modified.
+
+## Breaking Changes
+
+- Indicate breaking changes with a `!` before the colon
+- Example: `feat(api)!: change program enrollment response format`
+- Include `BREAKING CHANGE:` in the footer with detailed description
+
+## Commit Message Guidelines
+
+- Keep the first line under 72 characters
+- Use imperative mood ("Add feature" not "Added feature")
+- Be descriptive but concise
+- In body, explain "why" not just "what"
+- Reference Jira tickets: `SLYFE-123`
+
+## Examples of Proper Commit Sequencing
+
+```
+# Step 1: Foundation changes
+feat(types): add enrollment verification status enum
+
+# Step 2: Core logic that depends on types
+feat(helpers): implement enrollment verification algorithm
+
+# Step 3: API that uses the helper
+feat(api): add enrollment verification webhook endpoint
+
+# Step 4: Configuration for deployment
+build(stack): add lambda function for verification webhook
+
+# Step 5: Documentation
+docs(api): add enrollment verification endpoint documentation
+```
+
+## Examples of Good Commits
+
+```
+feat(webhook): add Jira issue ranking automation
+
+Implements automatic ranking of triage bugs based on priority and
+labels. The webhook triggers when issues are moved to the triage
+state and ranks them using the existing ranking algorithm.
+
+Related to: SLYFE-456
+```
+
+```
+fix(helpers): handle null values in Atlassian user lookup
+
+The findAtlassianUserByApproximateEmail function was throwing errors
+when users had null email fields. Added proper null checking and
+fallback logic.
+
+Fixes: SLYFE-789
+```
+
+```
+refactor(logger): extract console replacement logic
+
+Moved console replacement functionality into separate utility for
+better testability and reusability across different log levels.
+```
+
+## Pull Request Workflow
+
+- Reference Jira ticket numbers in commit messages and PR titles
+- Ensure each commit in the PR could be cherry-picked independently
+- Squash only when commits are truly incremental (not when they represent distinct logical changes)
+- PR description should explain the overall change and any deployment considerations
