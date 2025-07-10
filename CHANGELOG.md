@@ -1,3 +1,10 @@
+## [8.2.2](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v8.2.1...v8.2.2) (2025-07-10)
+
+
+### Bug Fixes
+
+* **teams:** handle team reviewers correctly in labeled events ([da1139c](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/da1139cf9fb5aab6fc8f60f81d6de102ad9aae5f))
+
 ## [8.2.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v8.2.0...v8.2.1) (2025-07-08)
 
 
