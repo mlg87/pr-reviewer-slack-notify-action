@@ -11,7 +11,9 @@ import { logger } from "./utils/logger";
 
 const run = async (): Promise<void> => {
   const { eventName, payload, ref } = github.context;
-  logger.info(`START run - Event: ${eventName}, Action: ${payload.action || 'N/A'}`);
+  logger.info(
+    `START run - Event: ${eventName}, Action: ${payload.action || "N/A"}`
+  );
   const baseBranch = core.getInput("base-branch");
   const isActingOnBaseBranch = ref.includes(baseBranch);
 

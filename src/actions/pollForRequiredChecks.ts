@@ -14,28 +14,30 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const pollForRequiredChecks = async (): Promise<void> => {
   logger.info("START pollForRequiredChecks");
-  
+
   // Initialize summary
   await core.summary
-    .addHeading('🔔 PR Slack Notify - Polling for Required Checks')
-    .addRaw('\n')
+    .addHeading("🔔 PR Slack Notify - Polling for Required Checks")
+    .addRaw("\n")
     .write();
-  
+
   try {
     const { repository } = github.context.payload;
     const pull_request = await getPullRequest();
 
     if (!pull_request || !repository) {
       await core.summary
-        .addRaw('❌ **Error**: Pull request or repository not found\n')
+        .addRaw("❌ **Error**: Pull request or repository not found\n")
         .write();
       throw Error("pull_request or repository not found in context");
     }
-    
+
     await core.summary
       .addRaw(`📝 **PR**: #${pull_request.number} - ${pull_request.title}\n`)
-      .addRaw(`🌿 **Branch**: ${pull_request.head.ref} → ${pull_request.base.ref}\n`)
-      .addRaw('\n')
+      .addRaw(
+        `🌿 **Branch**: ${pull_request.head.ref} → ${pull_request.base.ref}\n`
+      )
+      .addRaw("\n")
       .write();
 
     // Check if we should skip this (draft PR, quiet label, etc.)
@@ -78,7 +80,9 @@ export const pollForRequiredChecks = async (): Promise<void> => {
         `Required label '${labelForInitialNotification}' not present, will not poll`
       );
       await core.summary
-        .addRaw(`⏸️ **Waiting**: Required label '${labelForInitialNotification}' not yet applied\n`)
+        .addRaw(
+          `⏸️ **Waiting**: Required label '${labelForInitialNotification}' not yet applied\n`
+        )
         .write();
       return;
     }
@@ -119,12 +123,12 @@ export const pollForRequiredChecks = async (): Promise<void> => {
     logger.info(
       `Starting to poll every ${pollingIntervalSeconds}s for up to ${pollingTimeoutMinutes} minutes`
     );
-    
+
     await core.summary
       .addRaw(`⏱️ **Polling Configuration**:\n`)
       .addRaw(`   - Check interval: ${pollingIntervalSeconds}s\n`)
       .addRaw(`   - Timeout: ${pollingTimeoutMinutes} minutes\n`)
-      .addRaw('\n')
+      .addRaw("\n")
       .write();
 
     // Polling loop
@@ -137,7 +141,9 @@ export const pollForRequiredChecks = async (): Promise<void> => {
       if (elapsedTime >= pollingTimeoutMs) {
         logger.info("Polling timeout reached, exiting without notification");
         await core.summary
-          .addRaw(`⏰ **Timeout**: Polling timed out after ${pollingTimeoutMinutes} minutes\n`)
+          .addRaw(
+            `⏰ **Timeout**: Polling timed out after ${pollingTimeoutMinutes} minutes\n`
+          )
           .addRaw(`   - ${pollCount} poll attempts made\n`)
           .addRaw(`   - Required checks did not pass in time\n`)
           .write();
@@ -174,7 +180,9 @@ export const pollForRequiredChecks = async (): Promise<void> => {
         // No required checks, we can notify immediately
         logger.info("No required checks found, proceeding to notify");
         await core.summary
-          .addRaw(`✅ **No Required Checks**: Proceeding to notify immediately\n`)
+          .addRaw(
+            `✅ **No Required Checks**: Proceeding to notify immediately\n`
+          )
           .write();
         break;
       }
@@ -183,10 +191,12 @@ export const pollForRequiredChecks = async (): Promise<void> => {
         logger.info("All required checks have passed, proceeding to notify");
         const elapsedMinutes = Math.round(elapsedTime / 60000);
         await core.summary
-          .addRaw(`✅ **All Checks Passed**: ${checkResult.passedChecksCount}/${checkResult.requiredChecksCount} required checks passed\n`)
+          .addRaw(
+            `✅ **All Checks Passed**: ${checkResult.passedChecksCount}/${checkResult.requiredChecksCount} required checks passed\n`
+          )
           .addRaw(`   - Polls: ${pollCount}\n`)
           .addRaw(`   - Elapsed time: ${elapsedMinutes} minute(s)\n`)
-          .addRaw('\n')
+          .addRaw("\n")
           .write();
         break;
       }
