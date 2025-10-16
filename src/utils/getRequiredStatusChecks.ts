@@ -122,20 +122,16 @@ export const getRequiredStatusChecks = async (
       if (!status) {
         // Check hasn't started yet
         pendingCount++;
-        logger.info(`Required check '${requiredCheck}' has not started yet`);
       } else if (status === "success") {
         passedCount++;
-        logger.info(`Required check '${requiredCheck}' passed`);
       } else if (
         status === "pending" ||
         status === "queued" ||
         status === "in_progress"
       ) {
         pendingCount++;
-        logger.info(`Required check '${requiredCheck}' is pending (${status})`);
       } else {
         failedCount++;
-        logger.info(`Required check '${requiredCheck}' failed (${status})`);
       }
     }
 
