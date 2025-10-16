@@ -136,7 +136,7 @@ The `label-for-initial-notification` input allows you to require a specific labe
 - Notifications are now delayed until required checks pass (not immediate)
 - You **must** add a `concurrency` group to your workflow (see example above)
 - Job timeout should be set to slightly more than `polling-timeout` (default: 35 minutes)
-- Action now requires Node.js 22 runtime
+- Action now requires Node.js 24 runtime
 
 **Note**: If your repository has no required status checks configured in branch protection, notifications will be sent immediately (similar to v8.x behavior).
 
