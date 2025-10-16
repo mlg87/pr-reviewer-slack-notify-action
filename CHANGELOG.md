@@ -1,3 +1,79 @@
+## [9.2.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v9.1.1...v9.2.0) (2025-10-16)
+
+
+### Documentation
+
+* **readme:** add critical workflow triggers to example config ([e48275e](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/e48275e7c988a82dd8cc47cdad492bd8fb8f09ea))
+
+
+### Features
+
+* **logging:** reduce verbosity and add workflow summaries ([7cbb786](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/7cbb7864e562177f4f8101a27e41d6a42ddf693a))
+
+
+### Styling
+
+* apply prettier formatting to logging changes ([92a863e](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/92a863e5215c6755eb7331fb9cfe2bddfb97911b))
+
+## [9.1.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v9.1.0...v9.1.1) (2025-10-16)
+
+
+### Bug Fixes
+
+* **action:** change Node runtime from node22 to node24 ([83b056c](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/83b056cdb285a745be3d3d829706b671093cf905))
+
+## [9.1.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v9.0.0...v9.1.0) (2025-10-16)
+
+
+### Build System
+
+* **deps:** bump axios from 1.6.8 to 1.12.2 ([696d63e](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/696d63ef714f9907306c5ff58f8c1dea539cf8be))
+
+## [9.0.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v8.2.2...v9.0.0) (2025-10-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* **core:** Notifications are now delayed until all required CI/CD
+checks pass. This prevents premature Slack notifications and duplicate
+messages.
+
+Changes:
+- Add polling mechanism (90s intervals, 30min timeout) for check status
+- Add getRequiredStatusChecks utility to evaluate branch protection rules
+- Add getNotificationState utility for state tracking in PR comments
+- Add pollForRequiredChecks action handler with polling loop
+- Refactor index.ts to use polling instead of immediate notifications
+- Remove duplicate message creation logic from getSlackMessageId
+- Clean up handleLabelChange to remove label-triggered creation
+- Add polling-interval and polling-timeout action inputs
+- Remove unused dependencies: memory-cache, node-fetch
+- Upgrade to Node.js v22.9.0 runtime
+- Update GitHub Actions to latest versions (checkout@v5, setup-node@v5)
+- Update documentation with concurrency groups and migration guide
+
+Consumers must:
+- Add concurrency group to workflows to prevent duplicate runs
+- Set job timeout-minutes to 35+
+- Update action reference to v9.0.0
+
+Only required checks block notifications; non-required checks that fail
+won't prevent reviewers from being notified.
+
+### Bug Fixes
+
+* **ci:** enable Corepack for Yarn 4 support in release workflow ([9e3e681](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/9e3e6810ebc137fffb269066a0a5d0f6111ad8e1))
+
+
+### Documentation
+
+* **readme:** update for v9.0.0 accuracy and remove outdated content ([3d45576](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/3d4557608b425c0971ad19969cc28a447499a971))
+
+
+### Features
+
+* **core:** implement polling-based notifications with required checks ([2095552](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/2095552770792425038153e1c494c05c1c6e1f42))
+
 ## [8.2.2](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v8.2.1...v8.2.2) (2025-07-10)
 
 
