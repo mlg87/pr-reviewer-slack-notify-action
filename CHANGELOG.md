@@ -1,3 +1,10 @@
+## [9.1.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v9.1.0...v9.1.1) (2025-10-16)
+
+
+### Bug Fixes
+
+* **action:** change Node runtime from node22 to node24 ([83b056c](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/83b056cdb285a745be3d3d829706b671093cf905))
+
 ## [9.1.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v9.0.0...v9.1.0) (2025-10-16)
 
 
