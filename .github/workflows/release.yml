@@ -13,7 +13,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0 # gives semantic-release access to all previous commits
           token: ${{ secrets.GH_TOKEN }} # admin token
@@ -28,9 +28,9 @@ jobs:
             ${{ runner.OS }}-${{ env.cache-name }}-
             ${{ runner.OS }}-
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: 20.13.1
+          node-version-file: ".nvmrc"
       - name: Install dependencies
         run: yarn
       - name: Package code

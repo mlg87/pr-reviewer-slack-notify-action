@@ -6,6 +6,7 @@ import { getSlackMessageId } from "./utils/getSlackMessageId";
 import { handleMerge } from "./actions/handleMerge";
 import { handleCommitPush } from "./actions/handleCommitPush";
 import { handlePullRequestReview } from "./actions/handlePullRequestReview";
+import { pollForRequiredChecks } from "./actions/pollForRequiredChecks";
 import { logger } from "./utils/logger";
 
 const run = async (): Promise<void> => {
@@ -54,16 +55,10 @@ const run = async (): Promise<void> => {
   // route to the appropriate action
   if (eventName === "pull_request") {
     if (payload.action === "opened" || payload.action === "ready_for_review") {
-      console.log("running createInitialMessage::: ", payload);
+      console.log("running pollForRequiredChecks::: ", payload);
 
-      // Only create initial message if the required label is present (or no label is required)
-      if (hasRequiredLabel) {
-        await createInitialMessage();
-      } else {
-        logger.info(
-          `Skipping initial message creation because required label '${labelForInitialNotification}' is not present`
-        );
-      }
+      // Use polling handler which will wait for required checks to pass
+      await pollForRequiredChecks();
       return;
     }
 
@@ -76,18 +71,13 @@ const run = async (): Promise<void> => {
     }
   }
 
-  // reduce spamming channels by adding a message if one didn't get created somehow
+  // Get slack message ID for subsequent operations (reviews, commits, merge)
+  // The initial message should have been created by pollForRequiredChecks
   const slackMessageId = await getSlackMessageId();
   if (!slackMessageId) {
-    // If we can't get a slack message ID, it might be because the required label is not present
-    // In this case, we should try to create an initial message, but if that also fails, we should warn and return
-    const initialMessageId = await createInitialMessage();
-    if (!initialMessageId) {
-      core.warning(
-        "Unable to create or retrieve Slack message ID. This may be because the required label is not present."
-      );
-      return;
-    }
+    core.warning(
+      "No Slack message found. Initial notification may not have been sent yet (checks still pending) or PR may be skipped."
+    );
     return;
   }
 
