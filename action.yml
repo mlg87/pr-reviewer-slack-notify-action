@@ -49,7 +49,15 @@ inputs:
     description: "If verbose is set to true, the entire PR text is posted to Slack. If false, just the title is posted."
     required: false
     default: "true"
+  polling-interval:
+    description: "Number of seconds to wait between checks when polling for required status checks to pass."
+    required: false
+    default: "90"
+  polling-timeout:
+    description: "Maximum number of minutes to wait for required checks to pass before giving up."
+    required: false
+    default: "30"
   
 runs:
-  using: "node20"
+  using: "node22"
   main: "dist/index.js"

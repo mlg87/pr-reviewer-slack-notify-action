@@ -3,7 +3,6 @@ import * as core from "@actions/core";
 import { fail } from "./fail";
 import { logger } from "./logger";
 import { getPullRequest } from "./getPullRequest";
-import { createInitialMessage } from "../actions/createInitialMessage";
 
 // requires pull_request and repository as inputs bc of the differently shaped action payloads
 export const getSlackMessageId = async (): Promise<string | null> => {
@@ -70,17 +69,9 @@ export const getSlackMessageId = async (): Promise<string | null> => {
 
     if (!slackMessageId) {
       logger.info(
-        "no SLACK_MESSAGE_ID found, attempting to create initial message"
+        "no SLACK_MESSAGE_ID found in PR comments - initial notification may not have been sent yet"
       );
-      slackMessageId = await createInitialMessage();
-
-      if (!slackMessageId) {
-        core.warning(
-          "Unable to create SLACK_MESSAGE_ID comment in PR comment thread. This may be because the required label is not present or there are no requested reviewers."
-        );
-        logger.info("createInitialMessage returned void, returning null");
-        return null;
-      }
+      return null;
     }
 
     logger.info(`END getSlackMessageId: ${slackMessageId}`);

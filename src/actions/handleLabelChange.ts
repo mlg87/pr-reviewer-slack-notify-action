@@ -5,7 +5,6 @@ import { getEngineersFromS3 } from "../utils/getEngineersFromS3";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
 import { logger } from "../utils/logger";
 import { slackWebClient } from "../utils/slackWebClient";
-import { createInitialMessage } from "./createInitialMessage";
 
 // TODO handle labels being removed
 export const handleLabelChange = async (): Promise<void> => {
@@ -13,11 +12,8 @@ export const handleLabelChange = async (): Promise<void> => {
   try {
     const channelId = core.getInput("channel-id");
     const labelNameToWatchFor = core.getInput("label-name-to-watch-for");
-    const labelForInitialNotification = core.getInput(
-      "label-for-initial-notification"
-    );
     const slackUsers = await getEngineersFromS3();
-    const { pull_request, repository, sender, action } = github.context.payload;
+    const { pull_request, repository, sender } = github.context.payload;
 
     if (!pull_request) {
       throw Error("No pull_request found on github.context.payload");
@@ -27,24 +23,8 @@ export const handleLabelChange = async (): Promise<void> => {
       throw Error("No sender found on github.context.payload");
     }
 
-    // Check if the label-for-initial-notification was added
-    if (labelForInitialNotification && action === "labeled") {
-      let hasInitialNotificationLabel = false;
-      pull_request.labels.forEach((label: any) => {
-        if (label.name === labelForInitialNotification) {
-          hasInitialNotificationLabel = true;
-        }
-      });
-
-      // If the required label was added, trigger initial notification
-      if (hasInitialNotificationLabel) {
-        logger.info(
-          `Required label '${labelForInitialNotification}' was added, triggering initial notification`
-        );
-        await createInitialMessage();
-        return;
-      }
-    }
+    // Note: label-for-initial-notification is now handled by pollForRequiredChecks
+    // which checks for the label during its polling loop
 
     // Handle the label-name-to-watch-for functionality (existing logic)
     if (labelNameToWatchFor) {
