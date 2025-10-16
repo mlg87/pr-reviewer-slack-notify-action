@@ -10,8 +10,10 @@ import { pollForRequiredChecks } from "./actions/pollForRequiredChecks";
 import { logger } from "./utils/logger";
 
 const run = async (): Promise<void> => {
-  logger.info(`START run (github.context): ${JSON.stringify(github.context)}`);
   const { eventName, payload, ref } = github.context;
+  logger.info(
+    `START run - Event: ${eventName}, Action: ${payload.action || "N/A"}`
+  );
   const baseBranch = core.getInput("base-branch");
   const isActingOnBaseBranch = ref.includes(baseBranch);
 
@@ -55,8 +57,7 @@ const run = async (): Promise<void> => {
   // route to the appropriate action
   if (eventName === "pull_request") {
     if (payload.action === "opened" || payload.action === "ready_for_review") {
-      console.log("running pollForRequiredChecks::: ", payload);
-
+      logger.info(`Running pollForRequiredChecks for ${payload.action} event`);
       // Use polling handler which will wait for required checks to pass
       await pollForRequiredChecks();
       return;
@@ -64,8 +65,7 @@ const run = async (): Promise<void> => {
 
     // notify thread of a PR label change
     if (payload.action === "labeled" || payload.action === "unlabeled") {
-      console.log("running handleLabelChange::: ", payload);
-
+      logger.info(`Running handleLabelChange for ${payload.action} event`);
       await handleLabelChange();
       return;
     }
@@ -88,22 +88,19 @@ const run = async (): Promise<void> => {
   ) {
     // merge of PR to base branch
     if (isActingOnBaseBranch) {
-      console.log("running handleMerge::: ", payload);
-
+      logger.info(`Running handleMerge for ${eventName} event`);
       await handleMerge();
       return;
     }
 
-    console.log("running handleCommitPush::: ", payload);
-
+    logger.info(`Running handleCommitPush for ${eventName} event`);
     await handleCommitPush();
     return;
   }
 
   // a review has been submitted
   if (eventName === "pull_request_review") {
-    console.log("running handlePullRequestReview::: ", payload);
-
+    logger.info(`Running handlePullRequestReview for ${eventName} event`);
     await handlePullRequestReview();
     return;
   }
