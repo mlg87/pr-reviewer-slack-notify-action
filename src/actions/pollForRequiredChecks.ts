@@ -9,6 +9,7 @@ import {
   getNotificationState,
   setNotificationState,
 } from "../utils/getNotificationState";
+import { assignCodeownersAsReviewers } from "../utils/assignReviewers";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -108,6 +109,36 @@ export const pollForRequiredChecks = async (): Promise<void> => {
     // Mark as polling if not already
     if (currentState !== "POLLING") {
       await setNotificationState(pull_request, repository, "POLLING");
+    }
+
+    // Assign reviewers from CODEOWNERS if available
+    try {
+      const assignResult = await assignCodeownersAsReviewers(
+        pull_request,
+        repository,
+        true // expandTeams
+      );
+      
+      if (assignResult.success) {
+        const allAssigned = [
+          ...assignResult.assigned.users,
+          ...assignResult.assigned.teams.map((t) => `team:${t}`)
+        ];
+        await core.summary
+          .addRaw(
+            `👥 **Assigned Reviewers**: ${allAssigned.join(", ")}\n\n`
+          )
+          .write();
+      } else if (assignResult.errors.length > 0) {
+        await core.summary
+          .addRaw(
+            `⚠️ **Reviewer Assignment**: Some issues occurred - ${assignResult.errors.join(", ")}\n\n`
+          )
+          .write();
+      }
+    } catch (error: any) {
+      logger.warn(`CODEOWNERS assignment failed: ${error.message}`);
+      // Don't fail the entire workflow if CODEOWNERS assignment fails
     }
 
     // Get polling configuration
