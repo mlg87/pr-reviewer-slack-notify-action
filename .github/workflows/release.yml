@@ -27,12 +27,15 @@ jobs:
           restore-keys: |
             ${{ runner.OS }}-${{ env.cache-name }}-
             ${{ runner.OS }}-
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version-file: ".nvmrc"
+          cache: "yarn"
       - name: Install dependencies
-        run: yarn
+        run: yarn install --immutable
       - name: Package code
         run: yarn package
       - name: Commit dist
