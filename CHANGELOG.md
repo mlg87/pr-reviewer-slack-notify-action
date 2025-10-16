@@ -1,3 +1,20 @@
+## [9.2.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v9.1.1...v9.2.0) (2025-10-16)
+
+
+### Documentation
+
+* **readme:** add critical workflow triggers to example config ([e48275e](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/e48275e7c988a82dd8cc47cdad492bd8fb8f09ea))
+
+
+### Features
+
+* **logging:** reduce verbosity and add workflow summaries ([7cbb786](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/7cbb7864e562177f4f8101a27e41d6a42ddf693a))
+
+
+### Styling
+
+* apply prettier formatting to logging changes ([92a863e](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/92a863e5215c6755eb7331fb9cfe2bddfb97911b))
+
 ## [9.1.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v9.1.0...v9.1.1) (2025-10-16)
 
 
