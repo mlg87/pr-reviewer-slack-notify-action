@@ -1,6 +1,6 @@
 # PR Reviewer Slack Notify Action
 
-This action will post a message to a channel in Slack @ing the requested reviewers when a PR is opened. This is very easy to set up, but will require you to create an app in Slack as well where you can create incoming webhooks for your desired destinations.
+This action posts a message to a Slack channel @ing the requested reviewers after all required CI/CD checks have passed on a PR. The action polls until checks complete, ensuring reviewers are only notified when code is ready for review. This is easy to set up, but requires creating a Slack app with bot permissions.
 
 ## Setting up the Slack app
 
@@ -90,45 +90,25 @@ jobs:
 | `polling-interval`               | Number of seconds to wait between checks when polling for required status checks to pass.                                                                        | `false`  | `Number` | `90`    |
 | `polling-timeout`                | Maximum number of minutes to wait for required checks to pass before giving up.                                                                                  | `false`  | `Number` | `30`    |
 
-##### NOTE: It is recommended to store the webhook in GitHub Secrets
+##### NOTE: It is recommended to store sensitive values (bot-token, AWS credentials) in GitHub Secrets
 
 ## Using the label-for-initial-notification feature
 
-The `label-for-initial-notification` input allows you to delay initial Slack notifications until a specific label is added to the PR. This is useful when you want to wait for certain conditions to be met before notifying reviewers (e.g., waiting for CI checks to pass, or manual approval).
+The `label-for-initial-notification` input allows you to require a specific label before the action starts polling for checks. This is useful for manual approval workflows where you want human oversight before notifying reviewers.
 
-### Example usage:
-
-```yml
-- name: Send slack notifications to requested reviewers
-  id: pr-slack-notify
-  uses: mlg87/pr-reviewer-slack-notify-action@v4.0.8
-  with:
-    aws-region: "us-west-2"
-    aws-s3-bucket: "my-bucket"
-    aws-s3-object-key: "path/to/json/file/engineer-github-slack-mapping.json"
-    base-branch: "staging"
-    bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
-    channel-id: "[GET_THIS_FROM_SLACK]"
-    github-token: ${{ secrets.GH_TOKEN }}
-    label-for-initial-notification: "ready-for-review"
-    verbose: false
-```
+**Note**: In v9.0.0+, this feature works in combination with required checks. The action will wait for BOTH the label to be present AND all required checks to pass before notifying reviewers.
 
 ### How it works:
 
-1. **PR opened without label**: When a PR is opened or marked as ready for review, if the required label is not present, no initial Slack notification will be sent.
-
-2. **Label added**: When the specified label (e.g., "ready-for-review") is added to the PR, the action will trigger and send the initial notification to reviewers.
-
-3. **PR opened with label**: If the PR is opened with the required label already present, the initial notification will be sent immediately.
-
-4. **Normal operation**: Once the initial notification has been sent, all other functionality (review notifications, commit push notifications, etc.) works normally.
+1. **PR opened without label**: The action will not start polling for checks until the required label is added
+2. **Label added**: Once the label is added, the action begins polling for required checks to pass
+3. **PR opened with label**: If the label is already present, polling starts immediately
 
 ### Common use cases:
 
-- **CI-gated reviews**: Set up a workflow that adds the label only after all required CI checks pass
-- **Manual approval**: Require manual addition of the label before reviewers are notified
+- **Manual approval**: Require manual label addition before starting the review process
 - **Staged rollout**: Use different labels for different environments or review stages
+- **Extra gating**: Add a human checkpoint on top of automated checks
 
 ## How it Works (v9.0.0+)
 
@@ -155,9 +135,10 @@ The `label-for-initial-notification` input allows you to delay initial Slack not
 
 - Notifications are now delayed until required checks pass (not immediate)
 - You **must** add a `concurrency` group to your workflow (see example above)
-- Job timeout should be set to slightly more than `polling-timeout`
+- Job timeout should be set to slightly more than `polling-timeout` (default: 35 minutes)
+- Action now requires Node.js 22 runtime
 
-If you need immediate notifications (old behavior), you can set `polling-timeout: 0` but this is not recommended.
+**Note**: If your repository has no required status checks configured in branch protection, notifications will be sent immediately (similar to v8.x behavior).
 
 An example of a PR lifecyle and how the bot works:
 
