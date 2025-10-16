@@ -1,3 +1,10 @@
+## [9.3.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v9.2.0...v9.3.0) (2025-10-16)
+
+
+### Features
+
+* add automatic CODEOWNERS reviewer assignment with team expansion ([2182bc5](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/2182bc5232cfdcc96071e0f51160f53ab7c336ab))
+
 ## [9.2.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v9.1.1...v9.2.0) (2025-10-16)
 
 
