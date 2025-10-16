@@ -34,12 +34,24 @@ In your `./github/workflows` directory, add a `slackNotify.yml` (or whatever the
 
 ```yml
 name: PR Review Slack Notify
+permissions:
+  contents: read
+  pull-requests: write
+  checks: read # Required to read check status
 on:
   pull_request:
-    types: [opened, ready_for_review]
+    types: [opened, ready_for_review, synchronize, labeled]
   pull_request_review:
-    types: [submitted]
+    types: [submitted, dismissed]
   push:
+    branches:
+      - main # Replace with your base branch
+  # IMPORTANT: These triggers ensure the action re-runs when checks complete
+  check_suite:
+    types: [completed]
+  workflow_run:
+    workflows: ["Your PR Checks Workflow Name"] # Replace with your workflow name
+    types: [completed]
 
 # IMPORTANT: Prevent concurrent runs per PR to avoid duplicate notifications
 concurrency:
@@ -122,12 +134,21 @@ The `label-for-initial-notification` input allows you to require a specific labe
 4. Once all required checks pass, it notifies the reviewers in Slack
 5. If checks don't pass within the timeout period (30 minutes by default), no notification is sent
 
+**Critical Workflow Triggers**:
+
+The workflow **must** include `check_suite` and `workflow_run` triggers to function correctly:
+- Without these triggers, if your checks take longer than the polling timeout, the action won't re-run
+- The `check_suite: completed` trigger ensures the action re-runs when GitHub check suites finish
+- The `workflow_run: completed` trigger ensures the action re-runs when your PR check workflows complete
+- Together, these allow the action to notify reviewers as soon as checks pass, even if they take longer than one workflow run
+
 **Important Notes**:
 
 - Only **required** checks block notification - non-required checks that fail won't prevent notifications
 - Use the `concurrency` group in your workflow to prevent duplicate runs
 - Reviewers should be assigned before opening the PR or converting from draft
 - The action tracks state in PR comments to prevent duplicate notifications
+- Make sure to replace `"Your PR Checks Workflow Name"` in the `workflow_run` trigger with your actual workflow name
 
 ## Migrating from v8.x to v9.0.0
 
@@ -135,8 +156,35 @@ The `label-for-initial-notification` input allows you to require a specific labe
 
 - Notifications are now delayed until required checks pass (not immediate)
 - You **must** add a `concurrency` group to your workflow (see example above)
+- You **must** add `check_suite` and `workflow_run` triggers for the action to re-run when checks complete
+- You **must** add `permissions: checks: read` to allow the action to read check status
 - Job timeout should be set to slightly more than `polling-timeout` (default: 35 minutes)
 - Action now requires Node.js 24 runtime
+
+**Workflow Updates Required**:
+
+```diff
+name: PR Review Slack Notify
++permissions:
++  contents: read
++  pull-requests: write
++  checks: read
+on:
+  pull_request:
+-   types: [opened, ready_for_review]
++   types: [opened, ready_for_review, synchronize, labeled]
+  pull_request_review:
+-   types: [submitted]
++   types: [submitted, dismissed]
+  push:
++   branches:
++     - main
++ check_suite:
++   types: [completed]
++ workflow_run:
++   workflows: ["Your PR Checks Workflow Name"]
++   types: [completed]
+```
 
 **Note**: If your repository has no required status checks configured in branch protection, notifications will be sent immediately (similar to v8.x behavior).
 
