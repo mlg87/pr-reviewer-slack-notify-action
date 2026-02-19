@@ -1,19 +1,21 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+import { createInitialMessage } from "./createInitialMessage";
 import { fail } from "../utils/fail";
 import { getEngineersFromS3 } from "../utils/getEngineersFromS3";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
 import { logger } from "../utils/logger";
 import { slackWebClient } from "../utils/slackWebClient";
 
-// TODO handle labels being removed
 export const handleLabelChange = async (): Promise<void> => {
-  logger.info("START handleLableChange");
   try {
     const channelId = core.getInput("channel-id");
+    const labelForInitialNotification = core.getInput(
+      "label-for-initial-notification"
+    );
     const labelNameToWatchFor = core.getInput("label-name-to-watch-for");
-    const slackUsers = await getEngineersFromS3();
-    const { pull_request, repository, sender } = github.context.payload;
+    const { pull_request, repository, sender, label } =
+      github.context.payload;
 
     if (!pull_request) {
       throw Error("No pull_request found on github.context.payload");
@@ -23,23 +25,49 @@ export const handleLabelChange = async (): Promise<void> => {
       throw Error("No sender found on github.context.payload");
     }
 
-    // Note: label-for-initial-notification is now handled by pollForRequiredChecks
-    // which checks for the label during its polling loop
+    // Handle initial notification trigger via label-for-initial-notification
+    if (label?.name === labelForInitialNotification) {
+      logger.info(
+        `Label '${labelForInitialNotification}' applied to PR #${pull_request.number}, checking for existing Slack thread`
+      );
+
+      const existingMessageId = await getSlackMessageId();
+
+      if (existingMessageId) {
+        logger.info(
+          `Slack thread already exists (${existingMessageId}), skipping duplicate notification`
+        );
+        core.summary.addRaw(
+          `Slack thread already exists for PR #${pull_request.number}. No new notification sent.`
+        );
+        await core.summary.write();
+        return;
+      }
+
+      logger.info(
+        `No existing Slack thread found, creating initial notification`
+      );
+      await createInitialMessage();
+      return;
+    }
 
     // Handle the label-name-to-watch-for functionality (existing logic)
     if (labelNameToWatchFor) {
-      // if there is now a matching label added, notify the slack message
       let hasLabel = false;
-      pull_request.labels.forEach((label: any) => {
-        if (label.name === labelNameToWatchFor) {
+      pull_request.labels.forEach((l: any) => {
+        if (l.name === labelNameToWatchFor) {
           hasLabel = true;
         }
       });
 
       if (!hasLabel) {
+        logger.info(
+          `Label '${labelNameToWatchFor}' not present on PR, skipping`
+        );
         return;
       }
 
+      const slackUsers = await getEngineersFromS3();
       const [labeler] = slackUsers.engineers.filter((user) => {
         return user.github_username === sender.login;
       });
@@ -52,12 +80,18 @@ export const handleLabelChange = async (): Promise<void> => {
       const slackMessageId = await getSlackMessageId();
 
       if (!slackMessageId) {
+        logger.info(
+          `No Slack thread found for label '${labelNameToWatchFor}' notification, skipping`
+        );
         core.warning(
-          `Unable to notify about label '${labelNameToWatchFor}' because no Slack message ID could be found or created. This may be because the required label is not present.`
+          `Unable to notify about label '${labelNameToWatchFor}' because no Slack message ID could be found.`
         );
         return;
       }
 
+      logger.info(
+        `Posting label '${labelNameToWatchFor}' notification to Slack thread`
+      );
       await slackWebClient.chat.postMessage({
         channel: channelId,
         thread_ts: slackMessageId,
@@ -80,7 +114,6 @@ export const handleLabelChange = async (): Promise<void> => {
       });
     }
 
-    logger.info("END handleLableChange");
     return;
   } catch (error) {
     fail(error);

@@ -7,7 +7,7 @@ import { logger } from "./logger";
 export const createUsersToAtString = async (
   reviewers: string[]
 ): Promise<string> => {
-  logger.info("START createUsersToAtString");
+  logger.info(`Mapping ${reviewers.length} GitHub users to Slack mentions`);
   let engineers: EngineerGithubSlackMapping[] = [];
   try {
     const res = await getEngineersFromS3();
@@ -31,6 +31,6 @@ export const createUsersToAtString = async (
     return;
   });
 
-  logger.info(`END createUsersToAtString: ${JSON.stringify(usersToAtString)}`);
+  logger.info(`Mapped ${usersToAt.length}/${reviewers.length} reviewers to Slack mentions`);
   return usersToAtString;
 };

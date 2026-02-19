@@ -13,28 +13,29 @@ const reactionMap = {
 };
 
 export const handlePullRequestReview = async (): Promise<void> => {
-  logger.info("START handlePullRequestReview");
+  logger.info("Handling pull request review event");
   try {
     const channelId = core.getInput("channel-id");
     const slackUsers = await getEngineersFromS3();
     const { action, pull_request, review } = github.context.payload;
 
-    // TODO handle more than just submitted PRs
     if (action !== "submitted") {
+      logger.info(`Ignoring review action '${action}', only 'submitted' is handled`);
       return;
     }
 
     if (!pull_request) {
       throw Error(
-        "No pull_request found in handlePullRequestReivew (github.context.payload)"
+        "No pull_request found in handlePullRequestReview (github.context.payload)"
       );
     }
 
     const slackMessageId = await getSlackMessageId();
 
     if (!slackMessageId) {
+      logger.info("No Slack thread found, skipping review notification");
       core.warning(
-        "Unable to post pull request review notification because no Slack message ID could be found. This may be because the required label is not present."
+        "Unable to post pull request review notification because no Slack message ID could be found."
       );
       return;
     }
@@ -51,12 +52,14 @@ export const handlePullRequestReview = async (): Promise<void> => {
     });
 
     if (!reviewer) {
+      core.error(`Could not map reviewer '${review.user.login}' to a Slack user from the S3 mapping`);
       throw Error(
         `Could not map ${review.user.login} to the users you provided in action.yml`
       );
     }
 
     if (!author) {
+      core.error(`Could not map PR author '${pull_request.user.login}' to a Slack user from the S3 mapping`);
       throw Error(
         `Could not map ${pull_request.user.login} to the users you provided in action.yml`
       );
@@ -126,18 +129,17 @@ export const handlePullRequestReview = async (): Promise<void> => {
     }
 
     if (hasReaction) {
-      logger.info("END handlePullRequestReview: hasReaction");
+      logger.info(`Reaction '${reactionToAdd}' already present, skipping`);
       return;
     }
 
-    // add new reactions
     await slackWebClient.reactions.add({
       channel: channelId,
       timestamp: slackMessageId,
       name: reactionToAdd,
     });
 
-    logger.info("END handlePullRequestReview: new reactions added");
+    logger.info(`Review by ${review.user.login} (${review.state}) posted to Slack thread`);
     return;
   } catch (error) {
     fail(error);

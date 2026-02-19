@@ -10,14 +10,11 @@ import { slackWebClient } from "../utils/slackWebClient";
 // will only run on push to base branch (i.e. staging), so we can assume that a closed state for PR
 // equates to 'merged' (no specific event for 'merged' on PRs)
 export const handleMerge = async (): Promise<void> => {
-  logger.info("START handleMerge");
+  logger.info("Handling PR merge event");
   try {
     const channelId = core.getInput("channel-id");
     const { commits, repository } = github.context.payload;
     const commitSha = commits[0].id;
-    //
-    // ─── CONFIRM COMMIT IS ASSOCIATED WITH A PR IN CLOSED STATE ──────
-    //
 
     const pull_request = await getPullRequest();
 
@@ -32,8 +29,9 @@ export const handleMerge = async (): Promise<void> => {
     const slackMessageId = await getSlackMessageId();
 
     if (!slackMessageId) {
+      logger.info("No Slack thread found, skipping merge notification");
       core.warning(
-        "Unable to post merge notification because no Slack message ID could be found. This may be because the required label is not present."
+        "Unable to post merge notification because no Slack message ID could be found."
       );
       return;
     }
@@ -62,7 +60,7 @@ export const handleMerge = async (): Promise<void> => {
       text,
     });
 
-    logger.info("END handleMerge");
+    logger.info(`Merge notification posted for PR #${pull_request.number}`);
     return;
   } catch (error) {
     fail(error);

@@ -3,10 +3,12 @@ import { logger } from "./logger";
 
 export const fail = (error: any) => {
   const failSilently = core.getInput("fail-silently");
-  logger.error(JSON.stringify(error));
+  const message = error?.message ?? error ?? "Oops";
+  logger.error(message);
+  core.error(message);
   if (failSilently === "true") {
-    core.warning(error.message ?? "Oops");
+    core.warning(message);
   } else {
-    core.setFailed(error.message ?? "Oops");
+    core.setFailed(message);
   }
 };

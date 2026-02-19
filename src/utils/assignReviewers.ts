@@ -172,9 +172,10 @@ export const assignCodeownersAsReviewers = async (
       let commentBody: string;
 
       if (assignedReviewersText.length > 0) {
+        const labelForInitialNotification = core.getInput("label-for-initial-notification");
         commentBody = `🤖 **Auto-assigned reviewers from CODEOWNERS**\n\n${assignedReviewersText.join(
           "\n"
-        )}\n\n_You'll receive a Slack notification once all required checks have passed._`;
+        )}\n\n_You'll receive a Slack notification when the '${labelForInitialNotification}' label is applied._`;
       } else if (errors.length > 0) {
         commentBody = `🤖 **Attempted to auto-assign reviewers from CODEOWNERS**\n\n⚠️ However, some issues occurred:\n${errors
           .map((error) => `- ${error}`)
