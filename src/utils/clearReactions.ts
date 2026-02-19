@@ -5,7 +5,7 @@ import { slackWebClient } from "./slackWebClient";
 import { WebAPIPlatformError } from "@slack/web-api";
 
 export const clearReactions = async (slackMessageId: string) => {
-  logger.info(`START clearReactions: ${slackMessageId}`);
+  logger.info(`Clearing reactions on Slack message ${slackMessageId}`);
   try {
     const channelId = core.getInput("channel-id");
 
@@ -28,12 +28,11 @@ export const clearReactions = async (slackMessageId: string) => {
       }
     }
 
-    logger.info("END clearReactions");
+    logger.info("Reactions cleared");
     return;
   } catch (error) {
     if ((error as WebAPIPlatformError)?.data?.error === "no_reaction") {
-      // Fail silently
-      logger.info(`END clearReactions with error: ${JSON.stringify(error)}`);
+      logger.info("No reactions to clear (no_reaction error)");
       return;
     }
 

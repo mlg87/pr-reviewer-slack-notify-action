@@ -5,7 +5,7 @@ import { fail } from "./fail";
 import { logger } from "./logger";
 
 export const getPullRequest = async () => {
-  logger.info("START getPullRequest");
+  logger.info("Fetching pull request data");
   try {
     const ghToken = core.getInput("github-token");
     const octokit = github.getOctokit(ghToken);
@@ -16,7 +16,9 @@ export const getPullRequest = async () => {
     } = github.context.payload;
 
     if (prFromContext) {
-      logger.info(`using PR from context: ${JSON.stringify(prFromContext)}`);
+      logger.info(
+        `PR from context: #${prFromContext.number} "${prFromContext.title}" (${prFromContext.state})`
+      );
       const { data } = await octokit.rest.pulls.get({
         owner: github.context.payload.repository?.owner.login || "",
         repo: repository?.name || "",
@@ -46,7 +48,9 @@ export const getPullRequest = async () => {
       throw Error(`No pull_request found for commit: ${commit_sha}`);
     }
 
-    logger.info(`END getPullRequest: ${JSON.stringify(pull_request)}`);
+    logger.info(
+      `PR from commit: #${pull_request.number} "${pull_request.title}" (${pull_request.state})`
+    );
     return pull_request;
   } catch (error) {
     fail(error);
