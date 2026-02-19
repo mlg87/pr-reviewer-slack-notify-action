@@ -1,3 +1,10 @@
+## [10.0.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.0.0...v10.0.1) (2026-02-19)
+
+
+### Documentation
+
+* update README and CLAUDE.md for v10 label-driven architecture ([fdf85d1](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/fdf85d120dd94f4371e4804768d8bbeba7757edc))
+
 ## [10.0.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v9.3.0...v10.0.0) (2026-02-19)
 
 
