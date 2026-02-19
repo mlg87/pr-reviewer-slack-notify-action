@@ -9,43 +9,27 @@ import { getRequestedReviewersAsIndividuals } from "../utils/getRequestedReviewe
 
 export const createInitialMessage = async (): Promise<string | void> => {
   const verbose: boolean = core.getBooleanInput("verbose");
-  const labelForInitialNotification = core.getInput(
-    "label-for-initial-notification"
-  );
-  logger.info(`START createInitialMessage. Verbose? ${verbose}`);
+  logger.info(`Creating initial Slack notification (verbose: ${verbose})`);
 
   try {
     const channelId = core.getInput("channel-id");
     const { repository } = github.context.payload;
     const pull_request = await getPullRequest();
 
-    if (!pull_request || !repository) return;
+    if (!pull_request) {
+      logger.info("No pull_request found, skipping initial message");
+      return;
+    }
 
-    // Check if the required label is present (if one is configured)
-    if (labelForInitialNotification) {
-      let hasRequiredLabel = false;
-      for (const label of pull_request.labels || []) {
-        if (label.name === labelForInitialNotification) {
-          hasRequiredLabel = true;
-          break;
-        }
-      }
-
-      if (!hasRequiredLabel) {
-        logger.info(
-          `Skipping initial message creation because required label '${labelForInitialNotification}' is not present`
-        );
-        return;
-      }
+    if (!repository) {
+      logger.info("No repository found on payload, skipping initial message");
+      return;
     }
 
     const requestedReviewers = await getRequestedReviewersAsIndividuals();
 
-    //
-    // ─── RETURN IF THERE ARE NO REQUESTED REVIEWERS ──────────────────
-    //
-
     if (!requestedReviewers.length) {
+      logger.info("No requested reviewers on PR, skipping initial message");
       return;
     }
 
@@ -54,10 +38,8 @@ export const createInitialMessage = async (): Promise<string | void> => {
       baseMessage = `${baseMessage}\n>${pull_request.body}`;
     }
 
-    // build users to mention string
     const usersToAtString = await createUsersToAtString(requestedReviewers);
 
-    // DOCS https://api.slack.com/methods/chat.postMessage
     const text = `${usersToAtString} ${baseMessage}`;
     const prSlackMsg = await slackWebClient.chat.postMessage({
       channel: channelId,
@@ -74,7 +56,7 @@ export const createInitialMessage = async (): Promise<string | void> => {
     });
 
     if (!prSlackMsg.ok || !prSlackMsg.ts) {
-      throw Error("failed to create initial slack message");
+      throw Error("Failed to create initial Slack message");
     }
 
     const ghToken = core.getInput("github-token");
@@ -87,11 +69,17 @@ export const createInitialMessage = async (): Promise<string | void> => {
       body: slackMessageId,
     });
 
-    logger.info(`END createInitialMessage: ${slackMessageId}`);
+    logger.info(
+      `Initial Slack message created for PR #${pull_request.number} (${slackMessageId})`
+    );
+    core.summary.addRaw(
+      `Slack notification sent for PR #${pull_request.number}. Thread ID: ${prSlackMsg.ts}`
+    );
+    await core.summary.write();
+
     return slackMessageId;
   } catch (error: any) {
-    console.error("error in createInitialMessage::: ", error);
-
+    core.error(`Failed to create initial Slack message: ${error.message}`);
     fail(error.message);
   }
 };

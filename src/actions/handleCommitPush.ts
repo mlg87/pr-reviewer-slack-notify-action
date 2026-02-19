@@ -11,32 +11,29 @@ import { slackWebClient } from "../utils/slackWebClient";
 // NOTE in the future we may want to wait to notify everyone that they can review it again when the PR author
 // explicitly asks for a re-review
 export const handleCommitPush = async (): Promise<void> => {
-  logger.info("START handleCommitPush");
+  logger.info("Handling commit push event");
   try {
     const channelId = core.getInput("channel-id");
     const { repository } = github.context.payload;
 
     if (!repository) {
       throw Error(
-        "no repository found in github.context.paylod in handleCommitPush"
+        "No repository found in github.context.payload in handleCommitPush"
       );
     }
 
-    //
-    // ─── GET THE ISSUE NUMBER FOR THE COMMIT ─────────────────────────
-    //
-
     const pull_request = await getPullRequest();
-    // dont spam everyone on slack
     if (!pull_request || pull_request.state === "closed") {
+      logger.info("PR is closed or not found, skipping commit push notification");
       return;
     }
 
     const slackMessageId = await getSlackMessageId();
 
     if (!slackMessageId) {
+      logger.info("No Slack thread found, skipping commit push notification");
       core.warning(
-        "Unable to post commit push notification because no Slack message ID could be found. This may be because the required label is not present."
+        "Unable to post commit push notification because no Slack message ID could be found."
       );
       return;
     }
@@ -87,7 +84,7 @@ export const handleCommitPush = async (): Promise<void> => {
       }
     }
 
-    logger.info("END handleCommitPush");
+    logger.info(`Commit push notification posted to Slack thread for PR #${pull_request.number}`);
     return;
   } catch (error) {
     fail(error);

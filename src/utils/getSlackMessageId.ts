@@ -4,13 +4,11 @@ import { fail } from "./fail";
 import { logger } from "./logger";
 import { getPullRequest } from "./getPullRequest";
 
-// requires pull_request and repository as inputs bc of the differently shaped action payloads
 export const getSlackMessageId = async (): Promise<string | null> => {
-  logger.info("START getSlackMessageId");
+  logger.info("Looking up SLACK_MESSAGE_ID from PR comments");
   try {
     const { repository } = github.context.payload;
     let pull_request: any = github.context.payload.pull_request;
-    // pull_request is not on the payload for push events
     if (github.context.eventName === "push" && !pull_request) {
       pull_request = await getPullRequest();
     }
@@ -25,32 +23,6 @@ export const getSlackMessageId = async (): Promise<string | null> => {
       );
     }
 
-    const labelForInitialNotification = core.getInput(
-      "label-for-initial-notification"
-    );
-
-    // Check if the required label is present before attempting to get/create slack message
-    if (labelForInitialNotification) {
-      let hasRequiredLabel = false;
-      for (const label of pull_request.labels || []) {
-        if (label.name === labelForInitialNotification) {
-          hasRequiredLabel = true;
-          break;
-        }
-      }
-
-      if (!hasRequiredLabel) {
-        core.warning(
-          `Skipping Slack notification because required label '${labelForInitialNotification}' is not present on PR #${pull_request.number}`
-        );
-        logger.info(
-          `Required label '${labelForInitialNotification}' not present, returning null`
-        );
-        return null;
-      }
-    }
-
-    // get slack id and PR number from pull comment
     const octokit = github.getOctokit(core.getInput("github-token"));
     const res = await octokit.rest.issues.listComments({
       owner: repository.owner.login,
@@ -69,12 +41,12 @@ export const getSlackMessageId = async (): Promise<string | null> => {
 
     if (!slackMessageId) {
       logger.info(
-        "no SLACK_MESSAGE_ID found in PR comments - initial notification may not have been sent yet"
+        `No SLACK_MESSAGE_ID found in PR #${pull_request.number} comments`
       );
       return null;
     }
 
-    logger.info(`END getSlackMessageId: ${slackMessageId}`);
+    logger.info(`Found ${slackMessageId} for PR #${pull_request.number}`);
     return slackMessageId;
   } catch (error) {
     fail(error);

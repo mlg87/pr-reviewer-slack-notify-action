@@ -1,35 +1,61 @@
 import * as github from "@actions/github";
 import * as core from "@actions/core";
-import { createInitialMessage } from "./actions/createInitialMessage";
 import { handleLabelChange } from "./actions/handleLabelChange";
 import { getSlackMessageId } from "./utils/getSlackMessageId";
 import { handleMerge } from "./actions/handleMerge";
 import { handleCommitPush } from "./actions/handleCommitPush";
 import { handlePullRequestReview } from "./actions/handlePullRequestReview";
-import { pollForRequiredChecks } from "./actions/pollForRequiredChecks";
+import { assignCodeownersAsReviewers } from "./utils/assignReviewers";
+import { getPullRequest } from "./utils/getPullRequest";
 import { logger } from "./utils/logger";
+
+const handleReviewerAssignment = async (): Promise<void> => {
+  const { payload } = github.context;
+  const pull_request = payload.pull_request;
+  const { repository } = payload;
+
+  if (!pull_request || !repository) {
+    logger.info("Missing pull_request or repository on payload, skipping reviewer assignment");
+    return;
+  }
+
+  logger.info(`Assigning CODEOWNERS reviewers for PR #${pull_request.number}`);
+  const result = await assignCodeownersAsReviewers(pull_request, repository);
+
+  if (result.success) {
+    const assigned = [
+      ...result.assigned.users.map((u: string) => `@${u}`),
+      ...result.assigned.teams.map((t: string) => `@${t}`),
+    ].join(", ");
+    core.summary.addRaw(
+      `Reviewers assigned: ${assigned}. Slack notification will be sent when the '${core.getInput("label-for-initial-notification")}' label is applied.`
+    );
+  } else if (result.errors.length > 0) {
+    core.summary.addRaw(
+      `Reviewer assignment had issues: ${result.errors.join(", ")}`
+    );
+  } else {
+    core.summary.addRaw("No reviewers to assign from CODEOWNERS.");
+  }
+
+  await core.summary.write();
+};
 
 const run = async (): Promise<void> => {
   const { eventName, payload, ref } = github.context;
   logger.info(
-    `START run - Event: ${eventName}, Action: ${payload.action || "N/A"}`
+    `Event: ${eventName}, Action: ${payload.action || "N/A"}, Ref: ${ref}`
   );
   const baseBranch = core.getInput("base-branch");
   const isActingOnBaseBranch = ref.includes(baseBranch);
 
   let hasQuietLabel = false;
-  let hasRequiredLabel = true; // Default to true if no label is required
   const pull_request = payload.pull_request;
 
   const ignoreDraft = core.getInput("ignore-draft-prs");
   const silenceQuiet = core.getInput("silence-on-quiet-label");
-  const labelForInitialNotification = core.getInput(
-    "label-for-initial-notification"
-  );
 
-  // need to prevent unhandled errors here
   if (pull_request) {
-    // Check for quiet label
     for (const label of pull_request.labels) {
       if (label.name === "quiet") {
         hasQuietLabel = true;
@@ -37,46 +63,35 @@ const run = async (): Promise<void> => {
       }
     }
 
-    // Check for required label for initial notification
-    if (labelForInitialNotification) {
-      hasRequiredLabel = false; // Reset to false if we need to check for a specific label
-      for (const label of pull_request.labels) {
-        if (label.name === labelForInitialNotification) {
-          hasRequiredLabel = true;
-          break;
-        }
-      }
-    }
-
     const isWip = pull_request && pull_request["draft"] && ignoreDraft;
 
-    // Don't do anything if this is a draft or we tell it to shut up
-    if (isWip || (hasQuietLabel && silenceQuiet)) return;
+    if (isWip || (hasQuietLabel && silenceQuiet)) {
+      logger.info("Skipping: PR is draft or has quiet label");
+      return;
+    }
   }
 
   // route to the appropriate action
   if (eventName === "pull_request") {
     if (payload.action === "opened" || payload.action === "ready_for_review") {
-      logger.info(`Running pollForRequiredChecks for ${payload.action} event`);
-      // Use polling handler which will wait for required checks to pass
-      await pollForRequiredChecks();
+      logger.info(`PR ${payload.action}: assigning CODEOWNERS reviewers`);
+      await handleReviewerAssignment();
       return;
     }
 
-    // notify thread of a PR label change
     if (payload.action === "labeled" || payload.action === "unlabeled") {
-      logger.info(`Running handleLabelChange for ${payload.action} event`);
+      logger.info(`PR label event: ${payload.action}`);
       await handleLabelChange();
       return;
     }
   }
 
   // Get slack message ID for subsequent operations (reviews, commits, merge)
-  // The initial message should have been created by pollForRequiredChecks
   const slackMessageId = await getSlackMessageId();
   if (!slackMessageId) {
+    logger.info("No Slack thread found, skipping event");
     core.warning(
-      "No Slack message found. Initial notification may not have been sent yet (checks still pending) or PR may be skipped."
+      "No Slack message found. The initial notification may not have been sent yet."
     );
     return;
   }
@@ -86,24 +101,25 @@ const run = async (): Promise<void> => {
     eventName === "push" ||
     (eventName === "pull_request_review" && payload.action === "dismissed")
   ) {
-    // merge of PR to base branch
     if (isActingOnBaseBranch) {
-      logger.info(`Running handleMerge for ${eventName} event`);
+      logger.info(`Push to base branch detected, handling as merge`);
       await handleMerge();
       return;
     }
 
-    logger.info(`Running handleCommitPush for ${eventName} event`);
+    logger.info(`Commit pushed to feature branch, notifying reviewers`);
     await handleCommitPush();
     return;
   }
 
   // a review has been submitted
   if (eventName === "pull_request_review") {
-    logger.info(`Running handlePullRequestReview for ${eventName} event`);
+    logger.info(`Review submitted on PR, posting to Slack thread`);
     await handlePullRequestReview();
     return;
   }
+
+  logger.info(`Unhandled event: ${eventName} / ${payload.action}`);
 };
 
 run();
