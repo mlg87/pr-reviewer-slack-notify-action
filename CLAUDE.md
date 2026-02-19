@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-GitHub Action that notifies requested PR reviewers via Slack once all required CI/CD checks have passed. Integrates GitHub, Slack, and AWS S3 (for GitHub-to-Slack user mapping). Runtime: Node 24, packaged with @vercel/ncc.
+GitHub Action that notifies requested PR reviewers via Slack when a configured label is applied to a PR. Reviewers are auto-assigned from CODEOWNERS on PR open, and Slack notifications are triggered by label application. Integrates GitHub, Slack, and AWS S3 (for GitHub-to-Slack user mapping). Runtime: Node 24, packaged with @vercel/ncc.
 
 ## Commands
 
@@ -39,35 +39,31 @@ Releases are automated via semantic-release on push to main. Commit types map to
 
 | Event | Handler | What it does |
 |---|---|---|
-| PR opened/ready | `pollForRequiredChecks.ts` | Polls CI checks every 90s (30m timeout), sends Slack notification when all pass |
-| check_suite/workflow_run completed | `pollForRequiredChecks.ts` | Re-evaluates check status |
+| PR opened/ready | `src/index.ts` (`handleReviewerAssignment`) | Assigns CODEOWNERS reviewers, posts workflow summary |
+| PR labeled | `handleLabelChange.ts` | If label matches `label-for-initial-notification`, creates initial Slack thread via `createInitialMessage`. Also handles `label-name-to-watch-for` notifications. |
 | pull_request_review submitted | `handlePullRequestReview.ts` | Posts review status to Slack thread with emoji reactions |
-| push (synchronize) | `handleCommitPush.ts` | Clears reactions, notifies reviewers of new code |
-| PR merged | `handleMerge.ts` | Posts merge celebration, adds ship-it reaction |
-| Label added | `handleLabelChange.ts` | Watches for configured label, notifies author |
+| push (to feature branch) | `handleCommitPush.ts` | Clears reactions, notifies reviewers of new code |
+| push (to base branch) | `handleMerge.ts` | Posts merge celebration, adds ship-it reaction |
 
 ### State Management via PR Comments
 
-The action stores state in hidden PR comments to coordinate across workflow runs:
-- `SLACK_NOTIFICATION_STATE:STATE` — tracks notification lifecycle (PENDING → POLLING → NOTIFIED → SKIPPED)
-- `SLACK_MESSAGE_ID:timestamp` — stores the Slack message timestamp for threading
+The action stores the Slack message timestamp in a PR comment (`SLACK_MESSAGE_ID:timestamp`) to enable threading across workflow runs. Duplicate notifications are prevented by checking for an existing `SLACK_MESSAGE_ID` comment before creating a new Slack thread.
 
 ### Key Utilities (`src/utils/`)
 
 - **getEngineersFromS3/** — Fetches GitHub↔Slack user mapping JSON from S3
 - **assignReviewers.ts** + **parseCodeowners.ts** + **expandTeamMembers.ts** — CODEOWNERS parsing and automatic reviewer assignment with team expansion
-- **getRequiredStatusChecks.ts** — Fetches branch protection rules and evaluates check/status results
 - **createUsersToAtString.ts** — Maps GitHub usernames to Slack @-mentions using S3 data
-- **getNotificationState.ts** — Reads/writes notification state from PR comments
+- **getSlackMessageId.ts** — Reads Slack message ID from PR comments for thread tracking
 - **slackWebClient.ts** — Configured Slack WebClient instance
 - **logger.ts** — Winston logger with colored console output
 
 ### External Dependencies
 
-- **GitHub API** via `@actions/github` (Octokit) — PR data, checks, comments, team membership
+- **GitHub API** via `@actions/github` (Octokit) — PR data, comments, team membership
 - **Slack Web API** via `@slack/web-api` — Channel messages, threads, reactions
 - **AWS S3** via `@aws-sdk/client-s3` — Engineer mapping file (GitHub username → Slack ID)
 
 ### Action Inputs
 
-Defined in `action.yml`. Required: aws-region, aws-s3-bucket, aws-s3-object-key, base-branch, bot-token, channel-id, github-token. Notable optional: polling-interval (default 90s), polling-timeout (default 30m), ignore-draft-prs, silence-on-quiet-label, fail-silently.
+Defined in `action.yml`. Required: aws-region, aws-s3-bucket, aws-s3-object-key, base-branch, bot-token, channel-id, github-token, label-for-initial-notification. Notable optional: label-name-to-watch-for, ignore-draft-prs, silence-on-quiet-label, fail-silently, verbose.
