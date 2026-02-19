@@ -1,3 +1,24 @@
+## [10.0.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v9.3.0...v10.0.0) (2026-02-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* **actions:** label-for-initial-notification is now a required input
+
+### Build System
+
+* rebuild dist for label-driven refactor ([5b23623](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/5b2362302a8080c3bd240ca84ebeaced8a2c31dd))
+
+
+### Features
+
+* **actions:** replace polling with label-driven notifications ([4316ca8](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/4316ca80f5f78f34eec2e818bc4089a8e81d97ef))
+
+
+### Refactors
+
+* **utils:** improve logging and error handling ([436b202](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/436b20268cfb2e708aa7ff2e3182dda1218fa8e8))
+
 ## [9.3.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v9.2.0...v9.3.0) (2025-10-16)
 
 
