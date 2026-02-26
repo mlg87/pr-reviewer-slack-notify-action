@@ -1,3 +1,10 @@
+## [10.1.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.0.1...v10.1.0) (2026-02-26)
+
+
+### Features
+
+* **slack:** add thread permalink to SLACK_MESSAGE_ID PR comment ([8988b10](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/8988b100ce42df4d5ab288de583882dd1e04a221))
+
 ## [10.0.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.0.0...v10.0.1) (2026-02-19)
 
 
