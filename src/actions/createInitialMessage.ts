@@ -62,11 +62,26 @@ export const createInitialMessage = async (): Promise<string | void> => {
     const ghToken = core.getInput("github-token");
     const octokit = github.getOctokit(ghToken);
     const slackMessageId = `SLACK_MESSAGE_ID:${prSlackMsg.ts}`;
+
+    // Get a permalink to the Slack thread for easy access from the PR
+    let commentBody = slackMessageId;
+    try {
+      const permalink = await slackWebClient.chat.getPermalink({
+        channel: channelId,
+        message_ts: prSlackMsg.ts,
+      });
+      if (permalink.ok && permalink.permalink) {
+        commentBody = `${slackMessageId}\n\n[View Slack thread](${permalink.permalink})`;
+      }
+    } catch (e: any) {
+      logger.info(`Could not get Slack permalink: ${e.message}`);
+    }
+
     await octokit.rest.issues.createComment({
       owner: repository.owner.login,
       repo: repository.name,
       issue_number: pull_request.number,
-      body: slackMessageId,
+      body: commentBody,
     });
 
     logger.info(
