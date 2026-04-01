@@ -76,20 +76,51 @@ export const handlePullRequestReview = async (): Promise<void> => {
       case "changes_requested":
         actionText = "would like you to change some things in the code";
         reactionToAdd = reactionMap["changes_requested"];
+        if (review.body) {
+          actionText = `${actionText}\n>${review.body}`;
+        }
         break;
-      // TODO see if getting the review could allow for posting the text that was commented
-      // NOTE for reviews where the state is "commented", the comment text is not in the event payload
-      case "commented":
-        actionText = "neither approved or denied your PR, but merely commented";
+      case "commented": {
         reactionToAdd = reactionMap["commented"];
+
+        // fetch inline review comments from the API
+        const ghToken = core.getInput("github-token");
+        const octokit = github.getOctokit(ghToken);
+        const { repository } = github.context.payload;
+        const commentsRes =
+          await octokit.rest.pulls.listCommentsForReview({
+            owner: repository!.owner.login,
+            repo: repository!.name,
+            pull_number: pull_request.number,
+            review_id: review.id,
+          });
+
+        const allComments: { body: string; url: string }[] = [];
+        if (review.body) {
+          allComments.push({ body: review.body, url: review.html_url });
+        }
+        for (const comment of commentsRes.data) {
+          if (comment.body) {
+            allComments.push({ body: comment.body, url: comment.html_url });
+          }
+        }
+
+        const commentCount = allComments.length;
+        const commentLabel =
+          commentCount === 1 ? "a comment" : `${commentCount} comments`;
+        actionText = `added ${commentLabel}:`;
+        for (const { body, url } of allComments) {
+          actionText = `${actionText}\n><${url}|:link:> ${body}`;
+        }
         break;
+      }
       case "approved":
         actionText = "approved your PR";
         reactionToAdd = reactionMap["approved"];
+        if (review.body) {
+          actionText = `${actionText}\n>${review.body}`;
+        }
         break;
-    }
-    if (!!review.body) {
-      actionText = `${actionText}\n>${review.body}`;
     }
     const text = `${userText} ${actionText}`;
     // post corresponding message
