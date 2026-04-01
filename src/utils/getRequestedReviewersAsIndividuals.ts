@@ -26,14 +26,14 @@ export const getRequestedReviewersAsIndividuals = async () => {
         // Validate team data before processing
         if (!team || !team.id || team.id === 0) {
           logger.warn(
-            `Invalid team data - missing or invalid ID: ${JSON.stringify(team)}`
+            `Invalid team data - missing or invalid ID: ${JSON.stringify(team)}`,
           );
           continue;
         }
 
         if (!team.slug) {
           logger.warn(
-            `Invalid team data - missing slug: ${JSON.stringify(team)}`
+            `Invalid team data - missing slug: ${JSON.stringify(team)}`,
           );
           continue;
         }
@@ -48,14 +48,15 @@ export const getRequestedReviewersAsIndividuals = async () => {
         }
         // Try to get org from team.html_url (fallback)
         else if (team.html_url) {
-          const match = team.html_url.match(/github\.com\/orgs\/([^\/]+)/);
+          const match = team.html_url.match(/github\.com\/orgs\/([^/]+)/);
+
           if (match) {
             org = match[1];
           }
         }
         // Try to get org from team.url (another fallback)
         else if (team.url) {
-          const match = team.url.match(/\/orgs\/([^\/]+)\/teams/);
+          const match = team.url.match(/\/orgs\/([^/]+)\/teams/);
           if (match) {
             org = match[1];
           }
@@ -68,7 +69,7 @@ export const getRequestedReviewersAsIndividuals = async () => {
 
         if (!org) {
           logger.warn(
-            `Could not determine organization for team: ${JSON.stringify(team)}`
+            `Could not determine organization for team: ${JSON.stringify(team)}`,
           );
           continue;
         }
@@ -82,7 +83,7 @@ export const getRequestedReviewersAsIndividuals = async () => {
           });
 
           logger.info(
-            `Found ${teamMembers.data.length} members for team ${team.slug}`
+            `Found ${teamMembers.data.length} members for team ${team.slug}`,
           );
 
           teamMembers.data.forEach((member) => {
@@ -90,10 +91,10 @@ export const getRequestedReviewersAsIndividuals = async () => {
           });
         } catch (error: any) {
           logger.error(
-            `Failed to fetch team members for ${team.slug}: ${error.message}`
+            `Failed to fetch team members for ${team.slug}: ${error.message}`,
           );
           logger.error(
-            `API URL attempted: https://api.github.com/orgs/${org}/teams/${team.slug}/members`
+            `API URL attempted: https://api.github.com/orgs/${org}/teams/${team.slug}/members`,
           );
 
           // Continue processing other teams instead of failing completely
@@ -103,7 +104,7 @@ export const getRequestedReviewersAsIndividuals = async () => {
     }
 
     logger.info(
-      `END getRequestedReviewersAsIndividuals: ${JSON.stringify(users)}`
+      `END getRequestedReviewersAsIndividuals: ${JSON.stringify(users)}`,
     );
     return users;
   } catch (error) {

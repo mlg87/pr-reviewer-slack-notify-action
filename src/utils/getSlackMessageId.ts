@@ -1,8 +1,9 @@
-import * as github from "@actions/github";
 import * as core from "@actions/core";
+import * as github from "@actions/github";
+
 import { fail } from "./fail";
-import { logger } from "./logger";
 import { getPullRequest } from "./getPullRequest";
+import { logger } from "./logger";
 
 export const getSlackMessageId = async (): Promise<string | null> => {
   logger.info("Looking up SLACK_MESSAGE_ID from PR comments");
@@ -14,12 +15,12 @@ export const getSlackMessageId = async (): Promise<string | null> => {
     }
     if (!pull_request) {
       throw Error(
-        "No pull_request key on github.context.payload in getSlackMessageId"
+        "No pull_request key on github.context.payload in getSlackMessageId",
       );
     }
     if (!repository) {
       throw Error(
-        "No repository key on github.context.payload in getSlackMessageId"
+        "No repository key on github.context.payload in getSlackMessageId",
       );
     }
 
@@ -32,7 +33,7 @@ export const getSlackMessageId = async (): Promise<string | null> => {
     let slackMessageId;
     res.data.forEach((comment) => {
       const match = comment?.body?.match(
-        /SLACK_MESSAGE_ID:[0-9]{1,}.[0-9]{1,}/
+        /SLACK_MESSAGE_ID:[0-9]{1,}.[0-9]{1,}/,
       );
       if (match) {
         slackMessageId = match[0];
@@ -41,7 +42,7 @@ export const getSlackMessageId = async (): Promise<string | null> => {
 
     if (!slackMessageId) {
       logger.info(
-        `No SLACK_MESSAGE_ID found in PR #${pull_request.number} comments`
+        `No SLACK_MESSAGE_ID found in PR #${pull_request.number} comments`,
       );
       return null;
     }

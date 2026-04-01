@@ -5,7 +5,7 @@ import { logger } from "./logger";
 
 // reviewers is string[], where the strings should be github user names
 export const createUsersToAtString = async (
-  reviewers: string[]
+  reviewers: string[],
 ): Promise<string> => {
   logger.info(`Mapping ${reviewers.length} GitHub users to Slack mentions`);
   let engineers: EngineerGithubSlackMapping[] = [];
@@ -17,7 +17,7 @@ export const createUsersToAtString = async (
   }
 
   const usersToAt = engineers.filter((user) =>
-    reviewers.includes(user.github_username)
+    reviewers.includes(user.github_username),
   );
 
   let usersToAtString: string = "";
@@ -31,6 +31,8 @@ export const createUsersToAtString = async (
     return;
   });
 
-  logger.info(`Mapped ${usersToAt.length}/${reviewers.length} reviewers to Slack mentions`);
+  logger.info(
+    `Mapped ${usersToAt.length}/${reviewers.length} reviewers to Slack mentions`,
+  );
   return usersToAtString;
 };

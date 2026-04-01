@@ -1,4 +1,5 @@
 import * as core from "@actions/core";
+
 import { logger } from "./logger";
 
 export const fail = (error: any) => {

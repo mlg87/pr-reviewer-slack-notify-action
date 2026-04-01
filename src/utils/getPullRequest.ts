@@ -17,7 +17,7 @@ export const getPullRequest = async () => {
 
     if (prFromContext) {
       logger.info(
-        `PR from context: #${prFromContext.number} "${prFromContext.title}" (${prFromContext.state})`
+        `PR from context: #${prFromContext.number} "${prFromContext.title}" (${prFromContext.state})`,
       );
       const { data } = await octokit.rest.pulls.get({
         owner: github.context.payload.repository?.owner.login || "",
@@ -49,7 +49,7 @@ export const getPullRequest = async () => {
     }
 
     logger.info(
-      `PR from commit: #${pull_request.number} "${pull_request.title}" (${pull_request.state})`
+      `PR from commit: #${pull_request.number} "${pull_request.title}" (${pull_request.state})`,
     );
     return pull_request;
   } catch (error) {

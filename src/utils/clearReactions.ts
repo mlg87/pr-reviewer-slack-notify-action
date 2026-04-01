@@ -1,8 +1,9 @@
 import * as core from "@actions/core";
+import { WebAPIPlatformError } from "@slack/web-api";
+
 import { fail } from "./fail";
 import { logger } from "./logger";
 import { slackWebClient } from "./slackWebClient";
-import { WebAPIPlatformError } from "@slack/web-api";
 
 export const clearReactions = async (slackMessageId: string) => {
   logger.info(`Clearing reactions on Slack message ${slackMessageId}`);
