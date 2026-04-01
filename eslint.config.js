@@ -1,7 +1,7 @@
 import eslint from "@eslint/js";
-import tseslint from "typescript-eslint";
 import prettier from "eslint-config-prettier";
 import importPlugin from "eslint-plugin-import";
+import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   eslint.configs.recommended,
@@ -31,9 +31,7 @@ export default tseslint.config(
           "newlines-between": "always",
         },
       ],
-      indent: ["error", 2],
       "linebreak-style": ["error", "unix"],
-      semi: ["error", "always"],
       "@typescript-eslint/no-explicit-any": "warn",
     },
   },

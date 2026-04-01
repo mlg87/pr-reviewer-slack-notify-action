@@ -29,7 +29,7 @@ jobs:
           node-version-file: ".nvmrc"
           cache: "yarn"
       - run: yarn install --immutable
-      - run: yarn lint:script
+      - run: yarn lint
 
   format:
     name: Format

@@ -39,7 +39,7 @@
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
       "yarn format",
-      "yarn lint:script"
+      "yarn lint:fix"
     ]
   },
   "main": "src/index.ts",
@@ -48,7 +48,8 @@
   "scripts": {
     "build": "tsc",
     "format": "prettier --write '**/*.ts'",
-    "lint:script": "eslint --fix",
+    "lint": "eslint 'src/**/*.ts'",
+    "lint:fix": "eslint --fix 'src/**/*.ts'",
     "package": "ncc build --source-map --license licenses.txt --minify",
     "release": "semantic-release",
     "test": "vitest run"
