@@ -1,3 +1,10 @@
+## [10.2.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.1.0...v10.2.0) (2026-04-01)
+
+
+### Build System
+
+* **deps:** bump axios from 1.12.2 to 1.13.5 ([c0a257d](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/c0a257d82053c371e0a7c3725b9232e3588facb4))
+
 ## [10.1.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.0.1...v10.1.0) (2026-02-26)
 
 
