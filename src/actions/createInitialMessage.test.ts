@@ -1,11 +1,13 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { createUsersToAtString } from "../utils/createUsersToAtString";
 import { fail } from "../utils/fail";
 import { getPullRequest } from "../utils/getPullRequest";
-import { slackWebClient } from "../utils/slackWebClient";
 import { getRequestedReviewersAsIndividuals } from "../utils/getRequestedReviewersAsIndividuals";
+import { slackWebClient } from "../utils/slackWebClient";
+
 import { createInitialMessage } from "./createInitialMessage";
 
 vi.mock("@actions/core");
@@ -27,7 +29,7 @@ const mockCreateUsersToAtString = vi.mocked(createUsersToAtString);
 const mockFail = vi.mocked(fail);
 const mockGetPullRequest = vi.mocked(getPullRequest);
 const mockGetRequestedReviewersAsIndividuals = vi.mocked(
-  getRequestedReviewersAsIndividuals
+  getRequestedReviewersAsIndividuals,
 );
 const mockPostMessage = vi.mocked(slackWebClient.chat.postMessage);
 const mockGetPermalink = vi.mocked(slackWebClient.chat.getPermalink);
@@ -93,7 +95,7 @@ describe("createInitialMessage", () => {
     expect(mockPostMessage).toHaveBeenCalledWith(
       expect.objectContaining({
         channel: "C123456",
-      })
+      }),
     );
     expect(mockCreateComment).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -101,7 +103,7 @@ describe("createInitialMessage", () => {
         repo: "repo",
         issue_number: 42,
         body: expect.stringContaining("SLACK_MESSAGE_ID:1234567890.123456"),
-      })
+      }),
     );
     expect(result).toBe("SLACK_MESSAGE_ID:1234567890.123456");
   });
@@ -112,9 +114,9 @@ describe("createInitialMessage", () => {
     expect(mockCreateComment).toHaveBeenCalledWith(
       expect.objectContaining({
         body: expect.stringContaining(
-          "[View Slack thread](https://slack.com/archives/C123/p1234567890123456)"
+          "[View Slack thread](https://slack.com/archives/C123/p1234567890123456)",
         ),
-      })
+      }),
     );
   });
 
@@ -126,7 +128,7 @@ describe("createInitialMessage", () => {
     expect(mockCreateComment).toHaveBeenCalledWith(
       expect.objectContaining({
         body: "SLACK_MESSAGE_ID:1234567890.123456",
-      })
+      }),
     );
   });
 
@@ -185,7 +187,7 @@ describe("createInitialMessage", () => {
     await createInitialMessage();
 
     expect(mockFail).toHaveBeenCalledWith(
-      "Failed to create initial Slack message"
+      "Failed to create initial Slack message",
     );
   });
 });

@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as core from "@actions/core";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { fail } from "./fail";
 import { logger } from "./logger";
 

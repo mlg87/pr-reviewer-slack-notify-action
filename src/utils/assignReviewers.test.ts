@@ -1,10 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
+import { assignCodeownersAsReviewers } from "./assignReviewers";
+import { getTeamMembers } from "./expandTeamMembers";
 import { logger } from "./logger";
 import { parseCodeowners } from "./parseCodeowners";
-import { getTeamMembers } from "./expandTeamMembers";
-import { assignCodeownersAsReviewers } from "./assignReviewers";
 
 vi.mock("@actions/core");
 vi.mock("@actions/github");
@@ -80,7 +81,7 @@ describe("assignCodeownersAsReviewers", () => {
         repo: "test-repo",
         pull_number: 42,
         reviewers: ["alice", "bob"],
-      })
+      }),
     );
   });
 
@@ -106,14 +107,14 @@ describe("assignCodeownersAsReviewers", () => {
     const result = await assignCodeownersAsReviewers(
       pull_request,
       repository,
-      true
+      true,
     );
 
     expect(result.success).toBe(true);
     expect(result.assigned.users).toEqual(["alice", "bob"]);
     expect(mockGetTeamMembers).toHaveBeenCalledWith(
       ["test-org/frontend"],
-      "test-org"
+      "test-org",
     );
   });
 
@@ -137,10 +138,10 @@ describe("assignCodeownersAsReviewers", () => {
     expect(mockRequestReviewers).toHaveBeenCalledWith(
       expect.objectContaining({
         reviewers: ["alice", "bob"],
-      })
+      }),
     );
     expect(logger.info).toHaveBeenCalledWith(
-      expect.stringContaining("Filtered out PR author")
+      expect.stringContaining("Filtered out PR author"),
     );
   });
 
@@ -155,7 +156,7 @@ describe("assignCodeownersAsReviewers", () => {
 
     expect(result.success).toBe(false);
     expect(result.errors).toContain(
-      "No CODEOWNERS file found or parsing failed"
+      "No CODEOWNERS file found or parsing failed",
     );
     expect(mockRequestReviewers).not.toHaveBeenCalled();
   });
@@ -171,7 +172,7 @@ describe("assignCodeownersAsReviewers", () => {
 
     expect(result.success).toBe(false);
     expect(result.errors).toContain(
-      "No valid reviewers available after filtering out PR author"
+      "No valid reviewers available after filtering out PR author",
     );
     expect(mockRequestReviewers).not.toHaveBeenCalled();
   });
@@ -196,7 +197,7 @@ describe("assignCodeownersAsReviewers", () => {
 
     expect(result.success).toBe(false);
     expect(result.errors).toContain(
-      "Some reviewers could not be assigned (may not have repository access or already be reviewers)"
+      "Some reviewers could not be assigned (may not have repository access or already be reviewers)",
     );
   });
 
@@ -220,7 +221,7 @@ describe("assignCodeownersAsReviewers", () => {
 
     expect(result.success).toBe(false);
     expect(result.errors).toContain(
-      "Insufficient permissions to assign reviewers"
+      "Insufficient permissions to assign reviewers",
     );
   });
 
@@ -251,7 +252,7 @@ describe("assignCodeownersAsReviewers", () => {
     expect(result.success).toBe(true);
     expect(mockCreateComment).not.toHaveBeenCalled();
     expect(logger.info).toHaveBeenCalledWith(
-      "Auto-assignment comment already exists, skipping duplicate"
+      "Auto-assignment comment already exists, skipping duplicate",
     );
   });
 
@@ -279,14 +280,14 @@ describe("assignCodeownersAsReviewers", () => {
     const result = await assignCodeownersAsReviewers(
       pull_request,
       repository,
-      true
+      true,
     );
 
     // Has assigned users but also has errors, so success is false
     expect(result.success).toBe(false);
     expect(result.assigned.users).toEqual(["alice"]);
     expect(result.errors).toContain(
-      "Could not get members for team test-org/missing-team: Not Found"
+      "Could not get members for team test-org/missing-team: Not Found",
     );
   });
 });

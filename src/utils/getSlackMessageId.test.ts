@@ -1,10 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { fail } from "./fail";
-import { logger } from "./logger";
 import { getPullRequest } from "./getPullRequest";
 import { getSlackMessageId } from "./getSlackMessageId";
+import { logger } from "./logger";
 
 vi.mock("@actions/core");
 vi.mock("@actions/github");
@@ -70,7 +71,7 @@ describe("getSlackMessageId", () => {
 
     expect(result).toBeNull();
     expect(mockLogger.info).toHaveBeenCalledWith(
-      "No SLACK_MESSAGE_ID found in PR #42 comments"
+      "No SLACK_MESSAGE_ID found in PR #42 comments",
     );
   });
 
@@ -115,7 +116,7 @@ describe("getSlackMessageId", () => {
     });
 
     await expect(getSlackMessageId()).rejects.toThrow(
-      "No pull_request key on github.context.payload in getSlackMessageId"
+      "No pull_request key on github.context.payload in getSlackMessageId",
     );
     expect(mockFail).toHaveBeenCalled();
   });
@@ -133,7 +134,7 @@ describe("getSlackMessageId", () => {
     });
 
     await expect(getSlackMessageId()).rejects.toThrow(
-      "No repository key on github.context.payload in getSlackMessageId"
+      "No repository key on github.context.payload in getSlackMessageId",
     );
     expect(mockFail).toHaveBeenCalled();
   });

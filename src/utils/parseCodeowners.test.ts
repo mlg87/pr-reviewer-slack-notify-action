@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { logger } from "./logger";
 import { parseCodeowners } from "./parseCodeowners";
 
@@ -43,7 +44,7 @@ describe("parseCodeowners", () => {
     mockGetContent.mockResolvedValueOnce({
       data: {
         content: encodeContent(
-          "* @alice @myorg/frontend-team @myorg/backend-team\n"
+          "* @alice @myorg/frontend-team @myorg/backend-team\n",
         ),
       },
     });
@@ -90,13 +91,13 @@ describe("parseCodeowners", () => {
     expect(result.users).toEqual(["charlie"]);
     expect(mockGetContent).toHaveBeenCalledTimes(3);
     expect(mockGetContent).toHaveBeenCalledWith(
-      expect.objectContaining({ path: ".github/CODEOWNERS" })
+      expect.objectContaining({ path: ".github/CODEOWNERS" }),
     );
     expect(mockGetContent).toHaveBeenCalledWith(
-      expect.objectContaining({ path: "CODEOWNERS" })
+      expect.objectContaining({ path: "CODEOWNERS" }),
     );
     expect(mockGetContent).toHaveBeenCalledWith(
-      expect.objectContaining({ path: "docs/CODEOWNERS" })
+      expect.objectContaining({ path: "docs/CODEOWNERS" }),
     );
   });
 
@@ -112,11 +113,9 @@ describe("parseCodeowners", () => {
   });
 
   it("returns success: false when CODEOWNERS has no valid owners", async () => {
-    const content = [
-      "# Only comments and bare paths",
-      "src/",
-      "docs/",
-    ].join("\n");
+    const content = ["# Only comments and bare paths", "src/", "docs/"].join(
+      "\n",
+    );
 
     mockGetContent.mockResolvedValueOnce({
       data: { content: encodeContent(content) },
@@ -155,7 +154,9 @@ describe("parseCodeowners", () => {
 
     expect(result).toEqual({ users: [], teams: [], success: false });
     expect(logger.warn).toHaveBeenCalledWith(
-      expect.stringContaining("Error fetching CODEOWNERS from .github/CODEOWNERS")
+      expect.stringContaining(
+        "Error fetching CODEOWNERS from .github/CODEOWNERS",
+      ),
     );
   });
 });

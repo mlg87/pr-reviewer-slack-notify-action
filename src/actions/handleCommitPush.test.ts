@@ -1,12 +1,14 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { clearReactions } from "../utils/clearReactions";
 import { createUsersToAtString } from "../utils/createUsersToAtString";
 import { fail } from "../utils/fail";
 import { getPullRequest } from "../utils/getPullRequest";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
 import { slackWebClient } from "../utils/slackWebClient";
+
 import { handleCommitPush } from "./handleCommitPush";
 
 vi.mock("@actions/core");
@@ -64,7 +66,10 @@ describe("handleCommitPush", () => {
         { user: { login: "reviewer2" } },
       ],
     });
-    mockPostMessage.mockResolvedValue({ ok: true, ts: "1234567890.999" } as any);
+    mockPostMessage.mockResolvedValue({
+      ok: true,
+      ts: "1234567890.999",
+    } as any);
   });
 
   it("clears reactions and posts commit push notification with diff link", async () => {
@@ -75,7 +80,7 @@ describe("handleCommitPush", () => {
       expect.objectContaining({
         channel: "test-channel",
         thread_ts: "1234567890.123456",
-      })
+      }),
     );
     const callArgs = mockPostMessage.mock.calls[0][0] as any;
     expect(callArgs.text).toContain("new code has been committed");
@@ -83,7 +88,10 @@ describe("handleCommitPush", () => {
   });
 
   it("skips when PR is closed", async () => {
-    mockGetPullRequest.mockResolvedValue({ ...basePullRequest, state: "closed" } as any);
+    mockGetPullRequest.mockResolvedValue({
+      ...basePullRequest,
+      state: "closed",
+    } as any);
 
     await handleCommitPush();
 
@@ -108,7 +116,7 @@ describe("handleCommitPush", () => {
     expect(mockClearReactions).not.toHaveBeenCalled();
     expect(mockPostMessage).not.toHaveBeenCalled();
     expect(mockCore.warning).toHaveBeenCalledWith(
-      expect.stringContaining("no Slack message ID")
+      expect.stringContaining("no Slack message ID"),
     );
   });
 
@@ -119,7 +127,7 @@ describe("handleCommitPush", () => {
     });
 
     await expect(handleCommitPush()).rejects.toThrow(
-      "No repository found in github.context.payload in handleCommitPush"
+      "No repository found in github.context.payload in handleCommitPush",
     );
     expect(mockFail).toHaveBeenCalled();
   });
@@ -135,7 +143,10 @@ describe("handleCommitPush", () => {
 
     await handleCommitPush();
 
-    expect(mockCreateUsersToAtString).toHaveBeenCalledWith(["reviewer1", "reviewer2"]);
+    expect(mockCreateUsersToAtString).toHaveBeenCalledWith([
+      "reviewer1",
+      "reviewer2",
+    ]);
   });
 
   it("includes compare link when available", async () => {
@@ -167,7 +178,7 @@ describe("handleCommitPush", () => {
     mockPostMessage.mockResolvedValue({ ok: false } as any);
 
     await expect(handleCommitPush()).rejects.toThrow(
-      "Failed to post message to thread requesting re-review"
+      "Failed to post message to thread requesting re-review",
     );
     expect(mockFail).toHaveBeenCalled();
   });

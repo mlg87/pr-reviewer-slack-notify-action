@@ -1,9 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { fail } from "./fail";
-import { logger } from "./logger";
 import { getPullRequest } from "./getPullRequest";
+import { logger } from "./logger";
 
 vi.mock("@actions/core");
 vi.mock("@actions/github");
@@ -55,7 +56,7 @@ describe("getPullRequest", () => {
       pull_number: 42,
     });
     expect(mockLogger.info).toHaveBeenCalledWith(
-      'PR from context: #42 "Test PR" (open)'
+      'PR from context: #42 "Test PR" (open)',
     );
   });
 
@@ -83,7 +84,7 @@ describe("getPullRequest", () => {
       commit_sha: "abc123",
     });
     expect(mockLogger.info).toHaveBeenCalledWith(
-      'PR from commit: #10 "Commit PR" (open)'
+      'PR from commit: #10 "Commit PR" (open)',
     );
   });
 
@@ -114,7 +115,7 @@ describe("getPullRequest", () => {
     });
 
     await expect(getPullRequest()).rejects.toThrow(
-      "No repository found in github.context.payload"
+      "No repository found in github.context.payload",
     );
     expect(mockFail).toHaveBeenCalled();
   });
@@ -134,7 +135,7 @@ describe("getPullRequest", () => {
     mockListPRsForCommit.mockResolvedValue({ data: [] });
 
     await expect(getPullRequest()).rejects.toThrow(
-      "No pull_request found for commit: deadbeef"
+      "No pull_request found for commit: deadbeef",
     );
     expect(mockFail).toHaveBeenCalled();
   });
@@ -161,7 +162,7 @@ describe("getPullRequest", () => {
     await getPullRequest();
 
     expect(mockPullsGet).toHaveBeenCalledWith(
-      expect.objectContaining({ owner: "correct-login" })
+      expect.objectContaining({ owner: "correct-login" }),
     );
   });
 });

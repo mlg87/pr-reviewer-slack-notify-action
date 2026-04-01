@@ -1,8 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { EventEmitter } from "events";
+
 import * as core from "@actions/core";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { fail } from "../fail";
 import { logger } from "../logger";
-import { EventEmitter } from "events";
 
 vi.mock("@actions/core");
 vi.mock("../fail");
@@ -67,18 +69,8 @@ describe("getEngineersFromS3", () => {
   it("throws when required AWS inputs are missing", async () => {
     mockCore.getInput.mockReturnValue("");
 
-    // The source throws inside an async Promise executor, which produces
-    // an unhandled rejection rather than rejecting the promise. We catch
-    // it via the process event to verify the error is thrown.
-    const unhandled = vi.fn();
-    process.once("unhandledRejection", unhandled);
-
-    getEngineersFromS3();
-
-    await vi.waitFor(() => expect(unhandled).toHaveBeenCalled());
-    expect(unhandled).toHaveBeenCalledWith(
+    await expect(getEngineersFromS3()).rejects.toThrow(
       "Missing required inputs for AWS",
-      expect.anything()
     );
   });
 

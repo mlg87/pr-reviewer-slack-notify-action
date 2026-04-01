@@ -1,11 +1,13 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { clearReactions } from "../utils/clearReactions";
 import { fail } from "../utils/fail";
 import { getPullRequest } from "../utils/getPullRequest";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
 import { slackWebClient } from "../utils/slackWebClient";
+
 import { handleMerge } from "./handleMerge";
 
 vi.mock("@actions/core");
@@ -69,7 +71,7 @@ describe("handleMerge", () => {
       expect.objectContaining({
         channel: "test-channel",
         thread_ts: "1234567890.123456",
-      })
+      }),
     );
   });
 
@@ -77,16 +79,19 @@ describe("handleMerge", () => {
     mockGetPullRequest.mockResolvedValue(null as any);
 
     await expect(handleMerge()).rejects.toThrow(
-      "No pull_request found for commit: abc123"
+      "No pull_request found for commit: abc123",
     );
     expect(mockFail).toHaveBeenCalled();
   });
 
   it("throws when PR is not closed", async () => {
-    mockGetPullRequest.mockResolvedValue({ ...basePullRequest, state: "open" } as any);
+    mockGetPullRequest.mockResolvedValue({
+      ...basePullRequest,
+      state: "open",
+    } as any);
 
     await expect(handleMerge()).rejects.toThrow(
-      "PR is not closed for commit: abc123"
+      "PR is not closed for commit: abc123",
     );
     expect(mockFail).toHaveBeenCalled();
   });
@@ -100,7 +105,7 @@ describe("handleMerge", () => {
     expect(mockReactionsAdd).not.toHaveBeenCalled();
     expect(mockPostMessage).not.toHaveBeenCalled();
     expect(mockCore.warning).toHaveBeenCalledWith(
-      expect.stringContaining("no Slack message ID")
+      expect.stringContaining("no Slack message ID"),
     );
   });
 
@@ -109,7 +114,7 @@ describe("handleMerge", () => {
 
     const callArgs = mockPostMessage.mock.calls[0][0] as any;
     expect(callArgs.text).toBe(
-      "This PR has been merged. One-way ticket to Prod purchased. See you in Valhalla."
+      "This PR has been merged. One-way ticket to Prod purchased. See you in Valhalla.",
     );
     expect(callArgs.thread_ts).toBe("1234567890.123456");
     expect(callArgs.channel).toBe("test-channel");

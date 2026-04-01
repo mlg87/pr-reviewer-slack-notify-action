@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import { logger } from "./logger";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { getTeamMembers } from "./expandTeamMembers";
+import { logger } from "./logger";
 
 vi.mock("@actions/core");
 vi.mock("@actions/github");
@@ -62,7 +63,7 @@ describe("getTeamMembers", () => {
     await getTeamMembers(["design"], "fallback-org");
 
     expect(mockListMembersInOrg).toHaveBeenCalledWith(
-      expect.objectContaining({ org: "fallback-org", team_slug: "design" })
+      expect.objectContaining({ org: "fallback-org", team_slug: "design" }),
     );
   });
 
@@ -77,7 +78,7 @@ describe("getTeamMembers", () => {
 
     const result = await getTeamMembers(
       ["myorg/team-a", "myorg/team-b"],
-      "myorg"
+      "myorg",
     );
 
     expect(result.users).toEqual(["alice", "bob", "charlie"]);
@@ -93,12 +94,14 @@ describe("getTeamMembers", () => {
 
     const result = await getTeamMembers(
       ["myorg/missing-team", "myorg/good-team"],
-      "myorg"
+      "myorg",
     );
 
     expect(result.users).toEqual(["alice"]);
     expect(result.errors).toHaveLength(1);
-    expect(result.errors[0]).toContain("Could not get members for team myorg/missing-team");
+    expect(result.errors[0]).toContain(
+      "Could not get members for team myorg/missing-team",
+    );
     expect(logger.error).toHaveBeenCalled();
   });
 

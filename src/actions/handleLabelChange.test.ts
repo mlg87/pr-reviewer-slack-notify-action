@@ -1,11 +1,13 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import { createInitialMessage } from "./createInitialMessage";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { fail } from "../utils/fail";
 import { getEngineersFromS3 } from "../utils/getEngineersFromS3";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
 import { slackWebClient } from "../utils/slackWebClient";
+
+import { createInitialMessage } from "./createInitialMessage";
 import { handleLabelChange } from "./handleLabelChange";
 
 vi.mock("@actions/core");
@@ -83,7 +85,7 @@ describe("handleLabelChange", () => {
 
     expect(mockCreateInitialMessage).not.toHaveBeenCalled();
     expect(mockCore.summary.addRaw).toHaveBeenCalledWith(
-      expect.stringContaining("already exists")
+      expect.stringContaining("already exists"),
     );
   });
 
@@ -124,7 +126,7 @@ describe("handleLabelChange", () => {
       expect.objectContaining({
         channel: "C123456",
         thread_ts: "1234567890.123456",
-      })
+      }),
     );
     const callArgs = mockPostMessage.mock.calls[0][0] as any;
     expect(callArgs.text).toContain("<@U222>");
@@ -170,7 +172,7 @@ describe("handleLabelChange", () => {
         channel: "C123456",
         timestamp: "1234567890.123456",
         name: "heart_eyes",
-      })
+      }),
     );
   });
 
@@ -253,7 +255,7 @@ describe("handleLabelChange", () => {
     });
 
     await expect(handleLabelChange()).rejects.toThrow(
-      "No pull_request found on github.context.payload"
+      "No pull_request found on github.context.payload",
     );
     expect(mockFail).toHaveBeenCalled();
   });
@@ -271,7 +273,7 @@ describe("handleLabelChange", () => {
     });
 
     await expect(handleLabelChange()).rejects.toThrow(
-      "No sender found on github.context.payload"
+      "No sender found on github.context.payload",
     );
     expect(mockFail).toHaveBeenCalled();
   });

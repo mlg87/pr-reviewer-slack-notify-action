@@ -1,10 +1,12 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { fail } from "../utils/fail";
 import { getEngineersFromS3 } from "../utils/getEngineersFromS3";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
 import { slackWebClient } from "../utils/slackWebClient";
+
 import { handlePullRequestReview } from "./handlePullRequestReview";
 
 vi.mock("@actions/core");
@@ -83,7 +85,7 @@ describe("handlePullRequestReview", () => {
     expect(callArgs.channel).toBe("test-channel");
     expect(callArgs.thread_ts).toBe("1234567890.123456");
     expect(mockReactionsAdd).toHaveBeenCalledWith(
-      expect.objectContaining({ name: "white_check_mark" })
+      expect.objectContaining({ name: "white_check_mark" }),
     );
   });
 
@@ -97,7 +99,7 @@ describe("handlePullRequestReview", () => {
     expect(callArgs.text).toContain("would like you to change some things");
     expect(callArgs.text).toContain("Please fix the tests");
     expect(mockReactionsAdd).toHaveBeenCalledWith(
-      expect.objectContaining({ name: "octagonal_sign" })
+      expect.objectContaining({ name: "octagonal_sign" }),
     );
   });
 
@@ -106,7 +108,10 @@ describe("handlePullRequestReview", () => {
     mockGithub.context.payload.review.body = "Overall looks good";
     mockListCommentsForReview.mockResolvedValue({
       data: [
-        { body: "Nit: rename this var", html_url: "https://github.com/comment/1" },
+        {
+          body: "Nit: rename this var",
+          html_url: "https://github.com/comment/1",
+        },
       ],
     });
 
@@ -116,7 +121,7 @@ describe("handlePullRequestReview", () => {
     expect(callArgs.text).toContain("Overall looks good");
     expect(callArgs.text).toContain("Nit: rename this var");
     expect(mockReactionsAdd).toHaveBeenCalledWith(
-      expect.objectContaining({ name: "speech_balloon" })
+      expect.objectContaining({ name: "speech_balloon" }),
     );
   });
 
@@ -183,7 +188,7 @@ describe("handlePullRequestReview", () => {
 
     expect(mockPostMessage).not.toHaveBeenCalled();
     expect(mockCore.warning).toHaveBeenCalledWith(
-      expect.stringContaining("no Slack message ID")
+      expect.stringContaining("no Slack message ID"),
     );
   });
 
@@ -191,21 +196,19 @@ describe("handlePullRequestReview", () => {
     mockGithub.context.payload.review.user.login = "unknown-reviewer";
 
     await expect(handlePullRequestReview()).rejects.toThrow(
-      "Could not map unknown-reviewer to the users you provided in action.yml"
+      "Could not map unknown-reviewer to the users you provided in action.yml",
     );
     expect(mockFail).toHaveBeenCalled();
   });
 
   it("throws when author not found in S3 mapping", async () => {
     mockGetEngineersFromS3.mockResolvedValue({
-      engineers: [
-        { github_username: "reviewer1", slack_id: "UREV1" },
-      ],
+      engineers: [{ github_username: "reviewer1", slack_id: "UREV1" }],
     } as any);
     mockGithub.context.payload.pull_request.user.login = "unknown-author";
 
     await expect(handlePullRequestReview()).rejects.toThrow(
-      "Could not map unknown-author to the users you provided in action.yml"
+      "Could not map unknown-author to the users you provided in action.yml",
     );
     expect(mockFail).toHaveBeenCalled();
   });

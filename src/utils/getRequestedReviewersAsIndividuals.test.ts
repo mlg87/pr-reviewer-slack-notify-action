@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import { getRequestedReviewersAsIndividuals } from "./getRequestedReviewersAsIndividuals";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { getPullRequest } from "./getPullRequest";
+import { getRequestedReviewersAsIndividuals } from "./getRequestedReviewersAsIndividuals";
 
 vi.mock("@actions/core");
 vi.mock("@actions/github");

@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as core from "@actions/core";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { clearReactions } from "./clearReactions";
 import { fail } from "./fail";
 import { slackWebClient } from "./slackWebClient";
@@ -87,7 +88,7 @@ describe("clearReactions", () => {
     mockReactions.get.mockRejectedValue(otherError);
 
     await expect(clearReactions("1234567890.123456")).rejects.toThrow(
-      "some slack error"
+      "some slack error",
     );
     expect(mockFail).toHaveBeenCalledWith(otherError);
   });

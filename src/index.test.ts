@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 
 vi.mock("@actions/core");
 vi.mock("@actions/github");
@@ -252,7 +252,7 @@ describe("index run()", () => {
 
     expect(handleCommitPush).not.toHaveBeenCalled();
     expect(mockCore.warning).toHaveBeenCalledWith(
-      expect.stringContaining("No Slack message found")
+      expect.stringContaining("No Slack message found"),
     );
   });
 });
