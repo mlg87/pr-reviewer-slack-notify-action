@@ -1,5 +1,6 @@
-import * as github from "@actions/github";
 import * as core from "@actions/core";
+import * as github from "@actions/github";
+
 import { logger } from "./logger";
 
 /**
@@ -8,7 +9,7 @@ import { logger } from "./logger";
  */
 export const getTeamMembers = async (
   teams: string[],
-  org: string
+  org: string,
 ): Promise<{ users: string[]; errors: string[] }> => {
   const octokit = github.getOctokit(core.getInput("github-token"));
   const allUsers = new Set<string>();
@@ -36,14 +37,14 @@ export const getTeamMembers = async (
     } catch (error: any) {
       const errorMsg = `Could not get members for team ${teamSlug}: ${error.message}`;
       logger.error(errorMsg);
-      
+
       if (error.status === 403 || error.status === 404) {
         logger.warn(
           `Unable to expand team ${teamSlug} - missing 'members: read' organization permission or team not found. ` +
-          `The team will be assigned as a reviewer instead of individual members.`
+            `The team will be assigned as a reviewer instead of individual members.`,
         );
       }
-      
+
       errors.push(errorMsg);
     }
   }
@@ -53,4 +54,3 @@ export const getTeamMembers = async (
     errors,
   };
 };
-

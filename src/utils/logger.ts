@@ -15,8 +15,8 @@ const alignColorsAndTime = winston.format.combine(
     (info) =>
       ` ${info.label}  ${formatISO(new Date())}  ${info.level} : ${
         info.message
-      }`
-  )
+      }`,
+  ),
 );
 
 /**
@@ -51,7 +51,7 @@ export const logger = winston.createLogger({
       format: winston.format.combine(
         winston.format.colorize(),
         alignColorsAndTime,
-        winston.format.errors({ stack: true })
+        winston.format.errors({ stack: true }),
       ),
     }),
   ],

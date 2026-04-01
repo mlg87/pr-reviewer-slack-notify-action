@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+
 import { fail } from "../utils/fail";
 import { getEngineersFromS3 } from "../utils/getEngineersFromS3";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
@@ -20,13 +21,15 @@ export const handlePullRequestReview = async (): Promise<void> => {
     const { action, pull_request, review } = github.context.payload;
 
     if (action !== "submitted") {
-      logger.info(`Ignoring review action '${action}', only 'submitted' is handled`);
+      logger.info(
+        `Ignoring review action '${action}', only 'submitted' is handled`,
+      );
       return;
     }
 
     if (!pull_request) {
       throw Error(
-        "No pull_request found in handlePullRequestReview (github.context.payload)"
+        "No pull_request found in handlePullRequestReview (github.context.payload)",
       );
     }
 
@@ -35,7 +38,7 @@ export const handlePullRequestReview = async (): Promise<void> => {
     if (!slackMessageId) {
       logger.info("No Slack thread found, skipping review notification");
       core.warning(
-        "Unable to post pull request review notification because no Slack message ID could be found."
+        "Unable to post pull request review notification because no Slack message ID could be found.",
       );
       return;
     }
@@ -52,16 +55,20 @@ export const handlePullRequestReview = async (): Promise<void> => {
     });
 
     if (!reviewer) {
-      core.error(`Could not map reviewer '${review.user.login}' to a Slack user from the S3 mapping`);
+      core.error(
+        `Could not map reviewer '${review.user.login}' to a Slack user from the S3 mapping`,
+      );
       throw Error(
-        `Could not map ${review.user.login} to the users you provided in action.yml`
+        `Could not map ${review.user.login} to the users you provided in action.yml`,
       );
     }
 
     if (!author) {
-      core.error(`Could not map PR author '${pull_request.user.login}' to a Slack user from the S3 mapping`);
+      core.error(
+        `Could not map PR author '${pull_request.user.login}' to a Slack user from the S3 mapping`,
+      );
       throw Error(
-        `Could not map ${pull_request.user.login} to the users you provided in action.yml`
+        `Could not map ${pull_request.user.login} to the users you provided in action.yml`,
       );
     }
 
@@ -76,20 +83,50 @@ export const handlePullRequestReview = async (): Promise<void> => {
       case "changes_requested":
         actionText = "would like you to change some things in the code";
         reactionToAdd = reactionMap["changes_requested"];
+        if (review.body) {
+          actionText = `${actionText}\n>${review.body}`;
+        }
         break;
-      // TODO see if getting the review could allow for posting the text that was commented
-      // NOTE for reviews where the state is "commented", the comment text is not in the event payload
-      case "commented":
-        actionText = "neither approved or denied your PR, but merely commented";
+      case "commented": {
         reactionToAdd = reactionMap["commented"];
+
+        // fetch inline review comments from the API
+        const ghToken = core.getInput("github-token");
+        const octokit = github.getOctokit(ghToken);
+        const { repository } = github.context.payload;
+        const commentsRes = await octokit.rest.pulls.listCommentsForReview({
+          owner: repository!.owner.login,
+          repo: repository!.name,
+          pull_number: pull_request.number,
+          review_id: review.id,
+        });
+
+        const allComments: { body: string; url: string }[] = [];
+        if (review.body) {
+          allComments.push({ body: review.body, url: review.html_url });
+        }
+        for (const comment of commentsRes.data) {
+          if (comment.body) {
+            allComments.push({ body: comment.body, url: comment.html_url });
+          }
+        }
+
+        const commentCount = allComments.length;
+        const commentLabel =
+          commentCount === 1 ? "a comment" : `${commentCount} comments`;
+        actionText = `added ${commentLabel}:`;
+        for (const { body, url } of allComments) {
+          actionText = `${actionText}\n><${url}|:link:> ${body}`;
+        }
         break;
+      }
       case "approved":
         actionText = "approved your PR";
         reactionToAdd = reactionMap["approved"];
+        if (review.body) {
+          actionText = `${actionText}\n>${review.body}`;
+        }
         break;
-    }
-    if (!!review.body) {
-      actionText = `${actionText}\n>${review.body}`;
     }
     const text = `${userText} ${actionText}`;
     // post corresponding message
@@ -139,7 +176,9 @@ export const handlePullRequestReview = async (): Promise<void> => {
       name: reactionToAdd,
     });
 
-    logger.info(`Review by ${review.user.login} (${review.state}) posted to Slack thread`);
+    logger.info(
+      `Review by ${review.user.login} (${review.state}) posted to Slack thread`,
+    );
     return;
   } catch (error) {
     fail(error);

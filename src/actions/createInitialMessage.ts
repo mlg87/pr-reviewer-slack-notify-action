@@ -1,11 +1,12 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+
 import { createUsersToAtString } from "../utils/createUsersToAtString";
 import { fail } from "../utils/fail";
 import { getPullRequest } from "../utils/getPullRequest";
+import { getRequestedReviewersAsIndividuals } from "../utils/getRequestedReviewersAsIndividuals";
 import { logger } from "../utils/logger";
 import { slackWebClient } from "../utils/slackWebClient";
-import { getRequestedReviewersAsIndividuals } from "../utils/getRequestedReviewersAsIndividuals";
 
 export const createInitialMessage = async (): Promise<string | void> => {
   const verbose: boolean = core.getBooleanInput("verbose");
@@ -85,10 +86,10 @@ export const createInitialMessage = async (): Promise<string | void> => {
     });
 
     logger.info(
-      `Initial Slack message created for PR #${pull_request.number} (${slackMessageId})`
+      `Initial Slack message created for PR #${pull_request.number} (${slackMessageId})`,
     );
     core.summary.addRaw(
-      `Slack notification sent for PR #${pull_request.number}. Thread ID: ${prSlackMsg.ts}`
+      `Slack notification sent for PR #${pull_request.number}. Thread ID: ${prSlackMsg.ts}`,
     );
     await core.summary.write();
 

@@ -1,5 +1,6 @@
-import * as github from "@actions/github";
 import * as core from "@actions/core";
+import * as github from "@actions/github";
+
 import { logger } from "./logger";
 
 /**
@@ -8,7 +9,7 @@ import { logger } from "./logger";
  */
 export const parseCodeowners = async (
   repository: any,
-  branch: string
+  branch: string,
 ): Promise<{ users: string[]; teams: string[]; success: boolean }> => {
   logger.info("Looking for CODEOWNERS file...");
 
@@ -29,7 +30,7 @@ export const parseCodeowners = async (
 
       if ("content" in data && data.content) {
         codeownersContent = Buffer.from(data.content, "base64").toString(
-          "utf-8"
+          "utf-8",
         );
         logger.info(`Found CODEOWNERS file at ${path}`);
         break;
@@ -102,4 +103,3 @@ export const parseCodeowners = async (
     success: true,
   };
 };
-

@@ -1,12 +1,12 @@
-import * as github from "@actions/github";
 import * as core from "@actions/core";
-import { handleLabelChange } from "./actions/handleLabelChange";
-import { getSlackMessageId } from "./utils/getSlackMessageId";
-import { handleMerge } from "./actions/handleMerge";
+import * as github from "@actions/github";
+
 import { handleCommitPush } from "./actions/handleCommitPush";
+import { handleLabelChange } from "./actions/handleLabelChange";
+import { handleMerge } from "./actions/handleMerge";
 import { handlePullRequestReview } from "./actions/handlePullRequestReview";
 import { assignCodeownersAsReviewers } from "./utils/assignReviewers";
-import { getPullRequest } from "./utils/getPullRequest";
+import { getSlackMessageId } from "./utils/getSlackMessageId";
 import { logger } from "./utils/logger";
 
 const handleReviewerAssignment = async (): Promise<void> => {
@@ -15,7 +15,9 @@ const handleReviewerAssignment = async (): Promise<void> => {
   const { repository } = payload;
 
   if (!pull_request || !repository) {
-    logger.info("Missing pull_request or repository on payload, skipping reviewer assignment");
+    logger.info(
+      "Missing pull_request or repository on payload, skipping reviewer assignment",
+    );
     return;
   }
 
@@ -28,11 +30,11 @@ const handleReviewerAssignment = async (): Promise<void> => {
       ...result.assigned.teams.map((t: string) => `@${t}`),
     ].join(", ");
     core.summary.addRaw(
-      `Reviewers assigned: ${assigned}. Slack notification will be sent when the '${core.getInput("label-for-initial-notification")}' label is applied.`
+      `Reviewers assigned: ${assigned}. Slack notification will be sent when the '${core.getInput("label-for-initial-notification")}' label is applied.`,
     );
   } else if (result.errors.length > 0) {
     core.summary.addRaw(
-      `Reviewer assignment had issues: ${result.errors.join(", ")}`
+      `Reviewer assignment had issues: ${result.errors.join(", ")}`,
     );
   } else {
     core.summary.addRaw("No reviewers to assign from CODEOWNERS.");
@@ -44,7 +46,7 @@ const handleReviewerAssignment = async (): Promise<void> => {
 const run = async (): Promise<void> => {
   const { eventName, payload, ref } = github.context;
   logger.info(
-    `Event: ${eventName}, Action: ${payload.action || "N/A"}, Ref: ${ref}`
+    `Event: ${eventName}, Action: ${payload.action || "N/A"}, Ref: ${ref}`,
   );
   const baseBranch = core.getInput("base-branch");
   const isActingOnBaseBranch = ref.includes(baseBranch);
@@ -91,7 +93,7 @@ const run = async (): Promise<void> => {
   if (!slackMessageId) {
     logger.info("No Slack thread found, skipping event");
     core.warning(
-      "No Slack message found. The initial notification may not have been sent yet."
+      "No Slack message found. The initial notification may not have been sent yet.",
     );
     return;
   }
