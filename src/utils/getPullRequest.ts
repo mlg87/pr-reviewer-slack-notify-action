@@ -37,7 +37,7 @@ export const getPullRequest = async () => {
 
     const commit_sha = commits[0].id;
     const res = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
-      owner: repository.owner.name!,
+      owner: repository.owner.login,
       repo: repository.name,
       commit_sha,
     });
