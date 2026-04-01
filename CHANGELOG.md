@@ -1,3 +1,46 @@
+## [10.3.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.2.0...v10.3.0) (2026-04-01)
+
+
+### Bug Fixes
+
+* **config:** resolve eslint/prettier rule conflicts and lint script ([6d42d4d](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/6d42d4d6cfa997e2fedfaf9af85a2d3e4d356f6c))
+* **api:** use repository.owner.login instead of owner.name ([eb92f50](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/eb92f509e29767369e0a39b47053374cf93fc2ea)), closes [#93](https://github.com/mlg87/pr-reviewer-slack-notify-action/issues/93)
+
+
+### Build System
+
+* **config:** migrate eslint to flat config and fix tsconfig excludes ([f6dd8d7](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/f6dd8d7c14bf3dbaffd7dfc7a5b5c12705087546))
+* **deps:** migrate test framework from jest to vitest ([4aedd04](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/4aedd049b66e6bf9660230c349088038dd14cce7))
+* **dist:** rebuild bundled action ([873d6d4](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/873d6d42e6de03f94c18f65403387e51e69c6bf4))
+* **dist:** rebuild bundled action ([babb0b7](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/babb0b75bf3b824f46da97e9c14c4c4de978ac1f))
+
+
+### CI
+
+* add PR checks for lint, typecheck, tests, and commitlint ([5de84c1](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/5de84c157d09b32cdff587a716ab552de6b5aa3a))
+
+
+### Features
+
+* **slack:** include full review comments and diff links in notifications ([925b705](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/925b705ceb0c2f00fcf26a541a435b1126bacc1e))
+
+
+### Refactors
+
+* **utils:** fix lint errors and refactor S3 async executor ([869d933](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/869d9339c3d1e0212455ad5e3b8820c2b8ec5291))
+
+
+### Styling
+
+* **actions:** auto-fix import ordering and formatting ([65f4e3b](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/65f4e3b2973f92d542c9db3d385bf739c6333fd7))
+
+
+### Tests
+
+* add comprehensive unit tests and fix S3 test for refactor ([9e853c8](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/9e853c8575ba4a0cbe9cde536676ca3dd9cb19df))
+* add comprehensive unit tests for all modules ([4521627](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/45216273824aec59d91589f5cdb37cf573a2ca3d))
+* **utils:** migrate getRequestedReviewersAsIndividuals test to vitest ([f83a46c](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/f83a46c50106920687085123088a9b930d285b28))
+
 ## [10.2.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.1.0...v10.2.0) (2026-04-01)
 
 
