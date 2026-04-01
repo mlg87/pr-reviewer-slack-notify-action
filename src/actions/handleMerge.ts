@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+
 import { clearReactions } from "../utils/clearReactions";
 import { fail } from "../utils/fail";
 import { getPullRequest } from "../utils/getPullRequest";
@@ -13,7 +14,7 @@ export const handleMerge = async (): Promise<void> => {
   logger.info("Handling PR merge event");
   try {
     const channelId = core.getInput("channel-id");
-    const { commits, repository } = github.context.payload;
+    const { commits } = github.context.payload;
     const commitSha = commits[0].id;
 
     const pull_request = await getPullRequest();
@@ -31,7 +32,7 @@ export const handleMerge = async (): Promise<void> => {
     if (!slackMessageId) {
       logger.info("No Slack thread found, skipping merge notification");
       core.warning(
-        "Unable to post merge notification because no Slack message ID could be found."
+        "Unable to post merge notification because no Slack message ID could be found.",
       );
       return;
     }

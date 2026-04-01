@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+
 import { clearReactions } from "../utils/clearReactions";
 import { createUsersToAtString } from "../utils/createUsersToAtString";
 import { fail } from "../utils/fail";
@@ -18,13 +19,15 @@ export const handleCommitPush = async (): Promise<void> => {
 
     if (!repository) {
       throw Error(
-        "No repository found in github.context.payload in handleCommitPush"
+        "No repository found in github.context.payload in handleCommitPush",
       );
     }
 
     const pull_request = await getPullRequest();
     if (!pull_request || pull_request.state === "closed") {
-      logger.info("PR is closed or not found, skipping commit push notification");
+      logger.info(
+        "PR is closed or not found, skipping commit push notification",
+      );
       return;
     }
 
@@ -33,7 +36,7 @@ export const handleCommitPush = async (): Promise<void> => {
     if (!slackMessageId) {
       logger.info("No Slack thread found, skipping commit push notification");
       core.warning(
-        "Unable to post commit push notification because no Slack message ID could be found."
+        "Unable to post commit push notification because no Slack message ID could be found.",
       );
       return;
     }
@@ -59,12 +62,10 @@ export const handleCommitPush = async (): Promise<void> => {
     if (res.data) {
       const previousReviewers = res.data.map((review) => review!.user!.login);
       const distinctPreviousReviewers = [...new Set(previousReviewers)];
-      const diffLink = compare
-        ? ` <${compare}|View the changes>.`
-        : "";
+      const diffLink = compare ? ` <${compare}|View the changes>.` : "";
       const baseMessage = `new code has been committed since your review of <${pull_request._links.html.href}|*PR ${pull_request.number}*>, please review the updates.${diffLink}`;
       const usersToAtString = await createUsersToAtString(
-        distinctPreviousReviewers
+        distinctPreviousReviewers,
       );
       const text = `${usersToAtString} ${baseMessage}`;
       const threadUpdateRes = await slackWebClient.chat.postMessage({
@@ -87,7 +88,9 @@ export const handleCommitPush = async (): Promise<void> => {
       }
     }
 
-    logger.info(`Commit push notification posted to Slack thread for PR #${pull_request.number}`);
+    logger.info(
+      `Commit push notification posted to Slack thread for PR #${pull_request.number}`,
+    );
     return;
   } catch (error) {
     fail(error);
