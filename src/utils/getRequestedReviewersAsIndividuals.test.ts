@@ -1,33 +1,31 @@
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import { getRequestedReviewersAsIndividuals } from "./getRequestedReviewersAsIndividuals";
 import { getPullRequest } from "./getPullRequest";
 
-// Mock the dependencies
-jest.mock("@actions/core");
-jest.mock("@actions/github");
-jest.mock("./getPullRequest");
-jest.mock("./fail");
-jest.mock("./logger");
+vi.mock("@actions/core");
+vi.mock("@actions/github");
+vi.mock("./getPullRequest");
+vi.mock("./fail");
+vi.mock("./logger");
 
-const mockCore = core as jest.Mocked<typeof core>;
-const mockGithub = github as jest.Mocked<typeof github>;
-const mockGetPullRequest = getPullRequest as jest.MockedFunction<
-  typeof getPullRequest
->;
+const mockCore = vi.mocked(core);
+const mockGithub = vi.mocked(github);
+const mockGetPullRequest = vi.mocked(getPullRequest);
 
 // Mock octokit
 const mockOctokit = {
   rest: {
     teams: {
-      listMembersInOrg: jest.fn(),
+      listMembersInOrg: vi.fn(),
     },
   },
 };
 
 describe("getRequestedReviewersAsIndividuals", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockCore.getInput.mockReturnValue("fake-token");
     mockGithub.getOctokit.mockReturnValue(mockOctokit as any);
     Object.defineProperty(mockGithub, "context", {
