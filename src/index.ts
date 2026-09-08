@@ -121,7 +121,9 @@ const run = async (): Promise<void> => {
     return;
   }
 
-  logger.info(`Unhandled event: ${eventName} / ${payload.action}`);
+  core.warning(
+    `Unhandled event: ${eventName} / ${payload.action}. This trigger produces no side effects; remove it from your workflow to save CI time.`,
+  );
 };
 
 run();
