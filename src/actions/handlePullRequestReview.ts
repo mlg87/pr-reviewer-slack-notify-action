@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 
 import { fail } from "../utils/fail";
+import { formatQuote } from "../utils/formatQuote";
 import { getEngineersFromS3 } from "../utils/getEngineersFromS3";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
 import { logger } from "../utils/logger";
@@ -84,7 +85,7 @@ export const handlePullRequestReview = async (): Promise<void> => {
         actionText = "would like you to change some things in the code";
         reactionToAdd = reactionMap["changes_requested"];
         if (review.body) {
-          actionText = `${actionText}\n>${review.body}`;
+          actionText = `${actionText}\n${formatQuote(review.body)}`;
         }
         break;
       case "commented": {
@@ -116,7 +117,7 @@ export const handlePullRequestReview = async (): Promise<void> => {
           commentCount === 1 ? "a comment" : `${commentCount} comments`;
         actionText = `added ${commentLabel}:`;
         for (const { body, url } of allComments) {
-          actionText = `${actionText}\n><${url}|:link:> ${body}`;
+          actionText = `${actionText}\n${formatQuote(`<${url}|:link:> ${body}`)}`;
         }
         break;
       }
@@ -124,7 +125,7 @@ export const handlePullRequestReview = async (): Promise<void> => {
         actionText = "approved your PR";
         reactionToAdd = reactionMap["approved"];
         if (review.body) {
-          actionText = `${actionText}\n>${review.body}`;
+          actionText = `${actionText}\n${formatQuote(review.body)}`;
         }
         break;
     }

@@ -3,6 +3,7 @@ import * as github from "@actions/github";
 
 import { createUsersToAtString } from "../utils/createUsersToAtString";
 import { fail } from "../utils/fail";
+import { formatQuote } from "../utils/formatQuote";
 import { getPullRequest } from "../utils/getPullRequest";
 import { getRequestedReviewersAsIndividuals } from "../utils/getRequestedReviewersAsIndividuals";
 import { logger } from "../utils/logger";
@@ -36,7 +37,7 @@ export const createInitialMessage = async (): Promise<string | void> => {
 
     let baseMessage = `*${pull_request.user?.login}* is requesting your review on <${pull_request._links.html.href}|*${pull_request.title}*>`;
     if (!!pull_request.body && verbose) {
-      baseMessage = `${baseMessage}\n>${pull_request.body}`;
+      baseMessage = `${baseMessage}\n${formatQuote(pull_request.body)}`;
     }
 
     const usersToAtString = await createUsersToAtString(requestedReviewers);
