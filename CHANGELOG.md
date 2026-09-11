@@ -1,3 +1,10 @@
+## [10.4.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.3.1...v10.4.0) (2026-09-11)
+
+
+### Build System
+
+* **deps:** refresh lockfile for open security alerts ([dcfac5b](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/dcfac5b9fee671b02ed80d0e22d053bc42f85541)), closes [#90](https://github.com/mlg87/pr-reviewer-slack-notify-action/issues/90) [#91](https://github.com/mlg87/pr-reviewer-slack-notify-action/issues/91) [#92](https://github.com/mlg87/pr-reviewer-slack-notify-action/issues/92) [#95](https://github.com/mlg87/pr-reviewer-slack-notify-action/issues/95) [#98](https://github.com/mlg87/pr-reviewer-slack-notify-action/issues/98) [#103](https://github.com/mlg87/pr-reviewer-slack-notify-action/issues/103) [#104](https://github.com/mlg87/pr-reviewer-slack-notify-action/issues/104) [#105](https://github.com/mlg87/pr-reviewer-slack-notify-action/issues/105) [#106](https://github.com/mlg87/pr-reviewer-slack-notify-action/issues/106)
+
 ## [10.3.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.3.0...v10.3.1) (2026-09-11)
 
 
