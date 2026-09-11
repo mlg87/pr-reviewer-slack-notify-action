@@ -172,6 +172,27 @@ describe("handlePullRequestReview", () => {
     expect(callArgs.text).toContain(":link:");
   });
 
+  it("blockquotes every line of a multi-line inline comment body", async () => {
+    mockGithub.context.payload.review.state = "commented";
+    mockGithub.context.payload.review.body = "";
+    mockListCommentsForReview.mockResolvedValue({
+      data: [
+        {
+          body: "line one\nline two",
+          html_url: "https://github.com/comment/1",
+        },
+      ],
+    });
+
+    await handlePullRequestReview();
+
+    const callArgs = mockPostMessage.mock.calls[0][0] as any;
+    expect(callArgs.text).toContain(
+      "><https://github.com/comment/1|:link:> line one",
+    );
+    expect(callArgs.text).toContain(">line two");
+  });
+
   it("skips non-submitted actions", async () => {
     mockGithub.context.payload.action = "dismissed";
 

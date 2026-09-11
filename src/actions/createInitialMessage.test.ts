@@ -181,6 +181,20 @@ describe("createInitialMessage", () => {
     expect(callArgs.text).not.toContain(basePullRequest.body);
   });
 
+  it("truncates and blockquotes a PR body longer than 3000 characters", async () => {
+    mockCore.getBooleanInput.mockReturnValue(true);
+    mockGetPullRequest.mockResolvedValue({
+      ...basePullRequest,
+      body: "a".repeat(3001),
+    } as any);
+
+    await createInitialMessage();
+
+    const callArgs = mockPostMessage.mock.calls[0][0] as any;
+    expect(callArgs.text).not.toContain("a".repeat(3001));
+    expect(callArgs.text).toContain("…");
+  });
+
   it("throws when Slack postMessage fails", async () => {
     mockPostMessage.mockResolvedValue({ ok: false } as any);
 
