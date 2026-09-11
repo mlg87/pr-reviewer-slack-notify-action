@@ -1,3 +1,11 @@
+## [10.3.1](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.3.0...v10.3.1) (2026-09-11)
+
+
+### Bug Fixes
+
+* **slack:** truncate and blockquote PR and review bodies ([71301f7](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/71301f76a73a3853bd9c15cb1901168b810e129a)), closes [#36](https://github.com/mlg87/pr-reviewer-slack-notify-action/issues/36) [#5](https://github.com/mlg87/pr-reviewer-slack-notify-action/issues/5)
+* **index:** warn on unhandled workflow events ([4d17e07](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/4d17e07dba1bb1161d1ad66ed1b17fb87d907967)), closes [#99](https://github.com/mlg87/pr-reviewer-slack-notify-action/issues/99)
+
 ## [10.3.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.2.0...v10.3.0) (2026-04-01)
 
 
