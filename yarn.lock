@@ -600,13 +600,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@conventional-changelog/template@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "@conventional-changelog/template@npm:1.4.0"
-  checksum: 10c0/052ac38b43f67b2572d101ced1dee2691a2ac3828cbc1041738cf1646b956ff0fb3e87258ec59f46eb2c3fcc9a68bb89f90b8dcb1e354880f2c71d8f5ef3a021
-  languageName: node
-  linkType: hard
-
 "@dabh/diagnostics@npm:^2.0.2":
   version: 2.0.3
   resolution: "@dabh/diagnostics@npm:2.0.3"
@@ -2950,12 +2943,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"conventional-changelog-conventionalcommits@npm:10.4.0":
-  version: 10.4.0
-  resolution: "conventional-changelog-conventionalcommits@npm:10.4.0"
+"conventional-changelog-conventionalcommits@npm:9.3.1":
+  version: 9.3.1
+  resolution: "conventional-changelog-conventionalcommits@npm:9.3.1"
   dependencies:
-    "@conventional-changelog/template": "npm:^1.4.0"
-  checksum: 10c0/60d99d74e6fdba134fc4785c13f87df82b9cabd980b4390dc958a8abf75d6fe1fdad921f52fb75e02f01a376cfd194b9f506f1e7718041e522b5260b53273882
+    compare-func: "npm:^2.0.0"
+  checksum: 10c0/e3d0dfe5680899da3660a7fbc859de1a92dd9358dc497624c3582596173713a80dcc8236d844116a3ba8403350e244c007c0c7fa5796631aea19e464cc6c2f44
   languageName: node
   linkType: hard
 
@@ -7297,7 +7290,7 @@ __metadata:
     "@types/node": "npm:^22.9.0"
     "@vercel/ncc": "npm:^0.38.4"
     commitizen: "npm:^4.3.2"
-    conventional-changelog-conventionalcommits: "npm:10.4.0"
+    conventional-changelog-conventionalcommits: "npm:9.3.1"
     date-fns: "npm:^3.6.0"
     eslint: "npm:^9.2.0"
     eslint-config-prettier: "npm:^9.1.0"
