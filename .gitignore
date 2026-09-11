@@ -99,3 +99,5 @@ __tests__/runner/*
 lib/**/*
 
 delete.json
+
+.yarn/install-state.gz
