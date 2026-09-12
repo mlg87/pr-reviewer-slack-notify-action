@@ -1,3 +1,13 @@
+## [10.5.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.4.0...v10.5.0) (2026-09-12)
+
+### Bug Fixes
+
+* **release:** pin conventionalcommits preset below writer-9 requirement ([7ca5b19](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/7ca5b19be3f386c41cbcf6effb1f82356edb2c38))
+
+### Build System
+
+* **deps:** upgrade deps to clear all open dependabot alerts ([5c2ab98](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/5c2ab987aab9842ae15724c503db1176a165dbc4))
+
 ## [10.4.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.3.1...v10.4.0) (2026-09-11)
 
 
