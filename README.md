@@ -88,8 +88,47 @@ jobs:
 | `silence-on-quiet-label`         | Do not message if the PR has the `quiet` label                                                                                                                   | `false`  | `String` | `false` |
 | `fail-silently`                  | Allow action to fail silently to hide the red X of death                                                                                                         | `false`  | `String` | `false` |
 | `verbose`                        | Optional feature to shorten the slack message. Verbose: true will post the PR body. Verbose: false will not.                                                     | `false`  | `String` | `true`  |
+| `message-initial`                | Template for the message that opens the Slack thread. See [Customizing Slack copy](#customizing-slack-copy).                                                     | `false`  | `String` | built-in copy |
+| `message-review-approved`        | Template for the thread reply when a review approves the PR.                                                                                                     | `false`  | `String` | built-in copy |
+| `message-review-changes-requested` | Template for the thread reply when a review requests changes.                                                                                                  | `false`  | `String` | built-in copy |
+| `message-review-commented`       | Template for the thread reply when a review leaves exactly one comment.                                                                                          | `false`  | `String` | built-in copy |
+| `message-review-commented-plural` | Template for the thread reply when a review leaves any other number of comments.                                                                                | `false`  | `String` | built-in copy |
+| `message-review-comment-line`    | Template for each quoted comment under a commented review.                                                                                                       | `false`  | `String` | built-in copy |
+| `message-new-commits`            | Template for the thread reply when new commits are pushed.                                                                                                       | `false`  | `String` | built-in copy |
+| `message-new-commits-diff-link`  | Template appended (after a space) to `message-new-commits` when the push has a compare URL.                                                                      | `false`  | `String` | built-in copy |
+| `message-label-added`            | Template for the thread reply when `label-name-to-watch-for` is applied.                                                                                         | `false`  | `String` | built-in copy |
+| `message-merged`                 | Template for the thread reply when the PR is merged.                                                                                                             | `false`  | `String` | built-in copy |
+| `reaction-review-approved`       | Slack emoji name (with or without colons) added to the thread when a review approves.                                                                           | `false`  | `String` | `white_check_mark` |
+| `reaction-review-changes-requested` | Slack emoji name added to the thread when a review requests changes.                                                                                          | `false`  | `String` | `octagonal_sign` |
+| `reaction-review-commented`      | Slack emoji name added to the thread when a review comments.                                                                                                     | `false`  | `String` | `speech_balloon` |
+| `reaction-label-added`           | Slack emoji name added to the thread when `label-name-to-watch-for` is applied.                                                                                  | `false`  | `String` | `heart_eyes` |
+| `reaction-merged`                | Slack emoji name added to the thread when the PR is merged.                                                                                                      | `false`  | `String` | `ship-it` |
 
 ##### NOTE: It is recommended to store sensitive values (bot-token, AWS credentials) in GitHub Secrets
+
+## Customizing Slack copy
+
+Every Slack message and thread reaction can be overridden with the `message-*` and `reaction-*` inputs above. Leaving an input unset or empty keeps the built-in copy or emoji.
+
+Message inputs are whole-line templates using Slack `mrkdwn`, with `{{placeholder}}` substitution. An unknown placeholder is left as-is and logged as a workflow warning. Review bodies, PR bodies (when `verbose` is true) and comment quotes are still appended by the action below your template.
+
+| Input                                                                  | Placeholders                                                                                    |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `message-initial`, `message-new-commits`                               | `reviewer_mentions`, `author`, `pr_url`, `pr_title`, `pr_number`                                |
+| `message-new-commits-diff-link`                                        | those of `message-new-commits`, plus `compare_url`                                              |
+| `message-review-approved`, `message-review-changes-requested`          | `author_mention`, `reviewer`, `author`, `pr_url`, `pr_title`, `pr_number`                       |
+| `message-review-commented`, `message-review-commented-plural`          | those of `message-review-approved`, plus `comment_count`                                        |
+| `message-review-comment-line`                                          | those of `message-review-approved`, plus `comment_url`, `comment_body`                          |
+| `message-label-added`                                                  | `author_mention`, `labeler`, `label`, `author`, `pr_url`, `pr_title`, `pr_number`               |
+| `message-merged`                                                       | `author`, `pr_url`, `pr_title`, `pr_number`                                                     |
+
+```yml
+with:
+  # ... required inputs ...
+  message-merged: "Shipped <{{pr_url}}|#{{pr_number}} {{pr_title}}> :tada:"
+  message-review-approved: "{{author_mention}}, *{{reviewer}}* gave it the thumbs up"
+  reaction-merged: "rocket"
+```
 
 ## How it Works (v10.0.0+)
 
