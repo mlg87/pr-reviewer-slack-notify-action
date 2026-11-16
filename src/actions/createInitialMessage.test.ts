@@ -41,7 +41,7 @@ const basePullRequest = {
   title: "Add new feature",
   body: "This is the PR description",
   user: { login: "author" },
-  _links: { html: { href: "https://github.com/org/repo/pull/42" } },
+  html_url: "https://github.com/org/repo/pull/42",
 };
 
 describe("createInitialMessage", () => {
@@ -170,6 +170,7 @@ describe("createInitialMessage", () => {
 
     const callArgs = mockPostMessage.mock.calls[0][0] as any;
     expect(callArgs.text).toContain(basePullRequest.body);
+    expect(callArgs.text).not.toContain("{{");
   });
 
   it("does not include PR body when verbose is false", async () => {
@@ -179,6 +180,24 @@ describe("createInitialMessage", () => {
 
     const callArgs = mockPostMessage.mock.calls[0][0] as any;
     expect(callArgs.text).not.toContain(basePullRequest.body);
+  });
+
+  it("renders overridden initial message copy", async () => {
+    const inputs: Record<string, string> = {
+      "channel-id": "C123456",
+      "github-token": "gh-token",
+      "message-initial":
+        "{{reviewer_mentions}}: {{author}} opened <{{pr_url}}|#{{pr_number}} {{pr_title}}>",
+    };
+    mockCore.getInput.mockImplementation((name: string) => inputs[name] ?? "");
+    mockCore.getBooleanInput.mockReturnValue(true);
+
+    await createInitialMessage();
+
+    const callArgs = mockPostMessage.mock.calls[0][0] as any;
+    expect(callArgs.text).toBe(
+      "<@U111> <@U222>: author opened <https://github.com/org/repo/pull/42|#42 Add new feature>\n>This is the PR description",
+    );
   });
 
   it("truncates and blockquotes a PR body longer than 3000 characters", async () => {

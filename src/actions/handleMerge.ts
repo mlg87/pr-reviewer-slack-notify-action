@@ -6,6 +6,11 @@ import { fail } from "../utils/fail";
 import { getPullRequest } from "../utils/getPullRequest";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
 import { logger } from "../utils/logger";
+import {
+  getReaction,
+  pullRequestPlaceholders,
+  renderMessage,
+} from "../utils/slackCopy";
 import { slackWebClient } from "../utils/slackWebClient";
 
 // will only run on push to base branch (i.e. staging), so we can assume that a closed state for PR
@@ -50,11 +55,13 @@ export const handleMerge = async (): Promise<void> => {
     await slackWebClient.reactions.add({
       channel: channelId,
       timestamp: slackMessageId,
-      name: "ship-it",
+      name: getReaction("reaction-merged"),
     });
 
-    const text =
-      "This PR has been merged. One-way ticket to Prod purchased. See you in Valhalla.";
+    const text = renderMessage(
+      "message-merged",
+      pullRequestPlaceholders(pull_request),
+    );
     await slackWebClient.chat.postMessage({
       channel: channelId,
       thread_ts: slackMessageId,

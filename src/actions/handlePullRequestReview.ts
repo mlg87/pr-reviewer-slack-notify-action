@@ -6,13 +6,12 @@ import { formatQuote } from "../utils/formatQuote";
 import { getEngineersFromS3 } from "../utils/getEngineersFromS3";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
 import { logger } from "../utils/logger";
+import {
+  getReaction,
+  pullRequestPlaceholders,
+  renderMessage,
+} from "../utils/slackCopy";
 import { slackWebClient } from "../utils/slackWebClient";
-
-const reactionMap = {
-  commented: "speech_balloon",
-  approved: "white_check_mark",
-  changes_requested: "octagonal_sign",
-};
 
 export const handlePullRequestReview = async (): Promise<void> => {
   logger.info("Handling pull request review event");
@@ -77,19 +76,23 @@ export const handlePullRequestReview = async (): Promise<void> => {
     // ─── BUILD MESSAGE ───────────────────────────────────────────────
     //
 
-    const userText = `<@${author.slack_id}>, *${reviewer.github_username}*`;
-    let actionText: string = "";
+    const placeholders = {
+      ...pullRequestPlaceholders(pull_request),
+      author_mention: `<@${author.slack_id}>`,
+      reviewer: reviewer.github_username,
+    };
+    let text: string = "";
     let reactionToAdd: string = "";
     switch (review.state) {
       case "changes_requested":
-        actionText = "would like you to change some things in the code";
-        reactionToAdd = reactionMap["changes_requested"];
+        text = renderMessage("message-review-changes-requested", placeholders);
+        reactionToAdd = getReaction("reaction-review-changes-requested");
         if (review.body) {
-          actionText = `${actionText}\n${formatQuote(review.body)}`;
+          text = `${text}\n${formatQuote(review.body)}`;
         }
         break;
       case "commented": {
-        reactionToAdd = reactionMap["commented"];
+        reactionToAdd = getReaction("reaction-review-commented");
 
         // fetch inline review comments from the API
         const ghToken = core.getInput("github-token");
@@ -113,23 +116,30 @@ export const handlePullRequestReview = async (): Promise<void> => {
         }
 
         const commentCount = allComments.length;
-        const commentLabel =
-          commentCount === 1 ? "a comment" : `${commentCount} comments`;
-        actionText = `added ${commentLabel}:`;
+        text = renderMessage(
+          commentCount === 1
+            ? "message-review-commented"
+            : "message-review-commented-plural",
+          { ...placeholders, comment_count: commentCount },
+        );
         for (const { body, url } of allComments) {
-          actionText = `${actionText}\n${formatQuote(`<${url}|:link:> ${body}`)}`;
+          const line = renderMessage("message-review-comment-line", {
+            ...placeholders,
+            comment_url: url,
+            comment_body: body,
+          });
+          text = `${text}\n${formatQuote(line)}`;
         }
         break;
       }
       case "approved":
-        actionText = "approved your PR";
-        reactionToAdd = reactionMap["approved"];
+        text = renderMessage("message-review-approved", placeholders);
+        reactionToAdd = getReaction("reaction-review-approved");
         if (review.body) {
-          actionText = `${actionText}\n${formatQuote(review.body)}`;
+          text = `${text}\n${formatQuote(review.body)}`;
         }
         break;
     }
-    const text = `${userText} ${actionText}`;
     // post corresponding message
     await slackWebClient.chat.postMessage({
       channel: channelId,

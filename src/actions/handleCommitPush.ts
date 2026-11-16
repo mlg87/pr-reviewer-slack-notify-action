@@ -7,6 +7,7 @@ import { fail } from "../utils/fail";
 import { getPullRequest } from "../utils/getPullRequest";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
 import { logger } from "../utils/logger";
+import { pullRequestPlaceholders, renderMessage } from "../utils/slackCopy";
 import { slackWebClient } from "../utils/slackWebClient";
 
 // NOTE in the future we may want to wait to notify everyone that they can review it again when the PR author
@@ -62,12 +63,21 @@ export const handleCommitPush = async (): Promise<void> => {
     if (res.data) {
       const previousReviewers = res.data.map((review) => review!.user!.login);
       const distinctPreviousReviewers = [...new Set(previousReviewers)];
-      const diffLink = compare ? ` <${compare}|View the changes>.` : "";
-      const baseMessage = `new code has been committed since your review of <${pull_request._links.html.href}|*PR ${pull_request.number}*>, please review the updates.${diffLink}`;
       const usersToAtString = await createUsersToAtString(
         distinctPreviousReviewers,
       );
-      const text = `${usersToAtString} ${baseMessage}`;
+      const placeholders = {
+        ...pullRequestPlaceholders(pull_request),
+        reviewer_mentions: usersToAtString,
+      };
+      let text = renderMessage("message-new-commits", placeholders);
+      if (compare) {
+        const diffLink = renderMessage("message-new-commits-diff-link", {
+          ...placeholders,
+          compare_url: compare,
+        });
+        text = `${text} ${diffLink}`;
+      }
       const threadUpdateRes = await slackWebClient.chat.postMessage({
         channel: channelId,
         thread_ts: slackMessageId,

@@ -48,6 +48,66 @@ inputs:
     description: "If verbose is set to true, the entire PR text is posted to Slack. If false, just the title is posted."
     required: false
     default: "true"
+  message-initial:
+    description: "Template for the message that opens the Slack thread. Placeholders: {{reviewer_mentions}}, {{author}}, {{pr_url}}, {{pr_title}}, {{pr_number}}. Empty uses the built-in copy."
+    required: false
+    default: ""
+  message-review-approved:
+    description: "Template for the thread reply when a review approves the PR. Placeholders: {{author_mention}}, {{reviewer}}, {{author}}, {{pr_url}}, {{pr_title}}, {{pr_number}}. Empty uses the built-in copy."
+    required: false
+    default: ""
+  message-review-changes-requested:
+    description: "Template for the thread reply when a review requests changes. Placeholders: same as message-review-approved. Empty uses the built-in copy."
+    required: false
+    default: ""
+  message-review-commented:
+    description: "Template for the thread reply when a review leaves exactly one comment. Placeholders: those of message-review-approved plus {{comment_count}}. Empty uses the built-in copy."
+    required: false
+    default: ""
+  message-review-commented-plural:
+    description: "Template for the thread reply when a review leaves any other number of comments. Placeholders: those of message-review-approved plus {{comment_count}}. Empty uses the built-in copy."
+    required: false
+    default: ""
+  message-review-comment-line:
+    description: "Template for each quoted comment under a commented review. Placeholders: {{comment_url}}, {{comment_body}}, plus those of message-review-approved. Empty uses the built-in copy."
+    required: false
+    default: ""
+  message-new-commits:
+    description: "Template for the thread reply when new commits are pushed. Placeholders: {{reviewer_mentions}}, {{author}}, {{pr_url}}, {{pr_title}}, {{pr_number}}. Empty uses the built-in copy."
+    required: false
+    default: ""
+  message-new-commits-diff-link:
+    description: "Template appended after a space to message-new-commits when the push has a compare URL. Placeholders: {{compare_url}}, plus those of message-new-commits. Empty uses the built-in copy."
+    required: false
+    default: ""
+  message-label-added:
+    description: "Template for the thread reply when label-name-to-watch-for is applied. Placeholders: {{author_mention}}, {{labeler}}, {{label}}, {{author}}, {{pr_url}}, {{pr_title}}, {{pr_number}}. Empty uses the built-in copy."
+    required: false
+    default: ""
+  message-merged:
+    description: "Template for the thread reply when the PR is merged. Placeholders: {{author}}, {{pr_url}}, {{pr_title}}, {{pr_number}}. Empty uses the built-in copy."
+    required: false
+    default: ""
+  reaction-review-approved:
+    description: "Slack emoji name, with or without colons, added to the thread when a review approves. Empty uses white_check_mark."
+    required: false
+    default: ""
+  reaction-review-changes-requested:
+    description: "Slack emoji name, with or without colons, added to the thread when a review requests changes. Empty uses octagonal_sign."
+    required: false
+    default: ""
+  reaction-review-commented:
+    description: "Slack emoji name, with or without colons, added to the thread when a review comments. Empty uses speech_balloon."
+    required: false
+    default: ""
+  reaction-label-added:
+    description: "Slack emoji name, with or without colons, added to the thread when label-name-to-watch-for is applied. Empty uses heart_eyes."
+    required: false
+    default: ""
+  reaction-merged:
+    description: "Slack emoji name, with or without colons, added to the thread when the PR is merged. Empty uses ship-it."
+    required: false
+    default: ""
 runs:
   using: "node24"
   main: "dist/index.js"

@@ -5,6 +5,11 @@ import { fail } from "../utils/fail";
 import { getEngineersFromS3 } from "../utils/getEngineersFromS3";
 import { getSlackMessageId } from "../utils/getSlackMessageId";
 import { logger } from "../utils/logger";
+import {
+  getReaction,
+  pullRequestPlaceholders,
+  renderMessage,
+} from "../utils/slackCopy";
 import { slackWebClient } from "../utils/slackWebClient";
 
 import { createInitialMessage } from "./createInitialMessage";
@@ -76,8 +81,12 @@ export const handleLabelChange = async (): Promise<void> => {
         return user.github_username === pull_request.user.login;
       });
 
-      const plainText = `<@${author.slack_id}>, ${labeler.github_username} added the label ${labelNameToWatchFor} to your PR`;
-      const richText = `<@${author.slack_id}>, *${labeler.github_username}* added the label *${labelNameToWatchFor}* to your PR`;
+      const text = renderMessage("message-label-added", {
+        ...pullRequestPlaceholders(pull_request),
+        author_mention: `<@${author.slack_id}>`,
+        labeler: labeler.github_username,
+        label: labelNameToWatchFor,
+      });
       const slackMessageId = await getSlackMessageId();
 
       if (!slackMessageId) {
@@ -96,13 +105,13 @@ export const handleLabelChange = async (): Promise<void> => {
       await slackWebClient.chat.postMessage({
         channel: channelId,
         thread_ts: slackMessageId,
-        text: plainText,
+        text,
         blocks: [
           {
             type: "section",
             text: {
               type: "mrkdwn",
-              text: richText,
+              text,
             },
           },
         ],
@@ -111,7 +120,7 @@ export const handleLabelChange = async (): Promise<void> => {
       await slackWebClient.reactions.add({
         channel: channelId,
         timestamp: slackMessageId,
-        name: "heart_eyes",
+        name: getReaction("reaction-label-added"),
       });
     }
 

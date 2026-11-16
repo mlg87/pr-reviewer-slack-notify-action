@@ -7,6 +7,7 @@ import { formatQuote } from "../utils/formatQuote";
 import { getPullRequest } from "../utils/getPullRequest";
 import { getRequestedReviewersAsIndividuals } from "../utils/getRequestedReviewersAsIndividuals";
 import { logger } from "../utils/logger";
+import { pullRequestPlaceholders, renderMessage } from "../utils/slackCopy";
 import { slackWebClient } from "../utils/slackWebClient";
 
 export const createInitialMessage = async (): Promise<string | void> => {
@@ -35,14 +36,15 @@ export const createInitialMessage = async (): Promise<string | void> => {
       return;
     }
 
-    let baseMessage = `*${pull_request.user?.login}* is requesting your review on <${pull_request._links.html.href}|*${pull_request.title}*>`;
-    if (!!pull_request.body && verbose) {
-      baseMessage = `${baseMessage}\n${formatQuote(pull_request.body)}`;
-    }
-
     const usersToAtString = await createUsersToAtString(requestedReviewers);
 
-    const text = `${usersToAtString} ${baseMessage}`;
+    let text = renderMessage("message-initial", {
+      ...pullRequestPlaceholders(pull_request),
+      reviewer_mentions: usersToAtString,
+    });
+    if (!!pull_request.body && verbose) {
+      text = `${text}\n${formatQuote(pull_request.body)}`;
+    }
     const prSlackMsg = await slackWebClient.chat.postMessage({
       channel: channelId,
       text,

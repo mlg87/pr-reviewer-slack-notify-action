@@ -132,6 +132,7 @@ describe("handleLabelChange", () => {
     expect(callArgs.text).toContain("<@U222>");
     expect(callArgs.text).toContain("labeler-user");
     expect(callArgs.text).toContain("approved");
+    expect(callArgs.text).not.toContain("{{");
   });
 
   it("adds heart_eyes reaction for watched label", async () => {
@@ -173,6 +174,52 @@ describe("handleLabelChange", () => {
         timestamp: "1234567890.123456",
         name: "heart_eyes",
       }),
+    );
+  });
+
+  it("renders overridden label copy into text and block, with overridden reaction", async () => {
+    const inputs: Record<string, string> = {
+      "channel-id": "C123456",
+      "label-for-initial-notification": "needs-review",
+      "label-name-to-watch-for": "approved",
+      "message-label-added":
+        "{{labeler}} tagged {{label}} for {{author_mention}}",
+      "reaction-label-added": "label",
+    };
+    mockCore.getInput.mockImplementation((name: string) => inputs[name] ?? "");
+
+    Object.defineProperty(mockGithub, "context", {
+      value: {
+        payload: {
+          ...basePayload,
+          label: { name: "approved" },
+          pull_request: {
+            ...basePayload.pull_request,
+            labels: [{ name: "approved" }],
+          },
+        },
+      },
+      writable: true,
+      configurable: true,
+    });
+
+    mockGetSlackMessageId.mockResolvedValue("1234567890.123456");
+    mockGetEngineersFromS3.mockResolvedValue({
+      engineers: [
+        { github_username: "labeler-user", slack_id: "U111" },
+        { github_username: "pr-author", slack_id: "U222" },
+      ],
+    } as any);
+
+    await handleLabelChange();
+
+    const callArgs = mockPostMessage.mock.calls[0][0] as any;
+    expect(callArgs.text).toBe("labeler-user tagged approved for <@U222>");
+    expect(callArgs.blocks[0].text.text).toBe(
+      "labeler-user tagged approved for <@U222>",
+    );
+    expect(mockReactionsAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "label" }),
     );
   });
 

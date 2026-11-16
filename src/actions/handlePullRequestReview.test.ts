@@ -59,7 +59,9 @@ const basePayload = {
 describe("handlePullRequestReview", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockCore.getInput.mockReturnValue("test-channel");
+    mockCore.getInput.mockImplementation((name: string) =>
+      name === "channel-id" ? "test-channel" : "",
+    );
     Object.defineProperty(mockGithub, "context", {
       value: { payload: JSON.parse(JSON.stringify(basePayload)) },
       writable: true,
@@ -82,6 +84,7 @@ describe("handlePullRequestReview", () => {
 
     const callArgs = mockPostMessage.mock.calls[0][0] as any;
     expect(callArgs.text).toContain("approved your PR");
+    expect(callArgs.text).not.toContain("{{");
     expect(callArgs.channel).toBe("test-channel");
     expect(callArgs.thread_ts).toBe("1234567890.123456");
     expect(mockReactionsAdd).toHaveBeenCalledWith(
@@ -98,6 +101,7 @@ describe("handlePullRequestReview", () => {
     const callArgs = mockPostMessage.mock.calls[0][0] as any;
     expect(callArgs.text).toContain("would like you to change some things");
     expect(callArgs.text).toContain("Please fix the tests");
+    expect(callArgs.text).not.toContain("{{");
     expect(mockReactionsAdd).toHaveBeenCalledWith(
       expect.objectContaining({ name: "octagonal_sign" }),
     );
@@ -136,6 +140,7 @@ describe("handlePullRequestReview", () => {
 
     const callArgs = mockPostMessage.mock.calls[0][0] as any;
     expect(callArgs.text).toContain("added a comment:");
+    expect(callArgs.text).not.toContain("{{");
   });
 
   it('uses plural "N comments" for multiple comments', async () => {
@@ -152,6 +157,7 @@ describe("handlePullRequestReview", () => {
 
     const callArgs = mockPostMessage.mock.calls[0][0] as any;
     expect(callArgs.text).toContain("added 3 comments:");
+    expect(callArgs.text).not.toContain("{{");
   });
 
   it("includes links to each comment", async () => {
@@ -191,6 +197,35 @@ describe("handlePullRequestReview", () => {
       "><https://github.com/comment/1|:link:> line one",
     );
     expect(callArgs.text).toContain(">line two");
+  });
+
+  it("renders overridden commented copy, comment lines, and reaction", async () => {
+    const inputs: Record<string, string> = {
+      "channel-id": "test-channel",
+      "message-review-commented-plural":
+        "{{author_mention}} got {{comment_count}} notes from {{reviewer}}",
+      "message-review-comment-line": "{{comment_body}} ({{comment_url}})",
+      "reaction-review-commented": "eyes",
+    };
+    mockCore.getInput.mockImplementation((name: string) => inputs[name] ?? "");
+    mockGithub.context.payload.review.state = "commented";
+    mockGithub.context.payload.review.body = "";
+    mockListCommentsForReview.mockResolvedValue({
+      data: [
+        { body: "Comment A", html_url: "https://github.com/comment/a" },
+        { body: "Comment B", html_url: "https://github.com/comment/b" },
+      ],
+    });
+
+    await handlePullRequestReview();
+
+    const callArgs = mockPostMessage.mock.calls[0][0] as any;
+    expect(callArgs.text).toBe(
+      "<@UAUTH1> got 2 notes from reviewer1\n>Comment A (https://github.com/comment/a)\n>Comment B (https://github.com/comment/b)",
+    );
+    expect(mockReactionsAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "eyes" }),
+    );
   });
 
   it("skips non-submitted actions", async () => {
