@@ -46,7 +46,9 @@ const basePayload = {
 describe("handleMerge", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockCore.getInput.mockReturnValue("test-channel");
+    mockCore.getInput.mockImplementation((name: string) =>
+      name === "channel-id" ? "test-channel" : "",
+    );
     Object.defineProperty(mockGithub, "context", {
       value: { payload: { ...basePayload } },
       writable: true,
@@ -118,5 +120,31 @@ describe("handleMerge", () => {
     );
     expect(callArgs.thread_ts).toBe("1234567890.123456");
     expect(callArgs.channel).toBe("test-channel");
+  });
+
+  it("renders overridden merge copy and reaction", async () => {
+    const inputs: Record<string, string> = {
+      "channel-id": "test-channel",
+      "message-merged":
+        "Shipped <{{pr_url}}|#{{pr_number}} {{pr_title}}> by {{author}}",
+      "reaction-merged": ":rocket:",
+    };
+    mockCore.getInput.mockImplementation((name: string) => inputs[name] ?? "");
+    mockGetPullRequest.mockResolvedValue({
+      ...basePullRequest,
+      title: "Add feature",
+      html_url: "https://github.com/org/repo/pull/42",
+      user: { login: "author1" },
+    } as any);
+
+    await handleMerge();
+
+    const callArgs = mockPostMessage.mock.calls[0][0] as any;
+    expect(callArgs.text).toBe(
+      "Shipped <https://github.com/org/repo/pull/42|#42 Add feature> by author1",
+    );
+    expect(mockReactionsAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "rocket" }),
+    );
   });
 });

@@ -37,7 +37,7 @@ const mockListReviews = vi.fn();
 const basePullRequest = {
   number: 42,
   state: "open",
-  _links: { html: { href: "https://github.com/org/repo/pull/42" } },
+  html_url: "https://github.com/org/repo/pull/42",
 };
 
 const basePayload = {
@@ -48,7 +48,9 @@ const basePayload = {
 describe("handleCommitPush", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockCore.getInput.mockReturnValue("test-channel");
+    mockCore.getInput.mockImplementation((name: string) =>
+      name === "channel-id" ? "test-channel" : "",
+    );
     Object.defineProperty(mockGithub, "context", {
       value: { payload: { ...basePayload } },
       writable: true,
@@ -155,6 +157,7 @@ describe("handleCommitPush", () => {
     const callArgs = mockPostMessage.mock.calls[0][0] as any;
     expect(callArgs.text).toContain(basePayload.compare);
     expect(callArgs.text).toContain("View the changes");
+    expect(callArgs.text).not.toContain("{{");
   });
 
   it("omits compare link when compare is undefined", async () => {
@@ -172,6 +175,23 @@ describe("handleCommitPush", () => {
 
     const callArgs = mockPostMessage.mock.calls[0][0] as any;
     expect(callArgs.text).not.toContain("View the changes");
+  });
+
+  it("renders overridden new-commits copy and diff link", async () => {
+    const inputs: Record<string, string> = {
+      "channel-id": "test-channel",
+      "message-new-commits":
+        "{{reviewer_mentions}} re-review <{{pr_url}}|#{{pr_number}}>",
+      "message-new-commits-diff-link": "<{{compare_url}}|diff>",
+    };
+    mockCore.getInput.mockImplementation((name: string) => inputs[name] ?? "");
+
+    await handleCommitPush();
+
+    const callArgs = mockPostMessage.mock.calls[0][0] as any;
+    expect(callArgs.text).toBe(
+      "<@U123> re-review <https://github.com/org/repo/pull/42|#42> <https://github.com/org/repo/compare/abc123...def456|diff>",
+    );
   });
 
   it("throws when postMessage fails", async () => {
