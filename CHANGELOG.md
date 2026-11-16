@@ -1,3 +1,9 @@
+## [10.6.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.5.0...v10.6.0) (2026-11-16)
+
+### Build System
+
+* **deps:** bump undici from 6.28.1 to 6.29.1 ([76f69ee](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/76f69ee81fee0485af0bdbcf74a41b746775d7e7))
+
 ## [10.5.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.4.0...v10.5.0) (2026-09-12)
 
 ### Bug Fixes
