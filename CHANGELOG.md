@@ -1,3 +1,13 @@
+## [10.7.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.6.0...v10.7.0) (2026-11-16)
+
+### Documentation
+
+* **readme:** document message and reaction override inputs ([d77af3e](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/d77af3e274332afad4ef56250388a6eed5ffca6a))
+
+### Features
+
+* **slack:** allow overriding thread copy and reaction emoji ([b29333c](https://github.com/mlg87/pr-reviewer-slack-notify-action/commit/b29333c2fd420ba0208c59756f454a9bcc08a578))
+
 ## [10.6.0](https://github.com/mlg87/pr-reviewer-slack-notify-action/compare/v10.5.0...v10.6.0) (2026-11-16)
 
 ### Build System
